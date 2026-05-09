@@ -1,0 +1,2992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Diana's Swiss Army Knife for Numerology</title>
+<style>
+:root {
+  --primary: #8B5CF6;
+  --primary-dark: #6D28D9;
+  --primary-light: #A78BFA;
+  --accent: #F59E0B;
+  --accent-light: #FCD34D;
+  --bg-dark: #0a0a1a;
+  --bg-card: rgba(139,92,246,0.08);
+  --bg-card-hover: rgba(139,92,246,0.15);
+  --text: #E2E8F0;
+  --text-muted: #94A3B8;
+  --border: rgba(139,92,246,0.2);
+  --success: #10B981;
+  --warning: #F59E0B;
+  --danger: #EF4444;
+  --glass: rgba(15,15,35,0.7);
+  --glass-border: rgba(139,92,246,0.15);
+  --shadow: 0 8px 32px rgba(139,92,246,0.15);
+  --font-main: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --radius: 16px;
+  --radius-sm: 8px;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.theme-swiss {
+  --primary: #FF4136;
+  --primary-dark: #D32F2F;
+  --primary-light: #FF7961;
+  --accent: #FFFFFF;
+  --bg-dark: #0D1B2A;
+  --bg-card: rgba(255,65,54,0.08);
+  --bg-card-hover: rgba(255,65,54,0.15);
+  --border: rgba(255,65,54,0.2);
+  --glass-border: rgba(255,65,54,0.15);
+  --shadow: 0 8px 32px rgba(255,65,54,0.15);
+}
+
+.theme-ukraine {
+  --primary: #0057B7;
+  --primary-dark: #003D80;
+  --primary-light: #3388DD;
+  --accent: #FFDD00;
+  --accent-light: #FFEE66;
+  --bg-dark: #0A1628;
+  --bg-card: rgba(0,87,183,0.08);
+  --bg-card-hover: rgba(0,87,183,0.15);
+  --border: rgba(0,87,183,0.2);
+  --glass-border: rgba(0,87,183,0.15);
+  --shadow: 0 8px 32px rgba(0,87,183,0.15);
+}
+
+.theme-ocean {
+  --primary: #06B6D4;
+  --primary-dark: #0891B2;
+  --primary-light: #22D3EE;
+  --accent: #22D3EE;
+  --bg-dark: #0C1220;
+  --bg-card: rgba(6,182,212,0.08);
+  --bg-card-hover: rgba(6,182,212,0.15);
+  --border: rgba(6,182,212,0.2);
+  --glass-border: rgba(6,182,212,0.15);
+  --shadow: 0 8px 32px rgba(6,182,212,0.15);
+}
+
+.theme-rose {
+  --primary: #EC4899;
+  --primary-dark: #DB2777;
+  --primary-light: #F472B6;
+  --accent: #F472B6;
+  --bg-dark: #1A0A1E;
+  --bg-card: rgba(236,72,153,0.08);
+  --bg-card-hover: rgba(236,72,153,0.15);
+  --border: rgba(236,72,153,0.2);
+  --glass-border: rgba(236,72,153,0.15);
+  --shadow: 0 8px 32px rgba(236,72,153,0.15);
+}
+
+.theme-forest {
+  --primary: #10B981;
+  --primary-dark: #059669;
+  --primary-light: #34D399;
+  --accent: #34D399;
+  --bg-dark: #0A1A14;
+  --bg-card: rgba(16,185,129,0.08);
+  --bg-card-hover: rgba(16,185,129,0.15);
+  --border: rgba(16,185,129,0.2);
+  --glass-border: rgba(16,185,129,0.15);
+  --shadow: 0 8px 32px rgba(16,185,129,0.15);
+}
+
+.font-classic { --font-main: 'Georgia', 'Times New Roman', serif; }
+.font-modern { --font-main: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+.font-rounded { --font-main: 'Nunito', 'Rounded Mplus 1c', sans-serif; }
+.font-mono { --font-main: 'JetBrains Mono', 'Fira Code', monospace; }
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: var(--font-main);
+  background: var(--bg-dark);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: var(--transition);
+}
+
+/* Starry Sky Background */
+#starfield {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.star {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  animation: twinkle var(--duration) ease-in-out infinite;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: var(--min-opacity); transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.3); }
+}
+
+.meteor {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 0 6px 2px rgba(139,92,246,0.6),
+              0 0 12px 4px rgba(139,92,246,0.3);
+  animation: meteorFall linear forwards;
+}
+
+.meteor::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 80px;
+  height: 2px;
+  background: linear-gradient(to left, rgba(139,92,246,0.8), transparent);
+  transform-origin: right center;
+}
+
+@keyframes meteorFall {
+  0% { transform: translate(0,0) rotate(-45deg); opacity: 1; }
+  100% { transform: translate(-300px, 300px) rotate(-45deg); opacity: 0; }
+}
+
+.nebula {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.15;
+  pointer-events: none;
+  animation: nebulaDrift 30s ease-in-out infinite;
+}
+
+@keyframes nebulaDrift {
+  0%, 100% { transform: translate(0,0) scale(1); }
+  50% { transform: translate(30px, -20px) scale(1.1); }
+}
+
+/* Top Global Bar */
+#topbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 60px;
+  background: var(--glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--glass-border);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  transition: var(--transition);
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-container {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-dark);
+  flex-shrink: 0;
+}
+
+.logo-container svg { width: 36px; height: 36px; }
+
+.app-title {
+  font-size: 14px;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--primary-light), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.2;
+}
+
+.topbar-center {
+  display: flex;
+  gap: 4px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 12px;
+  padding: 4px;
+}
+
+.nav-btn {
+  padding: 8px 14px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: var(--transition);
+  white-space: nowrap;
+  font-family: var(--font-main);
+}
+
+.nav-btn:hover { color: var(--text); background: rgba(139,92,246,0.1); }
+.nav-btn.active {
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 2px 8px rgba(139,92,246,0.3);
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: rgba(255,255,255,0.05);
+  color: var(--text-muted);
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+  font-size: 16px;
+}
+
+.icon-btn:hover { background: rgba(139,92,246,0.15); color: var(--primary-light); }
+
+/* Main Content */
+#main-content {
+  position: relative;
+  z-index: 1;
+  padding-top: 60px;
+  min-height: 100vh;
+}
+
+.page {
+  display: none;
+  padding: 24px 16px;
+  max-width: 900px;
+  margin: 0 auto;
+  animation: pageIn 0.5s ease-out;
+}
+
+.page.active { display: block; }
+
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pageOut {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-20px); }
+}
+
+/* Cards */
+.card {
+  background: var(--bg-card);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 20px;
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--primary), transparent);
+  opacity: 0;
+  transition: var(--transition);
+}
+
+.card:hover {
+  background: var(--bg-card-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.card:hover::before { opacity: 1; }
+
+.card-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.card-title .icon {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+/* Hero Section */
+.hero {
+  text-align: center;
+  padding: 40px 20px;
+  position: relative;
+}
+
+.hero-logo {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 24px;
+  border-radius: 50%;
+  border: 3px solid var(--primary);
+  overflow: hidden;
+  box-shadow: 0 0 40px rgba(139,92,246,0.3), 0 0 80px rgba(139,92,246,0.1);
+  animation: heroFloat 4s ease-in-out infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-dark);
+}
+
+@keyframes heroFloat {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(2deg); }
+}
+
+.hero h1 {
+  font-size: 28px;
+  font-weight: 800;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, var(--primary-light), var(--accent), var(--primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  background-size: 200% auto;
+  animation: gradientShift 3s ease-in-out infinite;
+}
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% center; }
+  50% { background-position: 100% center; }
+}
+
+.hero p {
+  color: var(--text-muted);
+  font-size: 15px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+/* Quick Access Grid */
+.quick-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.quick-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.quick-card:hover {
+  background: var(--bg-card-hover);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow);
+  border-color: var(--primary);
+}
+
+.quick-card .qc-icon {
+  font-size: 32px;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.quick-card .qc-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.quick-card .qc-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* Input Groups */
+.input-group {
+  margin-bottom: 20px;
+}
+
+.input-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.input-group input,
+.input-group select,
+.input-group textarea {
+  width: 100%;
+  padding: 14px 16px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 15px;
+  font-family: var(--font-main);
+  transition: var(--transition);
+  outline: none;
+}
+
+.input-group input:focus,
+.input-group select:focus,
+.input-group textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(139,92,246,0.15);
+  background: rgba(255,255,255,0.08);
+}
+
+.input-group input::placeholder { color: var(--text-muted); opacity: 0.6; }
+
+.input-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* Buttons */
+.btn {
+  padding: 14px 28px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: var(--font-main);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: white;
+  box-shadow: 0 4px 15px rgba(139,92,246,0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(139,92,246,0.4);
+}
+
+.btn-secondary {
+  background: rgba(255,255,255,0.05);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover { background: rgba(255,255,255,0.1); }
+
+.btn-full { width: 100%; }
+
+/* Results */
+.result-display {
+  background: linear-gradient(135deg, rgba(139,92,246,0.1), rgba(139,92,246,0.05));
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  text-align: center;
+  margin-top: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.result-display::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(from 0deg, transparent, rgba(139,92,246,0.1), transparent);
+  animation: resultRotate 8s linear infinite;
+}
+
+@keyframes resultRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.result-number {
+  font-size: 64px;
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--primary-light), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  position: relative;
+  z-index: 1;
+  line-height: 1;
+}
+
+.result-label {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-top: 8px;
+  position: relative;
+  z-index: 1;
+}
+
+.result-description {
+  font-size: 14px;
+  color: var(--text);
+  margin-top: 16px;
+  line-height: 1.7;
+  position: relative;
+  z-index: 1;
+  text-align: left;
+}
+
+/* Number Chart */
+.number-chart {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 20px 0;
+}
+
+.number-cell {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  font-size: 20px;
+  font-weight: 700;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.number-cell.highlight {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: white;
+  border-color: var(--primary);
+  box-shadow: 0 0 20px rgba(139,92,246,0.3);
+}
+
+.number-cell:hover { transform: scale(1.1); }
+
+/* Compatibility */
+.compat-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  margin: 24px 0;
+}
+
+.compat-person {
+  text-align: center;
+}
+
+.compat-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 2px solid var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+.compat-heart {
+  font-size: 32px;
+  animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+.compat-meter {
+  width: 100%;
+  height: 12px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-top: 16px;
+}
+
+.compat-meter-fill {
+  height: 100%;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  transition: width 1s ease-out;
+  width: 0;
+}
+
+/* Quote Card */
+.quote-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  text-align: center;
+  position: relative;
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.quote-card::before {
+  content: '"';
+  position: absolute;
+  top: 12px;
+  left: 24px;
+  font-size: 64px;
+  color: var(--primary);
+  opacity: 0.2;
+  font-family: Georgia, serif;
+  line-height: 1;
+}
+
+.quote-text {
+  font-size: 17px;
+  line-height: 1.7;
+  font-style: italic;
+  color: var(--text);
+  margin-bottom: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.quote-author {
+  font-size: 13px;
+  color: var(--primary-light);
+  font-weight: 600;
+}
+
+.quote-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.quote-counter {
+  font-size: 13px;
+  color: var(--text-muted);
+  min-width: 60px;
+  text-align: center;
+}
+
+/* Settings */
+.setting-group {
+  margin-bottom: 24px;
+}
+
+.setting-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 12px;
+}
+
+.theme-option {
+  aspect-ratio: 1;
+  border-radius: 12px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.theme-option:hover { transform: scale(1.05); }
+.theme-option.active { border-color: var(--accent); box-shadow: 0 0 15px rgba(245,158,11,0.3); }
+
+.theme-option .to-preview {
+  width: 100%;
+  height: 60%;
+  border-radius: 12px 12px 0 0;
+}
+
+.theme-option .to-label {
+  font-size: 10px;
+  text-align: center;
+  padding: 4px;
+  background: rgba(255,255,255,0.05);
+}
+
+/* Toggle Switch */
+.toggle-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.toggle-label {
+  font-size: 14px;
+  color: var(--text);
+}
+
+.toggle {
+  width: 48px;
+  height: 26px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 13px;
+  cursor: pointer;
+  position: relative;
+  transition: var(--transition);
+}
+
+.toggle.active { background: var(--primary); }
+
+.toggle::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: white;
+  border-radius: 50%;
+  top: 3px;
+  left: 3px;
+  transition: var(--transition);
+}
+
+.toggle.active::after { left: 25px; }
+
+/* Progress Ring */
+.progress-ring-container {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  flex-wrap: wrap;
+  margin: 24px 0;
+}
+
+.progress-ring-item {
+  text-align: center;
+}
+
+.progress-ring {
+  width: 100px;
+  height: 100px;
+  transform: rotate(-90deg);
+}
+
+.progress-ring circle {
+  fill: none;
+  stroke-width: 8;
+  stroke-linecap: round;
+}
+
+.progress-ring .bg { stroke: rgba(255,255,255,0.05); }
+.progress-ring .fill {
+  stroke: var(--primary);
+  stroke-dasharray: 283;
+  stroke-dashoffset: 283;
+  transition: stroke-dashoffset 1.5s ease-out;
+}
+
+.progress-ring-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 8px;
+}
+
+.progress-ring-value {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--primary-light);
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(5px);
+  z-index: 2000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-overlay.active { display: flex; }
+
+.modal {
+  background: var(--bg-dark);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  max-width: 500px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  animation: modalIn 0.3s ease-out;
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.modal h3 {
+  font-size: 20px;
+  margin-bottom: 16px;
+  color: var(--primary-light);
+}
+
+/* Notification Toast */
+.toast {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: var(--glass);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  padding: 12px 24px;
+  color: var(--text);
+  font-size: 14px;
+  z-index: 3000;
+  transition: transform 0.3s ease-out;
+  white-space: nowrap;
+}
+
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+/* Bottom Nav for Mobile */
+#bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: var(--glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--glass-border);
+  z-index: 1000;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.bottom-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 8px 12px;
+  transition: var(--transition);
+  font-family: var(--font-main);
+}
+
+.bottom-nav-item.active { color: var(--primary-light); }
+.bottom-nav-item .bni-icon { font-size: 20px; }
+.bottom-nav-item .bni-label { font-size: 10px; font-weight: 600; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 3px; }
+
+/* Animations */
+.fade-in { animation: fadeIn 0.5s ease-out; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.slide-up { animation: slideUp 0.5s ease-out; }
+@keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+.pulse { animation: pulse 2s ease-in-out infinite; }
+@keyframes pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  #topbar .topbar-center { display: none; }
+  #bottom-nav { display: flex; }
+  #main-content { padding-bottom: 72px; }
+  .app-title { font-size: 12px; }
+  .hero h1 { font-size: 22px; }
+  .result-number { font-size: 48px; }
+  .input-row { grid-template-columns: 1fr; }
+  .quick-grid { grid-template-columns: repeat(2, 1fr); }
+  .card { padding: 16px; }
+  .page { padding: 16px 12px; }
+  .compat-container { flex-direction: column; gap: 16px; }
+}
+
+@media (max-width: 480px) {
+  .hero-logo { width: 90px; height: 90px; }
+  .result-number { font-size: 40px; }
+  .number-cell { width: 40px; height: 40px; font-size: 16px; }
+}
+
+/* Utility */
+.text-center { text-align: center; }
+.text-muted { color: var(--text-muted); }
+.mt-16 { margin-top: 16px; }
+.mb-16 { margin-bottom: 16px; }
+.gap-8 { gap: 8px; }
+.flex { display: flex; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+
+/* Number meaning tags */
+.meaning-tag {
+  display: inline-block;
+  padding: 4px 12px;
+  background: rgba(139,92,246,0.15);
+  border: 1px solid rgba(139,92,246,0.2);
+  border-radius: 20px;
+  font-size: 12px;
+  color: var(--primary-light);
+  margin: 4px;
+}
+
+/* Daily numbers */
+.daily-numbers {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin: 24px 0;
+}
+
+.daily-num {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: white;
+  box-shadow: 0 4px 15px rgba(139,92,246,0.3);
+  animation: dailyPop 0.5s ease-out both;
+}
+
+.daily-num:nth-child(1) { animation-delay: 0.1s; }
+.daily-num:nth-child(2) { animation-delay: 0.2s; }
+.daily-num:nth-child(3) { animation-delay: 0.3s; }
+.daily-num:nth-child(4) { animation-delay: 0.4s; }
+.daily-num:nth-child(5) { animation-delay: 0.5s; }
+
+@keyframes dailyPop {
+  from { opacity: 0; transform: scale(0) rotate(-180deg); }
+  to { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+/* Saved profiles */
+.profile-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.profile-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.profile-item:hover { background: var(--bg-card-hover); border-color: var(--primary); }
+
+.profile-info h4 { font-size: 15px; color: var(--text); }
+.profile-info p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+.profile-actions { display: flex; gap: 8px; }
+
+.profile-actions button {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: rgba(255,255,255,0.05);
+  color: var(--text-muted);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.profile-actions button:hover { color: var(--primary-light); background: rgba(139,92,246,0.15); }
+.profile-actions button.delete:hover { color: var(--danger); background: rgba(239,68,68,0.15); }
+
+/* Wheel of fortune animation */
+.wheel-container {
+  width: 280px;
+  height: 280px;
+  margin: 24px auto;
+  position: relative;
+}
+
+.wheel {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 4px solid var(--primary);
+  position: relative;
+  transition: transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+  overflow: hidden;
+}
+
+.wheel-segment {
+  position: absolute;
+  width: 50%;
+  height: 50%;
+  top: 0;
+  left: 50%;
+  transform-origin: 0% 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: white;
+}
+
+.wheel-pointer {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 24px;
+  z-index: 10;
+}
+
+/* Particle effects */
+.particle {
+  position: fixed;
+  pointer-events: none;
+  border-radius: 50%;
+  animation: particleFade 1s ease-out forwards;
+}
+
+@keyframes particleFade {
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0) translateY(-50px); }
+}
+
+/* Loading spinner */
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(139,92,246,0.2);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 20px auto;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Tooltip */
+.tooltip {
+  position: relative;
+}
+
+.tooltip::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 12px;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.tooltip:hover::after { opacity: 1; }
+
+/* Swiss/Alpine decorative elements */
+.alpine-border {
+  position: relative;
+}
+
+.alpine-border::before {
+  content: '⛰';
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 20px;
+  background: var(--bg-dark);
+  padding: 0 8px;
+}
+
+/* Select dropdown styling */
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394A3B8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px !important;
+}
+
+/* Saved data indicator */
+.saved-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(16,185,129,0.1);
+  border: 1px solid rgba(16,185,129,0.2);
+  border-radius: 20px;
+  font-size: 12px;
+  color: var(--success);
+}
+
+.saved-indicator .dot {
+  width: 8px;
+  height: 8px;
+  background: var(--success);
+  border-radius: 50%;
+  animation: dotPulse 2s ease-in-out infinite;
+}
+
+@keyframes dotPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* Chart visualization */
+.chart-bar-container {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 8px;
+  height: 120px;
+  margin: 20px 0;
+  padding: 0 16px;
+}
+
+.chart-bar {
+  flex: 1;
+  max-width: 40px;
+  background: linear-gradient(to top, var(--primary-dark), var(--primary-light));
+  border-radius: 6px 6px 0 0;
+  transition: height 1s ease-out;
+  position: relative;
+  cursor: pointer;
+}
+
+.chart-bar:hover { filter: brightness(1.2); }
+
+.chart-bar-label {
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.chart-bar-value {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--primary-light);
+}
+</style>
+</head>
+<body>
+
+<div id="starfield"></div>
+
+<div class="nebula" style="width:400px;height:400px;background:radial-gradient(circle,rgba(139,92,246,0.3),transparent);top:10%;left:20%;"></div>
+<div class="nebula" style="width:300px;height:300px;background:radial-gradient(circle,rgba(245,158,11,0.15),transparent);bottom:20%;right:10%;animation-delay:-15s;"></div>
+
+<!-- Top Global Bar -->
+<div id="topbar">
+  <div class="topbar-left">
+    <div class="logo-container">
+      <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#A78BFA"/>
+            <stop offset="100%" style="stop-color:#6D28D9"/>
+          </linearGradient>
+          <linearGradient id="dGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#F59E0B"/>
+            <stop offset="100%" style="stop-color:#D97706"/>
+          </linearGradient>
+        </defs>
+        <circle cx="32" cy="32" r="30" fill="url(#logoGrad)" opacity="0.2"/>
+        <circle cx="32" cy="32" r="28" fill="none" stroke="url(#logoGrad)" stroke-width="1.5"/>
+        <text x="32" y="42" text-anchor="middle" font-size="36" font-weight="bold" fill="url(#dGrad)" font-family="Georgia,serif">D</text>
+        <text x="46" y="22" font-size="10" font-weight="bold" fill="#A78BFA">11</text>
+        <text x="14" y="48" font-size="10" font-weight="bold" fill="#A78BFA">7</text>
+        <text x="44" y="50" font-size="10" font-weight="bold" fill="#A78BFA">22</text>
+        <polygon points="32,8 34,12 38,12 35,15 36,19 32,17 28,19 29,15 26,12 30,12" fill="#F59E0B" opacity="0.8"/>
+      </svg>
+    </div>
+    <div class="app-title" data-i18n="appTitle">Diana's Swiss Army Knife<br>for Numerology</div>
+  </div>
+
+  <div class="topbar-center" id="navButtons">
+    <button class="nav-btn active" data-page="home" data-i18n="navHome">🏠 Home</button>
+    <button class="nav-btn" data-page="calculator" data-i18n="navCalc">🔢 Calculator</button>
+    <button class="nav-btn" data-page="daily" data-i18n="navDaily"> Daily</button>
+    <button class="nav-btn" data-page="compatibility" data-i18n="navCompat">💕 Match</button>
+    <button class="nav-btn" data-page="quotes" data-i18n="navQuotes">💬 Quotes</button>
+    <button class="nav-btn" data-page="settings" data-i18n="navSettings">⚙️ Settings</button>
+  </div>
+
+  <div class="topbar-right">
+    <div class="saved-indicator" id="saveIndicator">
+      <span class="dot"></span>
+      <span data-i18n="saved">Saved</span>
+    </div>
+    <button class="icon-btn" onclick="showSavedProfiles()" title="Saved Profiles"></button>
+    <button class="icon-btn" onclick="toggleSettings()" title="Settings">⚙️</button>
+  </div>
+</div>
+
+<!-- Bottom Navigation (Mobile) -->
+<div id="bottom-nav">
+  <button class="bottom-nav-item active" data-page="home">
+    <span class="bni-icon">🏠</span>
+    <span class="bni-label" data-i18n="navHome">Home</span>
+  </button>
+  <button class="bottom-nav-item" data-page="calculator">
+    <span class="bni-icon">🔢</span>
+    <span class="bni-label" data-i18n="navCalc">Calc</span>
+  </button>
+  <button class="bottom-nav-item" data-page="daily">
+    <span class="bni-icon"></span>
+    <span class="bni-label" data-i18n="navDaily">Daily</span>
+  </button>
+  <button class="bottom-nav-item" data-page="compatibility">
+    <span class="bni-icon"></span>
+    <span class="bni-label" data-i18n="navCompat">Match</span>
+  </button>
+  <button class="bottom-nav-item" data-page="quotes">
+    <span class="bni-icon"></span>
+    <span class="bni-label" data-i18n="navQuotes">Quotes</span>
+  </button>
+  <button class="bottom-nav-item" data-page="settings">
+    <span class="bni-icon">⚙️</span>
+    <span class="bni-label" data-i18n="navSettings">Settings</span>
+  </button>
+</div>
+
+<!-- Main Content -->
+<div id="main-content">
+
+  <!-- PAGE: HOME -->
+  <div class="page active" id="page-home">
+    <div class="hero">
+      <div class="hero-logo">
+        <svg viewBox="0 0 64 64" width="110" height="110" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="heroGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#A78BFA"/>
+              <stop offset="100%" style="stop-color:#6D28D9"/>
+            </linearGradient>
+            <linearGradient id="dGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#F59E0B"/>
+              <stop offset="100%" style="stop-color:#D97706"/>
+            </linearGradient>
+          </defs>
+          <circle cx="32" cy="32" r="30" fill="url(#heroGrad)" opacity="0.2"/>
+          <circle cx="32" cy="32" r="28" fill="none" stroke="url(#heroGrad)" stroke-width="1.5"/>
+          <text x="32" y="42" text-anchor="middle" font-size="36" font-weight="bold" fill="url(#dGrad2)" font-family="Georgia,serif">D</text>
+          <text x="46" y="22" font-size="10" font-weight="bold" fill="#A78BFA">11</text>
+          <text x="14" y="48" font-size="10" font-weight="bold" fill="#A78BFA">7</text>
+          <text x="44" y="50" font-size="10" font-weight="bold" fill="#A78BFA">22</text>
+          <polygon points="32,8 34,12 38,12 35,15 36,19 32,17 28,19 29,15 26,12 30,12" fill="#F59E0B" opacity="0.8"/>
+        </svg>
+      </div>
+      <h1 data-i18n="heroTitle">Diana's Swiss Army Knife for Numerology</h1>
+      <p data-i18n="heroSubtitle">Discover the mystical power of numbers. Uncover your life path, destiny, and soul purpose through the ancient art of numerology.</p>
+    </div>
+
+    <div class="quick-grid">
+      <div class="quick-card" onclick="navigateTo('calculator')">
+        <span class="qc-icon">🔢</span>
+        <div class="qc-title" data-i18n="qcCalc">Number Calculator</div>
+        <div class="qc-sub" data-i18n="qcCalcSub">Life Path & Destiny</div>
+      </div>
+      <div class="quick-card" onclick="navigateTo('daily')">
+        <span class="qc-icon">🌟</span>
+        <div class="qc-title" data-i18n="qcDaily">Daily Forecast</div>
+        <div class="qc-sub" data-i18n="qcDailySub">Today's Numbers</div>
+      </div>
+      <div class="quick-card" onclick="navigateTo('compatibility')">
+        <span class="qc-icon">💕</span>
+        <div class="qc-title" data-i18n="qcCompat">Compatibility</div>
+        <div class="qc-sub" data-i18n="qcCompatSub">Soul Match Score</div>
+      </div>
+      <div class="quick-card" onclick="navigateTo('quotes')">
+        <span class="qc-icon">💬</span>
+        <div class="qc-title" data-i18n="qcQuotes">Wisdom Quotes</div>
+        <div class="qc-sub" data-i18n="qcQuotesSub">50 Inspirations</div>
+      </div>
+      <div class="quick-card" onclick="navigateTo('settings')">
+        <span class="qc-icon">⚙️</span>
+        <div class="qc-title" data-i18n="qcSettings">Settings</div>
+        <div class="qc-sub" data-i18n="qcSettingsSub">Theme & Language</div>
+      </div>
+      <div class="quick-card" onclick="generateRandomNumber()">
+        <span class="qc-icon">🎲</span>
+        <div class="qc-title" data-i18n="qcRandom">Random Number</div>
+        <div class="qc-sub" data-i18n="qcRandomSub">Your Lucky Digit</div>
+      </div>
+    </div>
+
+    <div class="card mt-16" id="todayOverview">
+      <div class="card-title">
+        <span class="icon">📅</span>
+        <span data-i18n="todayOverview">Today's Numerology Overview</span>
+      </div>
+      <div class="daily-numbers" id="homeDailyNumbers"></div>
+      <div id="homeDayMeaning" style="text-align:center; color:var(--text-muted); font-size:13px; margin-top:8px;"></div>
+    </div>
+  </div>
+
+  <!-- PAGE: CALCULATOR -->
+  <div class="page" id="page-calculator">
+    <div class="card">
+      <div class="card-title">
+        <span class="icon">🔢</span>
+        <span data-i18n="calcTitle">Numerology Calculator</span>
+      </div>
+
+      <div class="input-group">
+        <label data-i18n="calcName">Full Name</label>
+        <input type="text" id="calcName" placeholder="Enter your full name..." data-i18n-placeholder="calcNamePlaceholder">
+      </div>
+
+      <div class="input-row">
+        <div class="input-group">
+          <label data-i18n="calcBirthDate">Birth Date</label>
+          <input type="date" id="calcBirthDate">
+        </div>
+        <div class="input-group">
+          <label data-i18n="calcBirthTime">Birth Time (optional)</label>
+          <input type="time" id="calcBirthTime">
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-full" onclick="calculateNumerology()">
+        🔮 <span data-i18n="calcBtn">Calculate My Numbers</span>
+      </button>
+
+      <div id="calcResults" style="display:none;">
+        <div class="result-display" id="lifePathResult">
+          <div class="result-label" data-i18n="lifePathLabel">Life Path Number</div>
+          <div class="result-number" id="lifePathNumber">-</div>
+          <div class="result-description" id="lifePathDesc"></div>
+        </div>
+
+        <div class="number-chart" id="nameChart"></div>
+
+        <div class="progress-ring-container" id="numberRings">
+          <div class="progress-ring-item">
+            <svg class="progress-ring" viewBox="0 0 100 100">
+              <circle class="bg" cx="50" cy="50" r="45"/>
+              <circle class="fill" cx="50" cy="50" r="45" id="destinyRing"/>
+            </svg>
+            <div class="progress-ring-value" id="destinyValue">-</div>
+            <div class="progress-ring-label" data-i18n="destinyLabel">Destiny Number</div>
+          </div>
+          <div class="progress-ring-item">
+            <svg class="progress-ring" viewBox="0 0 100 100">
+              <circle class="bg" cx="50" cy="50" r="45"/>
+              <circle class="fill" cx="50" cy="50" r="45" id="soulRing"/>
+            </svg>
+            <div class="progress-ring-value" id="soulValue">-</div>
+            <div class="progress-ring-label" data-i18n="soulLabel">Soul Urge Number</div>
+          </div>
+          <div class="progress-ring-item">
+            <svg class="progress-ring" viewBox="0 0 100 100">
+              <circle class="bg" cx="50" cy="50" r="45"/>
+              <circle class="fill" cx="50" cy="50" r="45" id="personalityRing"/>
+            </svg>
+            <div class="progress-ring-value" id="personalityValue">-</div>
+            <div class="progress-ring-label" data-i18n="personalityLabel">Personality Number</div>
+          </div>
+        </div>
+
+        <div class="card" id="detailedMeaning" style="display:none;">
+          <div class="card-title">
+            <span class="icon">📖</span>
+            <span data-i18n="detailedMeaning">Detailed Meaning</span>
+          </div>
+          <div id="meaningContent"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span class="icon">👤</span>
+        <span data-i18n="savedProfiles">Saved Profiles</span>
+      </div>
+      <div class="profile-list" id="profileList">
+        <div class="text-center text-muted" style="padding:20px;" data-i18n="noProfiles">No saved profiles yet. Calculate a number to save!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: DAILY FORECAST -->
+  <div class="page" id="page-daily">
+    <div class="card">
+      <div class="card-title">
+        <span class="icon">🌟</span>
+        <span data-i18n="dailyTitle">Daily Numerology Forecast</span>
+      </div>
+
+      <div class="input-group">
+        <label data-i18n="dailySelectDate">Select Date</label>
+        <input type="date" id="dailyDate">
+      </div>
+
+      <div class="input-group">
+        <label data-i18n="dailyLifePath">Your Life Path Number</label>
+        <input type="number" id="dailyLifePathInput" min="1" max="9" placeholder="1-9">
+      </div>
+
+      <button class="btn btn-primary btn-full" onclick="generateDailyForecast()">
+        🌟 <span data-i18n="dailyBtn">Generate Forecast</span>
+      </button>
+
+      <div id="dailyResults" style="display:none;">
+        <div class="daily-numbers" id="dailyForecastNumbers"></div>
+
+        <div class="chart-bar-container" id="dailyChart"></div>
+
+        <div class="result-display" style="margin-top:24px;">
+          <div class="result-label" data-i18n="dailyEnergyLabel">Today's Energy Number</div>
+          <div class="result-number" id="dailyEnergyNumber">-</div>
+          <div class="result-description" id="dailyEnergyDesc"></div>
+        </div>
+
+        <div class="card mt-16" id="dailyAdvice">
+          <div class="card-title">
+            <span class="icon">📝</span>
+            <span data-i18n="dailyAdvice">Today's Advice</span>
+          </div>
+          <div id="dailyAdviceText" style="font-size:14px; line-height:1.7; color:var(--text);"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: COMPATIBILITY -->
+  <div class="page" id="page-compatibility">
+    <div class="card">
+      <div class="card-title">
+        <span class="icon">💕</span>
+        <span data-i18n="compatTitle">Soul Compatibility</span>
+      </div>
+
+      <div class="input-row">
+        <div class="input-group">
+          <label data-i18n="compatPerson1">Person 1 Life Path</label>
+          <input type="number" id="compatPerson1" min="1" max="9" placeholder="1-9">
+        </div>
+        <div class="input-group">
+          <label data-i18n="compatPerson2">Person 2 Life Path</label>
+          <input type="number" id="compatPerson2" min="1" max="9" placeholder="1-9">
+        </div>
+      </div>
+
+      <div class="input-row">
+        <div class="input-group">
+          <label data-i18n="compatName1">Person 1 Name</label>
+          <input type="text" id="compatName1" placeholder="Name 1">
+        </div>
+        <div class="input-group">
+          <label data-i18n="compatName2">Person 2 Name</label>
+          <input type="text" id="compatName2" placeholder="Name 2">
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-full" onclick="calculateCompatibility()">
+         <span data-i18n="compatBtn">Check Compatibility</span>
+      </button>
+
+      <div id="compatResults" style="display:none;">
+        <div class="compat-container">
+          <div class="compat-person">
+            <div class="compat-avatar" id="compatAvatar1"></div>
+            <div id="compatNameDisplay1" style="font-size:14px; font-weight:600;"></div>
+            <div class="result-number" style="font-size:24px; margin-top:4px;" id="compatNum1">-</div>
+          </div>
+          <div class="compat-heart">💕</div>
+          <div class="compat-person">
+            <div class="compat-avatar" id="compatAvatar2">👤</div>
+            <div id="compatNameDisplay2" style="font-size:14px; font-weight:600;"></div>
+            <div class="result-number" style="font-size:24px; margin-top:4px;" id="compatNum2">-</div>
+          </div>
+        </div>
+
+        <div class="compat-meter">
+          <div class="compat-meter-fill" id="compatMeterFill"></div>
+        </div>
+        <div class="text-center mt-16">
+          <span style="font-size:24px; font-weight:800; color:var(--primary-light);" id="compatScore">-</span>
+          <span style="color:var(--text-muted); font-size:13px;">% <span data-i18n="compatMatch">Match</span></span>
+        </div>
+
+        <div class="result-display" style="margin-top:24px;">
+          <div class="result-label" data-i18n="compatAnalysis">Compatibility Analysis</div>
+          <div class="result-description" id="compatAnalysis"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: QUOTES -->
+  <div class="page" id="page-quotes">
+    <div class="card">
+      <div class="card-title">
+        <span class="icon"></span>
+        <span data-i18n="quotesTitle">Wisdom & Numerology Quotes</span>
+      </div>
+
+      <div class="quote-card" id="quoteCard">
+        <div class="quote-text" id="quoteText">Loading...</div>
+        <div class="quote-author" id="quoteAuthor">-</div>
+      </div>
+
+      <div class="quote-nav">
+        <button class="icon-btn" onclick="prevQuote()" style="width:44px;height:44px;font-size:20px;">◀</button>
+        <span class="quote-counter" id="quoteCounter">1 / 50</span>
+        <button class="icon-btn" onclick="nextQuote()" style="width:44px;height:44px;font-size:20px;">▶</button>
+      </div>
+
+      <div class="text-center mt-16">
+        <button class="btn btn-secondary" onclick="randomQuote()">
+          🎲 <span data-i18n="randomQuote">Random Quote</span>
+        </button>
+      </div>
+
+      <div class="card mt-16">
+        <div class="card-title">
+          <span class="icon">📊</span>
+          <span data-i18n="quotesCategory">By Category</span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;" id="quoteCategories">
+          <button class="btn btn-secondary" style="padding:8px 16px;font-size:12px;" onclick="filterQuotes('all')">All</button>
+          <button class="btn btn-secondary" style="padding:8px 16px;font-size:12px;" onclick="filterQuotes('wisdom')">🧠 Wisdom</button>
+          <button class="btn btn-secondary" style="padding:8px 16px;font-size:12px;" onclick="filterQuotes('love')">💕 Love</button>
+          <button class="btn btn-secondary" style="padding:8px 16px;font-size:12px;" onclick="filterQuotes('success')">🌟 Success</button>
+          <button class="btn btn-secondary" style="padding:8px 16px;font-size:12px;" onclick="filterQuotes('numbers')">🔢 Numbers</button>
+          <button class="btn btn-secondary" style="padding:8px 16px;font-size:12px;" onclick="filterQuotes('swiss')">️ Swiss</button>
+          <button class="btn btn-secondary" style="padding:8px 16px;font-size:12px;" onclick="filterQuotes('ukrainian')"> Ukrainian</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: SETTINGS -->
+  <div class="page" id="page-settings">
+    <div class="card">
+      <div class="card-title">
+        <span class="icon"></span>
+        <span data-i18n="themeTitle">Color Theme</span>
+      </div>
+      <div class="theme-grid" id="themeGrid">
+        <div class="theme-option active" data-theme="default" onclick="setTheme('default')">
+          <div class="to-preview" style="background:linear-gradient(135deg,#0a0a1a,#8B5CF6);"></div>
+          <div class="to-label">Cosmic</div>
+        </div>
+        <div class="theme-option" data-theme="swiss" onclick="setTheme('swiss')">
+          <div class="to-preview" style="background:linear-gradient(135deg,#0D1B2A,#FF4136);"></div>
+          <div class="to-label">🇨🇭 Swiss</div>
+        </div>
+        <div class="theme-option" data-theme="ukraine" onclick="setTheme('ukraine')">
+          <div class="to-preview" style="background:linear-gradient(135deg,#0A1628,#0057B7);"></div>
+          <div class="to-label">🇦 Ukraine</div>
+        </div>
+        <div class="theme-option" data-theme="ocean" onclick="setTheme('ocean')">
+          <div class="to-preview" style="background:linear-gradient(135deg,#0C1220,#06B6D4);"></div>
+          <div class="to-label">🌊 Ocean</div>
+        </div>
+        <div class="theme-option" data-theme="rose" onclick="setTheme('rose')">
+          <div class="to-preview" style="background:linear-gradient(135deg,#1A0A1E,#EC4899);"></div>
+          <div class="to-label">🌹 Rose</div>
+        </div>
+        <div class="theme-option" data-theme="forest" onclick="setTheme('forest')">
+          <div class="to-preview" style="background:linear-gradient(135deg,#0A1A14,#10B981);"></div>
+          <div class="to-label">🌲 Forest</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span class="icon">🔤</span>
+        <span data-i18n="fontTitle">Font Style</span>
+      </div>
+      <div class="theme-grid">
+        <div class="theme-option active" data-font="font-modern" onclick="setFont('font-modern')">
+          <div class="to-preview" style="background:var(--bg-card);display:flex;align-items:center;justify-content:center;font-family:system-ui;color:var(--text);font-size:18px;font-weight:bold;">Aa</div>
+          <div class="to-label">Modern</div>
+        </div>
+        <div class="theme-option" data-font="font-classic" onclick="setFont('font-classic')">
+          <div class="to-preview" style="background:var(--bg-card);display:flex;align-items:center;justify-content:center;font-family:Georgia;color:var(--text);font-size:18px;font-weight:bold;">Aa</div>
+          <div class="to-label">Classic</div>
+        </div>
+        <div class="theme-option" data-font="font-rounded" onclick="setFont('font-rounded')">
+          <div class="to-preview" style="background:var(--bg-card);display:flex;align-items:center;justify-content:center;font-family:Nunito,sans-serif;color:var(--text);font-size:18px;font-weight:bold;">Aa</div>
+          <div class="to-label">Rounded</div>
+        </div>
+        <div class="theme-option" data-font="font-mono" onclick="setFont('font-mono')">
+          <div class="to-preview" style="background:var(--bg-card);display:flex;align-items:center;justify-content:center;font-family:monospace;color:var(--text);font-size:18px;font-weight:bold;">Aa</div>
+          <div class="to-label">Mono</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span class="icon">🌐</span>
+        <span data-i18n="langTitle">Language / Sprache / Мова</span>
+      </div>
+      <div class="input-group">
+        <select id="languageSelect" onchange="setLanguage(this.value)">
+          <option value="en">🇬🇧 English</option>
+          <option value="de">🇩🇪 Standard German</option>
+          <option value="ch">🇭 Swiss German (Schwiizerdütsch)</option>
+          <option value="uk">🇺🇦 Ukrainian</option>
+          <option value="ru">🇷🇺 Russian</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span class="icon">✨</span>
+        <span data-i18n="effectsTitle">Effects & Animations</span>
+      </div>
+      <div class="toggle-container">
+        <span class="toggle-label" data-i18n="meteorEffect">Meteor Effects</span>
+        <div class="toggle active" id="toggleMeteors" onclick="toggleEffect('meteors')"></div>
+      </div>
+      <div class="toggle-container">
+        <span class="toggle-label" data-i18n="starTwinkle">Star Twinkle</span>
+        <div class="toggle active" id="toggleStars" onclick="toggleEffect('stars')"></div>
+      </div>
+      <div class="toggle-container">
+        <span class="toggle-label" data-i18n="nebulaEffect">Nebula Background</span>
+        <div class="toggle active" id="toggleNebula" onclick="toggleEffect('nebula')"></div>
+      </div>
+      <div class="toggle-container">
+        <span class="toggle-label" data-i18n="particleEffects">Particle Effects</span>
+        <div class="toggle active" id="toggleParticles" onclick="toggleEffect('particles')"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span class="icon"></span>
+        <span data-i18n="dataTitle">Data Management</span>
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <button class="btn btn-secondary" onclick="exportData()">📤 <span data-i18n="exportData">Export Data</span></button>
+        <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">📥 <span data-i18n="importData">Import Data</span></button>
+        <input type="file" id="importFile" style="display:none;" accept=".json" onchange="importData(event)">
+        <button class="btn btn-secondary" style="color:var(--danger);border-color:var(--danger);" onclick="clearAllData()">🗑️ <span data-i18n="clearData">Clear All Data</span></button>
+      </div>
+    </div>
+
+    <div class="card" style="text-align:center; opacity:0.6;">
+      <p style="font-size:12px; color:var(--text-muted);" data-i18n="appVersion">Diana's Swiss Army Knife for Numerology v2.0</p>
+      <p style="font-size:11px; color:var(--text-muted); margin-top:4px;" data-i18n="appCredits">Inspired by Swiss Alps 🏔️ & Ukrainian Sunflowers 🌻</p>
+    </div>
+  </div>
+</div>
+
+<!-- Saved Profiles Modal -->
+<div class="modal-overlay" id="profileModal">
+  <div class="modal">
+    <div class="flex items-center justify-between mb-16">
+      <h3>👤 <span data-i18n="savedProfilesModal">Saved Profiles</span></h3>
+      <button class="icon-btn" onclick="closeModal('profileModal')">✕</button>
+    </div>
+    <div class="profile-list" id="modalProfileList"></div>
+  </div>
+</div>
+
+<!-- Random Number Modal -->
+<div class="modal-overlay" id="randomModal">
+  <div class="modal" style="text-align:center;">
+    <h3>🎲 <span data-i18n="luckyNumber">Your Lucky Number</span></h3>
+    <div class="result-number" id="randomNumber" style="font-size:80px; margin:24px 0;">-</div>
+    <div class="result-description" id="randomMeaning" style="text-align:center;"></div>
+    <button class="btn btn-primary mt-16" onclick="generateRandomNumber()">🎲 <span data-i18n="rollAgain">Roll Again</span></button>
+    <button class="btn btn-secondary mt-16" onclick="closeModal('randomModal')">Close</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// DIANA'S SWISS ARMY KNIFE FOR NUMEROLOGY - Complete Application
+// ============================================================
+
+// --- IndexedDB Setup ---
+const DB_NAME = 'DianaNumerologyDB';
+const DB_VERSION = 1;
+let db;
+
+function initDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => { db = request.result; resolve(db); };
+    request.onupgradeneeded = (e) => {
+      const database = e.target.result;
+      if (!database.objectStoreNames.contains('profiles')) {
+        database.createObjectStore('profiles', { keyPath: 'id', autoIncrement: true });
+      }
+      if (!database.objectStoreNames.contains('settings')) {
+        database.createObjectStore('settings', { keyPath: 'key' });
+      }
+      if (!database.objectStoreNames.contains('calculations')) {
+        database.createObjectStore('calculations', { keyPath: 'id', autoIncrement: true });
+      }
+    };
+  });
+}
+
+function dbPut(store, data) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(store, 'readwrite');
+    const s = tx.objectStore(store);
+    const req = s.put(data);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function dbGetAll(store) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(store, 'readonly');
+    const req = tx.objectStore(store).getAll();
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function dbDelete(store, id) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(store, 'readwrite');
+    const req = tx.objectStore(store).delete(id);
+    req.onsuccess = () => resolve();
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function dbGet(store, key) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(store, 'readonly');
+    const req = tx.objectStore(store).get(key);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+// --- Translations ---
+const TRANSLATIONS = {
+  en: {
+    appTitle: "Diana's Swiss Army Knife\nfor Numerology",
+    navHome: "🏠 Home", navCalc: "🔢 Calculator", navDaily: " Daily",
+    navCompat: " Match", navQuotes: "💬 Quotes", navSettings: "⚙️ Settings",
+    saved: "Saved", heroTitle: "Diana's Swiss Army Knife for Numerology",
+    heroSubtitle: "Discover the mystical power of numbers. Uncover your life path, destiny, and soul purpose through the ancient art of numerology.",
+    qcCalc: "Number Calculator", qcCalcSub: "Life Path & Destiny",
+    qcDaily: "Daily Forecast", qcDailySub: "Today's Numbers",
+    qcCompat: "Compatibility", qcCompatSub: "Soul Match Score",
+    qcQuotes: "Wisdom Quotes", qcQuotesSub: "50 Inspirations",
+    qcSettings: "Settings", qcSettingsSub: "Theme & Language",
+    qcRandom: "Random Number", qcRandomSub: "Your Lucky Digit",
+    todayOverview: "Today's Numerology Overview",
+    calcTitle: "Numerology Calculator", calcName: "Full Name",
+    calcBirthDate: "Birth Date", calcBirthTime: "Birth Time (optional)",
+    calcBtn: "Calculate My Numbers", lifePathLabel: "Life Path Number",
+    destinyLabel: "Destiny Number", soulLabel: "Soul Urge Number",
+    personalityLabel: "Personality Number", detailedMeaning: "Detailed Meaning",
+    savedProfiles: "Saved Profiles", noProfiles: "No saved profiles yet. Calculate a number to save!",
+    dailyTitle: "Daily Numerology Forecast", dailySelectDate: "Select Date",
+    dailyLifePath: "Your Life Path Number", dailyBtn: "Generate Forecast",
+    dailyEnergyLabel: "Today's Energy Number", dailyAdvice: "Today's Advice",
+    compatTitle: "Soul Compatibility", compatPerson1: "Person 1 Life Path",
+    compatPerson2: "Person 2 Life Path", compatName1: "Person 1 Name",
+    compatName2: "Person 2 Name", compatBtn: "Check Compatibility",
+    compatMatch: "Match", compatAnalysis: "Compatibility Analysis",
+    quotesTitle: "Wisdom & Numerology Quotes", randomQuote: "Random Quote",
+    quotesCategory: "By Category", themeTitle: "Color Theme",
+    fontTitle: "Font Style", langTitle: "Language",
+    effectsTitle: "Effects & Animations",
+    meteorEffect: "Meteor Effects", starTwinkle: "Star Twinkle",
+    nebulaEffect: "Nebula Background", particleEffects: "Particle Effects",
+    dataTitle: "Data Management", exportData: "Export Data",
+    importData: "Import Data", clearData: "Clear All Data",
+    appVersion: "Diana's Swiss Army Knife for Numerology v2.0",
+    appCredits: "Inspired by Swiss Alps 🏔️ & Ukrainian Sunflowers ",
+    savedProfilesModal: "Saved Profiles", luckyNumber: "Your Lucky Number",
+    rollAgain: "Roll Again", calcNamePlaceholder: "Enter your full name...",
+    calcBirthTimePlaceholder: "Optional",
+    meanings: {
+      1: { title: "The Leader", desc: "You are a born leader, independent, ambitious, and pioneering. Number 1 represents new beginnings, self-reliance, and determination. You have the power to manifest your dreams into reality through sheer willpower.", keywords: ["Leadership", "Independence", "Ambition", "Innovation", "Courage"] },
+      2: { title: "The Diplomat", desc: "You are a natural peacemaker with deep intuition. Number 2 represents partnership, balance, and harmony. You excel at cooperation and have the gift of understanding others' perspectives.", keywords: ["Diplomacy", "Intuition", "Cooperation", "Balance", "Sensitivity"] },
+      3: { title: "The Creative", desc: "You are blessed with artistic talent and infectious joy. Number 3 represents creativity, self-expression, and communication. Your enthusiasm inspires everyone around you.", keywords: ["Creativity", "Expression", "Joy", "Communication", "Imagination"] },
+      4: { title: "The Builder", desc: "You are the foundation upon which great things are built. Number 4 represents stability, hard work, and practical achievement. Your dedication creates lasting value.", keywords: ["Stability", "Hard Work", "Order", "Discipline", "Foundation"] },
+      5: { title: "The Adventurer", desc: "You crave freedom and new experiences. Number 5 represents change, adventure, and versatility. Your dynamic energy makes you unstoppable in pursuit of new horizons.", keywords: ["Freedom", "Adventure", "Change", "Versatility", "Energy"] },
+      6: { title: "The Nurturer", desc: "You have a heart of gold and a deep sense of responsibility. Number 6 represents love, family, and service. Your caring nature creates warmth wherever you go.", keywords: ["Love", "Family", "Responsibility", "Service", "Harmony"] },
+      7: { title: "The Seeker", desc: "You are driven by a quest for truth and deeper understanding. Number 7 represents spirituality, analysis, and wisdom. Your mind is a powerful tool for uncovering life's mysteries.", keywords: ["Wisdom", "Spirituality", "Analysis", "Introspection", "Truth"] },
+      8: { title: "The Powerhouse", desc: "You are destined for material and spiritual abundance. Number 8 represents authority, success, and the infinite flow of energy. Your ambition knows no bounds.", keywords: ["Power", "Success", "Abundance", "Authority", "Achievement"] },
+      9: { title: "The Humanitarian", desc: "You are an old soul with a mission to serve humanity. Number 9 represents completion, compassion, and universal love. Your generosity transforms the world around you.", keywords: ["Compassion", "Wisdom", "Completion", "Service", "Universal Love"] }
+    },
+    dailyAdvices: [
+      "Today is a powerful day for new beginnings. Trust your instincts and take bold action toward your goals.",
+      "Cooperation and patience will serve you well today. Listen to others and find common ground.",
+      "Express your creativity freely today. Your imagination is your greatest asset right now.",
+      "Focus on building solid foundations today. Hard work now will pay dividends later.",
+      "Embrace change with an open heart. New opportunities are presenting themselves to you.",
+      "Nurture your relationships today. Love and care shared with others returns multiplied.",
+      "Take time for quiet reflection today. The answers you seek are within you.",
+      "Take charge of your destiny today. Your leadership qualities shine brightest now.",
+      "Let go of what no longer serves you. Today is about completion and making way for the new."
+    ],
+    compatDescriptions: {
+      high: "This is an exceptionally harmonious match! Your energies complement each other beautifully, creating a relationship filled with understanding, growth, and mutual support.",
+      medium: "This pairing shows good potential with some areas that need attention. With effort and communication, this relationship can flourish and bring joy to both parties.",
+      low: "This combination presents challenges but also opportunities for significant growth. Understanding each other's differences is key to building a strong connection."
+    },
+    lifePathDescriptions: {
+      1: "Your life path is about developing independence and leadership. You are here to pioneer new ways and inspire others through your courage and determination.",
+      2: "Your life path revolves around cooperation and relationships. You are here to bring peace, balance, and harmony to the world around you.",
+      3: "Your life path is one of creative self-expression. You are here to share your unique gifts of art, communication, and joy with the world.",
+      4: "Your life path is about building lasting structures and systems. You are here to create order, stability, and practical solutions for the future.",
+      5: "Your life path is about experiencing freedom and facilitating positive change. You are here to break old patterns and show others new possibilities.",
+      6: "Your life path centers on love, responsibility, and service to family and community. You are here to nurture and protect those around you.",
+      7: "Your life path is about seeking truth and deeper understanding. You are here to develop wisdom and share your insights with the world.",
+      8: "Your life path is about achieving material and spiritual abundance. You are here to master the material world while maintaining ethical integrity.",
+      9: "Your life path is about serving humanity with compassion. You are here to complete karmic cycles and share your wisdom with all beings."
+    }
+  },
+  de: {
+    appTitle: "Dianas Schweizer Taschenmesser\nfür Numerologie",
+    navHome: "🏠 Startseite", navCalc: "🔢 Rechner", navDaily: "🌟 Täglich",
+    navCompat: "💕 Kompatibilität", navQuotes: "💬 Zitate", navSettings: "⚙️ Einstellungen",
+    saved: "Gespeichert", heroTitle: "Dianas Schweizer Taschenmesser für Numerologie",
+    heroSubtitle: "Entdecken Sie die mystische Kraft der Zahlen. Erforschen Sie Ihren Lebensweg, Ihr Schicksal und Ihre Seelenbestimmung durch die alte Kunst der Numerologie.",
+    qcCalc: "Zahlenrechner", qcCalcSub: "Lebensweg & Schicksal",
+    qcDaily: "Tägliche Vorhersage", qcDailySub: "Heutige Zahlen",
+    qcCompat: "Kompatibilität", qcCompatSub: "Seelen-Match-Score",
+    qcQuotes: "Weisheitszitate", qcQuotesSub: "50 Inspirationen",
+    qcSettings: "Einstellungen", qcSettingsSub: "Design & Sprache",
+    qcRandom: "Zufallszahl", qcRandomSub: "Ihre Glücksziffer",
+    todayOverview: "Heutige Numerologie-Übersicht",
+    calcTitle: "Numerologie-Rechner", calcName: "Vollständiger Name",
+    calcBirthDate: "Geburtsdatum", calcBirthTime: "Geburtszeit (optional)",
+    calcBtn: "Meine Zahlen berechnen", lifePathLabel: "Lebensweg-Zahl",
+    destinyLabel: "Schicksalszahl", soulLabel: "Seelenwunsch-Zahl",
+    personalityLabel: "Persönlichkeitszahl", detailedMeaning: "Detaillierte Bedeutung",
+    savedProfiles: "Gespeicherte Profile", noProfiles: "Noch keine Profile gespeichert. Berechnen Sie eine Zahl, um zu speichern!",
+    dailyTitle: "Tägliche Numerologie-Vorhersage", dailySelectDate: "Datum auswählen",
+    dailyLifePath: "Ihre Lebensweg-Zahl", dailyBtn: "Vorhersage erstellen",
+    dailyEnergyLabel: "Heutige Energie-Zahl", dailyAdvice: "Heutiger Rat",
+    compatTitle: "Seelen-Kompatibilität", compatPerson1: "Person 1 Lebensweg",
+    compatPerson2: "Person 2 Lebensweg", compatName1: "Person 1 Name",
+    compatName2: "Person 2 Name", compatBtn: "Kompatibilität prüfen",
+    compatMatch: "Übereinstimmung", compatAnalysis: "Kompatibilitäts-Analyse",
+    quotesTitle: "Weisheits- & Numerologie-Zitate", randomQuote: "Zufälliges Zitat",
+    quotesCategory: "Nach Kategorie", themeTitle: "Farbdesign",
+    fontTitle: "Schriftart", langTitle: "Sprache",
+    effectsTitle: "Effekte & Animationen",
+    meteorEffect: "Meteoreffekte", starTwinkle: "Sternenglimmern",
+    nebulaEffect: "Nebel-Hintergrund", particleEffects: "Partikeleffekte",
+    dataTitle: "Datenverwaltung", exportData: "Daten exportieren",
+    importData: "Daten importieren", clearData: "Alle Daten löschen",
+    appVersion: "Dianas Schweizer Taschenmesser für Numerologie v2.0",
+    appCredits: "Inspiriert von Schweizer Alpen 🏔️ & ukrainischen Sonnenblumen 🌻",
+    savedProfilesModal: "Gespeicherte Profile", luckyNumber: "Ihre Glückszahl",
+    rollAgain: "Nochmal würfeln", calcNamePlaceholder: "Geben Sie Ihren vollständigen Namen ein...",
+    calcBirthTimePlaceholder: "Optional",
+    meanings: {
+      1: { title: "Der Anführer", desc: "Sie sind ein geborener Anführer, unabhängig, ehrgeizig und bahnbrechend. Die Zahl 1 steht für Neuanfänge, Eigenständigkeit und Entschlossenheit.", keywords: ["Führung", "Unabhängigkeit", "Ehrgeiz", "Innovation", "Mut"] },
+      2: { title: "Der Diplomat", desc: "Sie sind ein natürlicher Friedensstifter mit tiefer Intuition. Die Zahl 2 steht für Partnerschaft, Gleichgewicht und Harmonie.", keywords: ["Diplomatie", "Intuition", "Zusammenarbeit", "Gleichgewicht", "Empfindsamkeit"] },
+      3: { title: "Der Kreative", desc: "Sie sind mit künstlerischem Talent und ansteckender Freude gesegnet. Die Zahl 3 steht für Kreativität, Selbstausdruck und Kommunikation.", keywords: ["Kreativität", "Ausdruck", "Freude", "Kommunikation", "Vorstellungskraft"] },
+      4: { title: "Der Erbauer", desc: "Sie sind das Fundament, auf dem Großes gebaut wird. Die Zahl 4 steht für Stabilität, harte Arbeit und praktische Errungenschaften.", keywords: ["Stabilität", "Harte Arbeit", "Ordnung", "Disziplin", "Fundament"] },
+      5: { title: "Der Abenteurer", desc: "Sie sehnen sich nach Freiheit und neuen Erfahrungen. Die Zahl 5 steht für Wandel, Abenteuer und Vielseitigkeit.", keywords: ["Freiheit", "Abenteuer", "Wandel", "Vielseitigkeit", "Energie"] },
+      6: { title: "Der Fürsorger", desc: "Sie haben ein Herz aus Gold und ein tiefes Verantwortungsgefühl. Die Zahl 6 steht für Liebe, Familie und Dienst.", keywords: ["Liebe", "Familie", "Verantwortung", "Dienst", "Harmonie"] },
+      7: { title: "Der Sucher", desc: "Sie werden von der Suche nach Wahrheit und tieferem Verständnis getrieben. Die Zahl 7 steht für Spiritualität, Analyse und Weisheit.", keywords: ["Weisheit", "Spiritualität", "Analyse", "Introspektion", "Wahrheit"] },
+      8: { title: "Das Kraftpaket", desc: "Sie sind für materiellen und spirituellen Wohlstand bestimmt. Die Zahl 8 steht für Autorität, Erfolg und den unendlichen Energiefluss.", keywords: ["Kraft", "Erfolg", "Wohlstand", "Autorität", "Errungenschaft"] },
+      9: { title: "Der Humanitäre", desc: "Sie sind eine alte Seele mit einer Mission, der Menschheit zu dienen. Die Zahl 9 steht für Vollendung, Mitgefühl und universelle Liebe.", keywords: ["Mitgefühl", "Weisheit", "Vollendung", "Dienst", "Universelle Liebe"] }
+    },
+    dailyAdvices: [
+      "Heute ist ein kraftvoller Tag für neue Anfänge. Vertrauen Sie auf Ihre Instinkte und ergreifen Sie mutige Maßnahmen.",
+      "Zusammenarbeit und Geduld werden Ihnen heute gut dienen. Hören Sie anderen zu und finden Sie Gemeinsamkeiten.",
+      "Drücken Sie Ihre Kreativität heute frei aus. Ihre Vorstellungskraft ist jetzt Ihr größtes Kapital.",
+      "Konzentrieren Sie sich heute auf den Aufbau solider Grundlagen. Harte Arbeit jetzt zahlt sich später aus.",
+      "Umarmen Sie Veränderungen mit offenem Herzen. Neue Möglichkeiten präsentieren sich Ihnen.",
+      "Pflegen Sie Ihre Beziehungen heute. Liebe und Fürsorge, die mit anderen geteilt wird, kehrt vervielfacht zurück.",
+      "Nehmen Sie sich heute Zeit für stille Reflexion. Die Antworten, die Sie suchen, liegen in Ihnen.",
+      "Übernehmen Sie heute die Kontrolle über Ihr Schicksal. Ihre Führungsqualitäten strahlen am hellsten.",
+      "Lassen Sie los, was Ihnen nicht mehr dient. Heute geht es um Vollendung und Platz für Neues schaffen."
+    ],
+    compatDescriptions: {
+      high: "Dies ist eine außergewöhnlich harmonische Verbindung! Ihre Energien ergänzen sich wunderbar und schaffen eine Beziehung voller Verständnis, Wachstum und gegenseitiger Unterstützung.",
+      medium: "Diese Paarung zeigt gutes Potenzial mit einigen Bereichen, die Aufmerksamkeit benötigen. Mit Anstrengung und Kommunikation kann diese Beziehung erblühen.",
+      low: "Diese Kombination stellt Herausforderungen dar, bietet aber auch Möglichkeiten für bedeutendes Wachstum. Das Verständnis der Unterschiede ist der Schlüssel."
+    },
+    lifePathDescriptions: {
+      1: "Ihr Lebensweg handelt von der Entwicklung von Unabhängigkeit und Führung. Sie sind hier, um neue Wege zu bahnen und andere durch Ihren Mut zu inspirieren.",
+      2: "Ihr Lebensweg dreht sich um Zusammenarbeit und Beziehungen. Sie sind hier, um Frieden, Gleichgewicht und Harmonie in die Welt zu bringen.",
+      3: "Ihr Lebensweg ist einer des kreativen Selbstausdrucks. Sie sind hier, um Ihre einzigartigen Gaben von Kunst, Kommunikation und Freude mit der Welt zu teilen.",
+      4: "Ihr Lebensweg handelt vom Aufbau dauerhafter Strukturen. Sie sind hier, um Ordnung, Stabilität und praktische Lösungen für die Zukunft zu schaffen.",
+      5: "Ihr Lebensweg handelt von Freiheitserfahrung und der Förderung positiver Veränderungen. Sie sind hier, um alte Muster zu durchbrechen.",
+      6: "Ihr Lebensweg dreht sich um Liebe, Verantwortung und Dienst an Familie und Gemeinschaft. Sie sind hier, um die Menschen um Sie herum zu nähren.",
+      7: "Ihr Lebensweg handelt von der Suche nach Wahrheit und tieferem Verständnis. Sie sind hier, um Weisheit zu entwickeln und Ihre Erkenntnisse zu teilen.",
+      8: "Ihr Lebensweg handelt vom Erreichen materiellen und spirituellen Wohlstands. Sie sind hier, um die materielle Welt zu meistern.",
+      9: "Ihr Lebensweg handelt vom Dienst an der Menschheit mit Mitgefühl. Sie sind hier, um karmische Zyklen zu vollenden und Ihre Weisheit zu teilen."
+    }
+  },
+  ch: {
+    appTitle: "Dianas Schwiizer Taschenmesser\nfür Numerologii",
+    navHome: "🏠 Heimet", navCalc: "🔢 Rächner", navDaily: " Hüt",
+    navCompat: "💕 Match", navQuotes: " Sprüch", navSettings: "️ Iistellige",
+    saved: "Gspicheret", heroTitle: "Dianas Schwiizer Taschenmesser für Numerologii",
+    heroSubtitle: "Entdeck di d' mystischi Chraft vo de Zahle. Find use, was dini Läbeswäg, Schicksal und Seelebedütig dur d' alti Chunscht vo de Numerologii sait.",
+    qcCalc: "Zahle-Rächner", qcCalcSub: "Läbeswäg & Schicksal",
+    qcDaily: "Hütigi Vorherschag", qcDailySub: "Hütigi Zahle",
+    qcCompat: "Kompatibilität", qcCompatSub: "Seele-Match-Punkti",
+    qcQuotes: "Wiisheits-Sprüch", qcQuotesSub: "50 Inspiratione",
+    qcSettings: "Iistellige", qcSettingsSub: "Design & Sproch",
+    qcRandom: "Zuefallszahl", qcRandomSub: "Dini Glücksziffer",
+    todayOverview: "Hütigi Numerologii-Übersicht",
+    calcTitle: "Numerologii-Rächner", calcName: "Vollständigi Name",
+    calcBirthDate: "Geburtstag", calcBirthTime: "Geburtsziit (optional)",
+    calcBtn: "Mini Zahle berechne", lifePathLabel: "Läbeswäg-Zahl",
+    destinyLabel: "Schicksalszahl", soulLabel: "Seeläwunsch-Zahl",
+    personalityLabel: "Persönlichkeitszahl", detailedMeaning: "Detaillierti Bedütig",
+    savedProfiles: "Gspichereti Profile", noProfiles: "Noch kei Profile gspicheret. Berechn e Zahl zum spichere!",
+    dailyTitle: "Hütigi Numerologii-Vorherschag", dailySelectDate: "Datum wähle",
+    dailyLifePath: "Dini Läbeswäg-Zahl", dailyBtn: "Vorherschag mache",
+    dailyEnergyLabel: "Hütigi Energi-Zahl", dailyAdvice: "Hütigi Ratschlag",
+    compatTitle: "Seelä-Kompatibilität", compatPerson1: "Person 1 Läbeswäg",
+    compatPerson2: "Person 2 Läbeswäg", compatName1: "Person 1 Name",
+    compatName2: "Person 2 Name", compatBtn: "Kompatibilität prüefe",
+    compatMatch: "Match", compatAnalysis: "Kompatibilitäts-Analyse",
+    quotesTitle: "Wiisheits- & Numerologii-Sprüch", randomQuote: "Zuefälligi Spruch",
+    quotesCategory: "Nach Kategorie", themeTitle: "Farb-Design",
+    fontTitle: "Schriftart", langTitle: "Sproch",
+    effectsTitle: "Effekt & Animatione",
+    meteorEffect: "Meteor-Effekt", starTwinkle: "Sternä-Flüggere",
+    nebulaEffect: "Nebel-Hintergrund", particleEffects: "Partikel-Effekt",
+    dataTitle: "Date-Verwaltig", exportData: "Date exportiere",
+    importData: "Date importiere", clearData: "Alli Date löschä",
+    appVersion: "Dianas Schwiizer Taschenmesser für Numerologii v2.0",
+    appCredits: "Inspiriert vo Schwiizer Alpe ️ & ukrainische Sunneblueme 🌻",
+    savedProfilesModal: "Gspichereti Profile", luckyNumber: "Dini Glückszahl",
+    rollAgain: "Nomal würfle", calcNamePlaceholder: "Gib dine vollständigi Name i...",
+    calcBirthTimePlaceholder: "Optional",
+    meanings: {
+      1: { title: "De Aafüerer", desc: "Du bisch en geborne Aafüerer, unabhängig, ehrgeizig und bahnbrechend. D' Zahl 1 steit für Neuaafang, Eigenständigkeit und Entschlossenheit.", keywords: ["Füerig", "Unabhängigkeit", "Ehrgeiz", "Innovation", "Muät"] },
+      2: { title: "De Diplomat", desc: "Du bisch en natürliche Friidestifter mit tiefer Intuition. D' Zahl 2 steit für Partnerschaft, Gliichgwicht und Harmonii.", keywords: ["Diplomatie", "Intuition", "Zsämmearbeit", "Gliichgwicht", "Empfindsamkeit"] },
+      3: { title: "De Kreative", desc: "Du bisch mit künstlerischem Talent und ansteckendi Freud gsegnet. D' Zahl 3 steit für Kreativität, Selbstusdruck und Kommunikation.", keywords: ["Kreativität", "Usdruck", "Freud", "Kommunikation", "Vorstelligskraft"] },
+      4: { title: "De Erbauer", desc: "Du bisch s' Fundamänt, uf dem Grosses baut wird. D' Zahl 4 steit für Stabilität, harti Arbeit und praktisch Errungeschafte.", keywords: ["Stabilität", "Harti Arbeit", "Ordnig", "Disziplin", "Fundamänt"] },
+      5: { title: "De Abenteurer", desc: "Du sehns dich nach Freiheit und neue Erfahrige. D' Zahl 5 steit für Wandel, Abenteur und Vielseitigkeit.", keywords: ["Freiheit", "Abenteur", "Wandel", "Vielseitigkeit", "Energie"] },
+      6: { title: "De Fürsorger", desc: "Du hesch es Herz us Gold und es tiefs Verantwortigsgefühl. D' Zahl 6 steit für Liebi, Familie und Dienst.", keywords: ["Liebi", "Familie", "Verantwortig", "Dienst", "Harmonii"] },
+      7: { title: "De Suecher", desc: "Du wirsch vo de Suechi nach Wahrheit und tieferem Verständnis tribe. D' Zahl 7 steit für Spiritualität, Analysis und Wiisheit.", keywords: ["Wiisheit", "Spiritualität", "Analysis", "Introspektion", "Wahrheit"] },
+      8: { title: "Ds Chraftpaket", desc: "Du bisch für materielle und spirituelle Wohlstand bestimmt. D' Zahl 8 steit für Autorität, Erfolg und de unendliche Energiifluss.", keywords: ["Chraft", "Erfolg", "Wohlstand", "Autorität", "Errungeschaft"] },
+      9: { title: "De Humanitäri", desc: "Du bisch e alti Seele mit ere Mission, de Menschheit z' diene. D' Zahl 9 steit für Volländig, Mitgefühl und universelli Liebi.", keywords: ["Mitgefühl", "Wiisheit", "Volländig", "Dienst", "Universelli Liebi"] }
+    },
+    dailyAdvices: [
+      "Hüt isch en chraftvolle Tag für neui Aafäng. Vertrau uf dini Instinkte und gang mutig vorwärts.",
+      "Zsämmearbeit und Geduld werded dir hüt guät diene. Hör andere zue und find Gmeinsamkeite.",
+      "Drück dini Kreativität hüt frei us. Dini Vorstelligskraft isch jetzt dis gröschts Kapital.",
+      "Konzentrier di hüt uf de Ufbau vo solide Fundamänt. Harte Arbeit jetzt zahled sich spöter us.",
+      "Umarm Veränderige mit offenem Herzä. Neui Möglichkeitä präsentiäred sich dir.",
+      "Pfleg dini Beziehige hüt. Liebi und Fürsorg, wo mit andere teilt wird, chunnt vervielfacht zrugg.",
+      "Nimm dir hüt Ziit für stilli Reflexion. De Antworte, wo du suechisch, liged i dir.",
+      "Übernimm hüt d' Kontroll über dis Schicksal. Dini Füerigsqualitäte strahled am hellste.",
+      "Los los, was dir nümme dient. Hüt geits um Volländig und Platz für Neus schaffe."
+    ],
+    compatDescriptions: {
+      high: "Das isch e ussergwönlich harmonischi Verbindig! Euri Energie ergänze sich wunderbar und schaffed e Beziehig voller Verständnis, Wachstum und gägesitiger Unterstützig.",
+      medium: "Das Paarig zeigt guäts Potenzial mit einigi Bereich, wo Ufmerksamkeit bruuched. Mit Aasträngig und Kommunikation chan das Beziehig erblüehe.",
+      low: "Das Kombinazion stellt Herausforderige dar, bütet aber au Möglichkeitä für bedütends Wachstum. S' Verständnis vo de Underschiid isch de Schlüssel."
+    },
+    lifePathDescriptions: {
+      1: "Din Läbeswäg handlet vo de Entwicklig vo Unabhängigkeit und Füerig. Du bisch do, um neui Wäg z' bahne und anderi dure din Muät z' inspiriere.",
+      2: "Din Läbeswäg dreit sich um Zsämmearbeit und Beziehige. Du bisch do, um Friide, Gliichgwicht und Harmonii i d' Welt z' bringe.",
+      3: "Din Läbeswäg isch eine vom kreative Selbstusdruck. Du bisch do, um dini einzigartige Gabe vo Chunscht, Kommunikation und Freud mit de Welt z' teile.",
+      4: "Din Läbeswäg handlet vom Ufbau vo dauerhafte Strukture. Du bisch do, um Ordnig, Stabilität und praktisch Lösige für d' Zukunft z' schaffe.",
+      5: "Din Läbeswäg handlet vo Freiheitserfahrig und de Förderig vo positive Veränderige. Du bisch do, um alti Muster z' durchbreche.",
+      6: "Din Läbeswäg dreit sich um Liebi, Verantwortig und Dienst a Familie und Gemeinschaft. Du bisch do, um d' Mensche um di umä z' nähre.",
+      7: "Din Läbeswäg handlet vo de Suechi nach Wahrheit und tieferem Verständnis. Du bisch do, um Wiisheit z' entwickle und dini Erkenntnis z' teile.",
+      8: "Din Läbeswäg handlet vom Erreiche vo materiellem und spirituellem Wohlstand. Du bisch do, um d' materielli Welt z' meistere.",
+      9: "Din Läbeswäg handlet vom Dienst a de Menschheit mit Mitgefühl. Du bisch do, um karmischi Zykle z' vollände und dini Wiisheit z' teile."
+    }
+  },
+  uk: {
+    appTitle: "Швейцарський ніж Діани\nдля Нумерології",
+    navHome: "🏠 Головна", navCalc: "🔢 Калькулятор", navDaily: "🌟 Щоденно",
+    navCompat: "💕 Сумісність", navQuotes: "💬 Цитати", navSettings: "️ Налаштування",
+    saved: "Збережено", heroTitle: "Швейцарський ніж Діани для Нумерології",
+    heroSubtitle: "Відкрийте містичну силу чисел. Дізнайтеся свій життєвий шлях, долю та призначення душі через стародавнє мистецтво нумерології.",
+    qcCalc: "Калькулятор чисел", qcCalcSub: "Життєвий шлях та Доля",
+    qcDaily: "Щоденний прогноз", qcDailySub: "Сьогоднішні числа",
+    qcCompat: "Сумісність", qcCompatSub: "Оцінка душ",
+    qcQuotes: "Цитати мудрості", qcQuotesSub: "50 Натхнень",
+    qcSettings: "Налаштування", qcSettingsSub: "Тема та Мова",
+    qcRandom: "Випадкове число", qcRandomSub: "Ваша щаслива цифра",
+    todayOverview: "Сьогоднішній нумерологічний огляд",
+    calcTitle: "Нумерологічний калькулятор", calcName: "Повне ім'я",
+    calcBirthDate: "Дата народження", calcBirthTime: "Час народження (необов'язково)",
+    calcBtn: "Розрахувати мої числа", lifePathLabel: "Число життєвого шляху",
+    destinyLabel: "Число долі", soulLabel: "Число бажання душі",
+    personalityLabel: "Число особистості", detailedMeaning: "Детальне значення",
+    savedProfiles: "Збережені профілі", noProfiles: "Ще немає збережених профілів. Розрахуйте число, щоб зберегти!",
+    dailyTitle: "Щоденний нумерологічний прогноз", dailySelectDate: "Оберіть дату",
+    dailyLifePath: "Ваше число життєвого шляху", dailyBtn: "Створити прогноз",
+    dailyEnergyLabel: "Сьогоднішнє число енергії", dailyAdvice: "Сьогоднішня порада",
+    compatTitle: "Душевна сумісність", compatPerson1: "Життєвий шлях Особи 1",
+    compatPerson2: "Життєвий шлях Особи 2", compatName1: "Ім'я Особи 1",
+    compatName2: "Ім'я Особи 2", compatBtn: "Перевірити сумісність",
+    compatMatch: "Сумісність", compatAnalysis: "Аналіз сумісності",
+    quotesTitle: "Цитати мудрості та нумерології", randomQuote: "Випадкова цитата",
+    quotesCategory: "За категорією", themeTitle: "Кольорова тема",
+    fontTitle: "Стиль шрифту", langTitle: "Мова",
+    effectsTitle: "Ефекти та анімації",
+    meteorEffect: "Ефекти метеорів", starTwinkle: "Мерехтіння зірок",
+    nebulaEffect: "Туманність фону", particleEffects: "Ефекти частинок",
+    dataTitle: "Управління даними", exportData: "Експорт даних",
+    importData: "Імпорт даних", clearData: "Очистити всі дані",
+    appVersion: "Швейцарський ніж Діани для Нумерології v2.0",
+    appCredits: "Натхненно Швейцарськими Альпами 🏔️ та Українськими Соняшниками 🌻",
+    savedProfilesModal: "Збережені профілі", luckyNumber: "Ваше щасливе число",
+    rollAgain: "Кинути знову", calcNamePlaceholder: "Введіть ваше повне ім'я...",
+    calcBirthTimePlaceholder: "Необов'язково",
+    meanings: {
+      1: { title: "Лідер", desc: "Ви — народжений лідер, незалежний, амбітний та новаторський. Число 1 символізує нові починання, самостійність та рішучість.", keywords: ["Лідерство", "Незалежність", "Амбіції", "Інновації", "Сміливість"] },
+      2: { title: "Дипломат", desc: "Ви — природний миротворець з глибокою інтуїцією. Число 2 символізує партнерство, баланс та гармонію.", keywords: ["Дипломатія", "Інтуїція", "Співпраця", "Баланс", "Чутливість"] },
+      3: { title: "Творець", desc: "Ви благословенні артистичним талантом та заражаючою радістю. Число 3 символізує креативність, самовираження та комунікацію.", keywords: ["Креативність", "Вираз", "Радість", "Комунікація", "Уява"] },
+      4: { title: "Будівельник", desc: "Ви — фундамент, на якому будується велике. Число 4 символізує стабільність, наполегливу працю та практичні досягнення.", keywords: ["Стабільність", "Наполегливість", "Порядок", "Дисципліна", "Фундамент"] },
+      5: { title: "Мандрівник", desc: "Ви прагнете свободи та нових вражень. Число 5 символізує зміни, пригоди та різнобічність.", keywords: ["Свобода", "Пригоди", "Зміни", "Різноманітність", "Енергія"] },
+      6: { title: "Піклувальник", desc: "У вас золоте серце та глибоке почуття відповідальності. Число 6 символізує любов, сім'ю та служіння.", keywords: ["Любов", "Сім'я", "Відповідальність", "Служіння", "Гармонія"] },
+      7: { title: "Шукач", desc: "Вас рухає пошук істини та глибшого розуміння. Число 7 символізує духовність, аналіз та мудрість.", keywords: ["Мудрість", "Духовність", "Аналіз", "Інтроспекція", "Істина"] },
+      8: { title: "Могутній", desc: "Ви призначені для матеріального та духовного достатку. Число 8 символізує владу, успіх та нескінченний потік енергії.", keywords: ["Влада", "Успіх", "Достаток", "Авторитет", "Досягнення"] },
+      9: { title: "Гуманіст", desc: "Ви — стара душа з місією служити людству. Число 9 символізує завершення, співчуття та універсальну любов.", keywords: ["Співчуття", "Мудрість", "Завершення", "Служіння", "Універсальна любов"] }
+    },
+    dailyAdvices: [
+      "Сьогодні потужний день для нових починань. Довіряйте своїм інстинктам та дійте сміливо.",
+      "Співпраця та терпіння будуть вам сьогодні корисними. Слухайте інших та шукайте спільне.",
+      "Вільно виражайте свою креативність сьогодні. Ваша уява — ваш найбільший актив.",
+      "Зосередьтеся сьогодні на будівництві міцних основ. Наполеглива праця зараз окупиться пізніше.",
+      "Приймайте зміни з відкритим серцем. Нові можливості представляються вам.",
+      "Дбайте про свої стосунки сьогодні. Любов та турбота, поділена з іншими, повертається примноженою.",
+      "Знайдіть час сьогодні для тихої рефлексії. Відповіді, які ви шукаєте, всередині вас.",
+      "Візьміть контроль над своєю долею сьогодні. Ваші лідерські якості сяють яскравіше за все.",
+      "Відпустіть те, що більше не служить вам. Сьогодні — про завершення та звільнення місця для нового."
+    ],
+    compatDescriptions: {
+      high: "Це винятково гармонійний союз! Ваші енергії чудово доповнюють одна одну, створюючи стосунки, сповнені розуміння, зростання та взаємної підтримки.",
+      medium: "Ця пара показує хороший потенціал з деякими областями, які потребують уваги. З зусиллями та комунікацією ці стосунки можуть розквітнути.",
+      low: "Ця комбінація представляє виклики, але також можливості для значного зростання. Розуміння відмінностей один одного — ключ до міцного зв'язку."
+    },
+    lifePathDescriptions: {
+      1: "Ваш життєвий шлях — це розвиток незалежності та лідерства. Ви тут, щоб прокладати нові шляхи та надихати інших своєю сміливістю.",
+      2: "Ваш життєвий шлях обертається навколо співпраці та стосунків. Ви тут, щоб принести мир, баланс та гармонію у світ.",
+      3: "Ваш життєвий шлях — це творче самовираження. Ви тут, щоб поділитися своїми унікальними дарами мистецтва, комунікації та радості зі світом.",
+      4: "Ваш життєвий шлях — це будівництво міцних структур. Ви тут, щоб створювати порядок, стабільність та практичні рішення для майбутнього.",
+      5: "Ваш життєвий шлях — це досвід свободи та сприяння позитивним змінам. Ви тут, щоб розірвати старі шаблони.",
+      6: "Ваш життєвий шлях обертається навколо любові, відповідальності та служіння сім'ї та спільноти. Ви тут, щоб плекати тих, хто вас оточує.",
+      7: "Ваш життєвий шлях — це пошук істини та глибшого розуміння. Ви тут, щоб розвивати мудрість та ділитися своїми знаннями.",
+      8: "Ваш життєвий шлях — це досягнення матеріального та духовного достатку. Ви тут, щоб опанувати матеріальний світ.",
+      9: "Ваш життєвий шлях — це служіння людству зі співчуттям. Ви тут, щоб завершити кармічні цикли та поділитися своєю мудрістю."
+    }
+  },
+  ru: {
+    appTitle: "Швейцарский нож Дианы\nдля Нумерологии",
+    navHome: "🏠 Главная", navCalc: " Калькулятор", navDaily: "🌟 Ежедневно",
+    navCompat: "💕 Совместимость", navQuotes: " Цитаты", navSettings: "️ Настройки",
+    saved: "Сохранено", heroTitle: "Швейцарский нож Дианы для Нумерологии",
+    heroSubtitle: "Откройте мистическую силу чисел. Узнайте свой жизненный путь, судьбу и предназначение души через древнее искусство нумерологии.",
+    qcCalc: "Калькулятор чисел", qcCalcSub: "Жизненный путь и Судьба",
+    qcDaily: "Ежедневный прогноз", qcDailySub: "Сегодняшние числа",
+    qcCompat: "Совместимость", qcCompatSub: "Оценка душ",
+    qcQuotes: "Цитаты мудрости", qcQuotesSub: "50 Вдохновений",
+    qcSettings: "Настройки", qcSettingsSub: "Тема и Язык",
+    qcRandom: "Случайное число", qcRandomSub: "Ваше счастливое число",
+    todayOverview: "Сегодняшний нумерологический обзор",
+    calcTitle: "Нумерологический калькулятор", calcName: "Полное имя",
+    calcBirthDate: "Дата рождения", calcBirthTime: "Время рождения (необязательно)",
+    calcBtn: "Рассчитать мои числа", lifePathLabel: "Число жизненного пути",
+    destinyLabel: "Число судьбы", soulLabel: "Число желания души",
+    personalityLabel: "Число личности", detailedMeaning: "Подробное значение",
+    savedProfiles: "Сохранённые профили", noProfiles: "Пока нет сохранённых профилей. Рассчитайте число, чтобы сохранить!",
+    dailyTitle: "Ежедневный нумерологический прогноз", dailySelectDate: "Выберите дату",
+    dailyLifePath: "Ваше число жизненного пути", dailyBtn: "Создать прогноз",
+    dailyEnergyLabel: "Сегодняшнее число энергии", dailyAdvice: "Сегодняшний совет",
+    compatTitle: "Душевная совместимость", compatPerson1: "Жизненный путь Человека 1",
+    compatPerson2: "Жизненный путь Человека 2", compatName1: "Имя Человека 1",
+    compatName2: "Имя Человека 2", compatBtn: "Проверить совместимость",
+    compatMatch: "Совместимость", compatAnalysis: "Анализ совместимости",
+    quotesTitle: "Цитаты мудрости и нумерологии", randomQuote: "Случайная цитата",
+    quotesCategory: "По категории", themeTitle: "Цветовая тема",
+    fontTitle: "Стиль шрифта", langTitle: "Язык",
+    effectsTitle: "Эффекты и анимации",
+    meteorEffect: "Эффекты метеоров", starTwinkle: "Мерцание звёзд",
+    nebulaEffect: "Туманность фона", particleEffects: "Эффекты частиц",
+    dataTitle: "Управление данными", exportData: "Экспорт данных",
+    importData: "Импорт данных", clearData: "Очистить все данные",
+    appVersion: "Швейцарский нож Дианы для Нумерологии v2.0",
+    appCredits: "Вдохновлено Швейцарскими Альпами 🏔️ и Украинскими Подсолнухами 🌻",
+    savedProfilesModal: "Сохранённые профили", luckyNumber: "Ваше счастливое число",
+    rollAgain: "Бросить снова", calcNamePlaceholder: "Введите ваше полное имя...",
+    calcBirthTimePlaceholder: "Необязательно",
+    meanings: {
+      1: { title: "Лидер", desc: "Вы — прирождённый лидер, независимый, амбициозный и новаторский. Число 1 символизирует новые начинания, самостоятельность и решимость.", keywords: ["Лидерство", "Независимость", "Амбиции", "Инновации", "Смелость"] },
+      2: { title: "Дипломат", desc: "Вы — природный миротворец с глубокой интуицией. Число 2 символизирует партнёрство, баланс и гармонию.", keywords: ["Дипломатия", "Интуиция", "Сотрудничество", "Баланс", "Чувствительность"] },
+      3: { title: "Творец", desc: "Вы благословлены артистическим талантом и заразительной радостью. Число 3 символизирует креативность, самовыражение и коммуникацию.", keywords: ["Креативность", "Выражение", "Радость", "Коммуникация", "Воображение"] },
+      4: { title: "Строитель", desc: "Вы — фундамент, на котором строится великое. Число 4 символизирует стабильность, упорный труд и практические достижения.", keywords: ["Стабильность", "Упорный труд", "Порядок", "Дисциплина", "Фундамент"] },
+      5: { title: "Искатель приключений", desc: "Вы стремитесь к свободе и новым впечатлениям. Число 5 символизирует перемены, приключения и разносторонность.", keywords: ["Свобода", "Приключения", "Перемены", "Разносторонность", "Энергия"] },
+      6: { title: "Хранитель", desc: "У вас золотое сердце и глубокое чувство ответственности. Число 6 символизирует любовь, семью и служение.", keywords: ["Любовь", "Семья", "Ответственность", "Служение", "Гармония"] },
+      7: { title: "Искатель истины", desc: "Вас движет поиск истины и более глубокого понимания. Число 7 символизирует духовность, анализ и мудрость.", keywords: ["Мудрость", "Духовность", "Анализ", "Интроспекция", "Истина"] },
+      8: { title: "Могущественный", desc: "Вы предназначены для материального и духовного изобилия. Число 8 символизирует власть, успех и бесконечный поток энергии.", keywords: ["Власть", "Успех", "Изобилие", "Авторитет", "Достижения"] },
+      9: { title: "Гуманист", desc: "Вы — старая душа с миссией служить человечеству. Число 9 символизирует завершение, сострадание и универсальную любовь.", keywords: ["Сострадание", "Мудрость", "Завершение", "Служение", "Универсальная любовь"] }
+    },
+    dailyAdvices: [
+      "Сегодня мощный день для новых начинаний. Доверяйте своим инстинктам и действуйте смело.",
+      "Сотрудничество и терпение будут вам сегодня полезны. Слушайте других и ищите общее.",
+      "Свободно выражайте свою креативность сегодня. Ваше воображение — ваш величайший актив.",
+      "Сосредоточьтесь сегодня на строительстве прочных основ. Упорный труд сейчас окупится позже.",
+      "Принимайте перемены с открытым сердцем. Новые возможности представляются вам.",
+      "Заботьтесь о своих отношениях сегодня. Любовь и забота, разделённая с другими, возвращается умноженной.",
+      "Найдите время сегодня для тихой рефлексии. Ответы, которые вы ищете, внутри вас.",
+      "Возьмите контроль над своей судьбой сегодня. Ваши лидерские качества сияют ярче всего.",
+      "Отпустите то, что больше не служит вам. Сегодня — о завершении и освобождении места для нового."
+    ],
+    compatDescriptions: {
+      high: "Это исключительно гармоничный союз! Ваши энергии прекрасно дополняют друг друга, создавая отношения, полные понимания, роста и взаимной поддержки.",
+      medium: "Эта пара показывает хороший потенциал с некоторыми областями, требующими внимания. С усилиями и коммуникацией эти отношения могут расцвести.",
+      low: "Эта комбинация представляет вызовы, но также возможности для значительного роста. Понимание различий друг друга — ключ к прочной связи."
+    },
+    lifePathDescriptions: {
+      1: "Ваш жизненный путь — это развитие независимости и лидерства. Вы здесь, чтобы прокладывать новые пути и вдохновлять других своей смелостью.",
+      2: "Ваш жизненный путь вращается вокруг сотрудничества и отношений. Вы здесь, чтобы принести мир, баланс и гармонию в мир.",
+      3: "Ваш жизненный путь — это творческое самовыражение. Вы здесь, чтобы поделиться своими уникальными дарами искусства, коммуникации и радости с миром.",
+      4: "Ваш жизненный путь — это строительство прочных структур. Вы здесь, чтобы создавать порядок, стабильность и практические решения для будущего.",
+      5: "Ваш жизненный путь — это опыт свободы и содействие позитивным переменам. Вы здесь, чтобы разорвать старые шаблоны.",
+      6: "Ваш жизненный путь вращается вокруг любви, ответственности и служения семье и сообществу. Вы здесь, чтобы взращивать тех, кто вас окружает.",
+      7: "Ваш жизненный путь — это поиск истины и более глубокого понимания. Вы здесь, чтобы развивать мудрость и делиться своими знаниями.",
+      8: "Ваш жизненный путь — это достижение материального и духовного изобилия. Вы здесь, чтобы освоить материальный мир.",
+      9: "Ваш жизненный путь — это служение человечеству с состраданием. Вы здесь, чтобы завершить кармические циклы и поделиться своей мудростью."
+    }
+  }
+};
+
+// --- 50 Quotes in 5 Languages ---
+const QUOTES = [
+  { en: { text: "Everything in the universe is vibration. The numbers reveal the vibration of your soul.", author: "Pythagoras", cat: "numbers" }, de: { text: "Alles im Universum ist Vibration. Die Zahlen offenbaren die Vibration Ihrer Seele.", author: "Pythagoras", cat: "numbers" }, ch: { text: "Alles im Universum isch Vibration. D' Zahle offenbared d' Vibration vo dinere Seele.", author: "Pythagoras", cat: "numbers" }, uk: { text: "Все у всесвіті — це вібрація. Числа розкривають вібрацію вашої душі.", author: "Піфагор", cat: "numbers" }, ru: { text: "Всё во вселенной — это вибрация. Числа раскрывают вибрацию вашей души.", author: "Пифагор", cat: "numbers" }},
+  { en: { text: "The mountains do not yield to the storm; they endure it with silent strength.", author: "Swiss Proverb", cat: "swiss" }, de: { text: "Die Berge weichen nicht vor dem Sturm; sie ertragen ihn mit stiller Stärke.", author: "Schweizer Sprichwort", cat: "swiss" }, ch: { text: "D' Berge gebed ned vor em Sturm no; si erträged ihn mit stiller Stärchi.", author: "Schwiizer Sprichwort", cat: "swiss" }, uk: { text: "Гори не поступаються шторму; вони витримують його з мовчазною силою.", author: "Швейцарське прислів'я", cat: "swiss" }, ru: { text: "Горы не уступают буре; они выдерживают её с молчаливой силой.", author: "Швейцарская пословица", cat: "swiss" }},
+  { en: { text: "A single sunflower can turn its face to follow the sun across the entire sky.", author: "Ukrainian Proverb", cat: "ukrainian" }, de: { text: "Eine einzelne Sonnenblume kann ihr Gesicht wenden, um der Sonne über den gesamten Himmel zu folgen.", author: "Ukrainisches Sprichwort", cat: "ukrainian" }, ch: { text: "E einzelni Sunneblueme chan ihr Gsicht wende, um de Sonne über de ganze Himmel z' folge.", author: "Ukrainischs Sprichwort", cat: "ukrainian" }, uk: { text: "Один соняшник може повернути обличчя, щоб слідувати за сонцем по всьому небу.", author: "Українське прислів'я", cat: "ukrainian" }, ru: { text: "Один подсолнух может повернуть лицо, чтобы следовать за солнцем по всему небу.", author: "Украинская пословица", cat: "ukrainian" }},
+  { en: { text: "Know thyself, and you shall know the universe and the gods.", author: "Inscription at Delphi", cat: "wisdom" }, de: { text: "Erkenne dich selbst, und du wirst das Universum und die Götter erkennen.", author: "Inschrift in Delphi", cat: "wisdom" }, ch: { text: "Kenn di selber, und du wirsch ds Universum und d' Götter erkenne.", author: "Inschrift z' Delphi", cat: "wisdom" }, uk: { text: "Пізнай себе, і ти пізнаєш всесвіт і богів.", author: "Напис у Дельфах", cat: "wisdom" }, ru: { text: "Познай себя, и ты познаешь вселенную и богов.", author: "Надпись в Дельфах", cat: "wisdom" }},
+  { en: { text: "The secret of change is to focus all of your energy not on fighting the old, but on building the new.", author: "Socrates", cat: "wisdom" }, de: { text: "Das Geheimnis der Veränderung liegt darin, alle Energie nicht auf das Kämpfen gegen das Alte, sondern auf das Bauen des Neuen zu richten.", author: "Sokrates", cat: "wisdom" }, ch: { text: "Ds Gheimnis vo de Veränderig lit drin, alli Energi nid uf ds Kämpfe gäge ds Alte, sondern uf ds Baue vom Neue z' richte.", author: "Sokrates", cat: "wisdom" }, uk: { text: "Секрет змін — зосередити всю свою енергію не на боротьбі зі старим, а на будівництві нового.", author: "Сократ", cat: "wisdom" }, ru: { text: "Секрет перемен — направить всю свою энергию не на борьбу со старым, а на построение нового.", author: "Сократ", cat: "wisdom" }},
+  { en: { text: "Where there is love, there is life.", author: "Mahatma Gandhi", cat: "love" }, de: { text: "Wo Liebe ist, ist Leben.", author: "Mahatma Gandhi", cat: "love" }, ch: { text: "Wo Liebi isch, isch Läbe.", author: "Mahatma Gandhi", cat: "love" }, uk: { text: "Де є любов, там є життя.", author: "Махатма Ганді", cat: "love" }, ru: { text: "Где любовь, там и жизнь.", author: "Махатма Ганди", cat: "love" }},
+  { en: { text: "Success is not final, failure is not fatal: it is the courage to continue that counts.", author: "Winston Churchill", cat: "success" }, de: { text: "Erfolg ist nicht endgültig, Misserfolg ist nicht tödlich: Es ist der Mut, weiterzumachen, der zählt.", author: "Winston Churchill", cat: "success" }, ch: { text: "Erfolg isch ned definitiv, Misserfolg isch ned tödlich: Es isch de Muät, wyterzmache, wo zehlt.", author: "Winston Churchill", cat: "success" }, uk: { text: "Успіх не остаточний, невдача не фатальна: важлива лише сміливість продовжувати.", author: "Вінстон Черчілль", cat: "success" }, ru: { text: "Успех не окончателен, неудача не фатальна: важна лишь смелость продолжать.", author: "Уинстон Черчилль", cat: "success" }},
+  { en: { text: "The number 7 has been considered sacred and mystical since ancient times, appearing in religions and cultures worldwide.", author: "Numerology Tradition", cat: "numbers" }, de: { text: "Die Zahl 7 gilt seit der Antike als heilig und mystisch und erscheint in Religionen und Kulturen weltweit.", author: "Numerologie-Tradition", cat: "numbers" }, ch: { text: "D' Zahl 7 gilt sit de Antike als heilig und mystisch und erschynt i Religione und Kulture uf de ganze Wält.", author: "Numerologii-Tradition", cat: "numbers" }, uk: { text: "Число 7 вважається священним і містичним з давніх часів, з'являючись у релігіях і культурах у всьому світі.", author: "Нумерологічна традиція", cat: "numbers" }, ru: { text: "Число 7 считается священным и мистическим с древних времён, появляясь в религиях и культурах по всему миру.", author: "Нумерологическая традиция", cat: "numbers" }},
+  { en: { text: "In the middle of difficulty lies opportunity.", author: "Albert Einstein", cat: "success" }, de: { text: "In der Mitte der Schwierigkeit liegt die Möglichkeit.", author: "Albert Einstein", cat: "success" }, ch: { text: "I de Mitti vo de Schwierigkeit ligt d' Möglichkeit.", author: "Albert Einstein", cat: "success" }, uk: { text: "У середині труднощів криється можливість.", author: "Альберт Ейнштейн", cat: "success" }, ru: { text: "В середине трудности кроется возможность.", author: "Альберт Эйнштейн", cat: "success" }},
+  { en: { text: "The soul becomes dyed with the color of its thoughts.", author: "Marcus Aurelius", cat: "wisdom" }, de: { text: "Die Seele wird mit der Farbe ihrer Gedanken gefärbt.", author: "Marc Aurel", cat: "wisdom" }, ch: { text: "D' Seele wird mit de Farb vo ihre Gedanke gfärbt.", author: "Marc Aurel", cat: "wisdom" }, uk: { text: "Душа забарвлюється кольором своїх думок.", author: "Марк Аврелій", cat: "wisdom" }, ru: { text: "Душа окрашивается цветом своих мыслей.", author: "Марк Аврелий", cat: "wisdom" }},
+  { en: { text: "Swiss precision is not just about clocks; it is about a way of life that values excellence.", author: "Swiss Wisdom", cat: "swiss" }, de: { text: "Schweizer Präzision betrifft nicht nur Uhren; es ist eine Lebensart, die Exzellenz schätzt.", author: "Schweizer Weisheit", cat: "swiss" }, ch: { text: "Schwiizer Präzision betrüfft nid nur Uhrä; es isch e Läbensart, wo Exzellenz schätzt.", author: "Schwiizer Wiisheit", cat: "swiss" }, uk: { text: "Швейцарська точність — це не лише про годинники; це спосіб життя, що цінує досконалість.", author: "Швейцарська мудрість", cat: "swiss" }, ru: { text: "Швейцарская точность — это не только часы; это образ жизни, ценящий совершенство.", author: "Швейцарская мудрость", cat: "swiss" }},
+  { en: { text: "Ukraine is not just a country on the map; it is a spirit that cannot be broken.", author: "Ukrainian Proverb", cat: "ukrainian" }, de: { text: "Die Ukraine ist nicht nur ein Land auf der Karte; sie ist ein Geist, der nicht gebrochen werden kann.", author: "Ukrainisches Sprichwort", cat: "ukrainian" }, ch: { text: "D' Ukraine isch nid nur es Land uf de Chartä; si isch en Geist, wo nid broche wärde chan.", author: "Ukrainischs Sprichwort", cat: "ukrainian" }, uk: { text: "Україна — це не просто країна на карті; це дух, який не можна зламати.", author: "Українське прислів'я", cat: "ukrainian" }, ru: { text: "Украина — это не просто страна на карте; это дух, который нельзя сломить.", author: "Украинская пословица", cat: "ukrainian" }},
+  { en: { text: "Life is what happens when you're busy making other plans.", author: "John Lennon", cat: "wisdom" }, de: { text: "Das Leben ist das, was passiert, während du andere Pläne machst.", author: "John Lennon", cat: "wisdom" }, ch: { text: "Ds Läbe isch das, was bassiert, während du anderi Plän machsch.", author: "John Lennon", cat: "wisdom" }, uk: { text: "Життя — це те, що відбувається, поки ти зайнятий складанням інших планів.", author: "Джон Леннон", cat: "wisdom" }, ru: { text: "Жизнь — это то, что происходит, пока ты занят составлением других планов.", author: "Джон Леннон", cat: "wisdom" }},
+  { en: { text: "To love and be loved is to feel the sun from both sides.", author: "David Viscott", cat: "love" }, de: { text: "Zu lieben und geliebt zu werden, bedeutet, die Sonne von beiden Seiten zu spüren.", author: "David Viscott", cat: "love" }, ch: { text: "Z' liebe und gliebt z' wärde, bedütet, d' Sonne vo beide Site z' spüre.", author: "David Viscott", cat: "love" }, uk: { text: "Любити і бути коханим — це відчувати сонце з обох боків.", author: "Девід Віскотт", cat: "love" }, ru: { text: "Любить и быть любимым — значит чувствовать солнце с обеих сторон.", author: "Дэвид Вискотт", cat: "love" }},
+  { en: { text: "The master number 11 is the most intuitive of all numbers, representing spiritual insight and enlightenment.", author: "Numerology Tradition", cat: "numbers" }, de: { text: "Die Meisterzahl 11 ist die intuitivste aller Zahlen und steht für spirituelle Einsicht und Erleuchtung.", author: "Numerologie-Tradition", cat: "numbers" }, ch: { text: "D' Meischterzahl 11 isch d' intuitivschti vo alle Zahle und steit für spirituelle Isicht und Erleuchtig.", author: "Numerologii-Tradition", cat: "numbers" }, uk: { text: "Майстерне число 11 — найбільш інтуїтивне з усіх чисел, що представляє духовне прозріння та просвітлення.", author: "Нумерологічна традиція", cat: "numbers" }, ru: { text: "Мастер-число 11 — самое интуитивное из всех чисел, представляющее духовное прозрение и просветление.", author: "Нумерологическая традиция", cat: "numbers" }},
+  { en: { text: "The best time to plant a tree was 20 years ago. The second best time is now.", author: "Chinese Proverb", cat: "wisdom" }, de: { text: "Die beste Zeit, einen Baum zu pflanzen, war vor 20 Jahren. Die zweitbeste Zeit ist jetzt.", author: "Chinesisches Sprichwort", cat: "wisdom" }, ch: { text: "D' bescht Ziit, en Baum z' pflanze, isch vor 20 Jahr gsi. D' zweibeschti Ziit isch jetzt.", author: "Chinesisches Sprichwort", cat: "wisdom" }, uk: { text: "Найкращий час посадити дерево був 20 років тому. Другий найкращий час — зараз.", author: "Китайське прислів'я", cat: "wisdom" }, ru: { text: "Лучшее время посадить дерево было 20 лет назад. Второе лучшее время — сейчас.", author: "Китайская пословица", cat: "wisdom" }},
+  { en: { text: "Chocolate is the answer. Who cares what the question is?", author: "Swiss Saying", cat: "swiss" }, de: { text: "Schokolade ist die Antwort. Wen interessiert, was die Frage ist?", author: "Schweizer Sprichwort", cat: "swiss" }, ch: { text: "Schoggi isch d' Antwort. Wem interessiert, was d' Frag isch?", author: "Schwiizer Sprichwort", cat: "swiss" }, uk: { text: "Шоколад — це відповідь. Кому яка різниця, яке питання?", author: "Швейцарський жарт", cat: "swiss" }, ru: { text: "Шоколад — это ответ. Кто заботится, в чём вопрос?", author: "Швейцарская шутка", cat: "swiss" }},
+  { en: { text: "A nation that has forgotten its history has no future.", author: "Ukrainian Proverb", cat: "ukrainian" }, de: { text: "Eine Nation, die ihre Geschichte vergessen hat, hat keine Zukunft.", author: "Ukrainisches Sprichwort", cat: "ukrainian" }, ch: { text: "E Nation, wo ihri Gschicht vergässe het, het kei Zukunft.", author: "Ukrainischs Sprichwort", cat: "ukrainian" }, uk: { text: "Нація, яка забула свою історію, не має майбутнього.", author: "Українське прислів'я", cat: "ukrainian" }, ru: { text: "Нация, забывшая свою историю, не имеет будущего.", author: "Украинская пословица", cat: "ukrainian" }},
+  { en: { text: "The only way to do great work is to love what you do.", author: "Steve Jobs", cat: "success" }, de: { text: "Der einzige Weg, großartige Arbeit zu leisten, besteht darin, das zu lieben, was man tut.", author: "Steve Jobs", cat: "success" }, ch: { text: "De einzigi Wäg, grossartigi Arbeit z' leischte, bestoht drin, das z' liebe, was me tuät.", author: "Steve Jobs", cat: "success" }, uk: { text: "Єдиний спосіб робити велику роботу — любити те, що ти робиш.", author: "Стів Джобс", cat: "success" }, ru: { text: "Единственный способ делать великую работу — любить то, что ты делаешь.", author: "Стив Джобс", cat: "success" }},
+  { en: { text: "In the depths of winter, I finally learned that within me there lay an invincible summer.", author: "Albert Camus", cat: "wisdom" }, de: { text: "Mitten im Winter habe ich endlich entdeckt, dass in mir ein unbesiegbarer Sommer liegt.", author: "Albert Camus", cat: "wisdom" }, ch: { text: "Mitten im Winter han ich endlech entdeckt, dass i mir en unbsiegbari Summer ligt.", author: "Albert Camus", cat: "wisdom" }, uk: { text: "У глибині зими я нарешті дізнався, що всередині мене лежить непереможне літо.", author: "Альбер Камю", cat: "wisdom" }, ru: { text: "В глубине зимы я наконец обнаружил, что во мне живёт непобедимое лето.", author: "Альбер Камю", cat: "wisdom" }},
+  { en: { text: "The number 22 is the master builder, capable of turning the most ambitious dreams into reality.", author: "Numerology Tradition", cat: "numbers" }, de: { text: "Die Zahl 22 ist der Meisterbauer, der die ambitioniertesten Träume in die Realität umsetzen kann.", author: "Numerologie-Tradition", cat: "numbers" }, ch: { text: "D' Zahl 22 isch de Meischterbauer, wo d' ambitioniertischte Träum i d' Realität cha umsetze.", author: "Numerologii-Tradition", cat: "numbers" }, uk: { text: "Число 22 — це майстер-будівельник, здатний перетворити найамбітніші мрії на реальність.", author: "Нумерологічна традиція", cat: "numbers" }, ru: { text: "Число 22 — это мастер-строитель, способный превратить самые амбициозные мечты в реальность.", author: "Нумерологическая традиция", cat: "numbers" }},
+  { en: { text: "Love is composed of a single soul inhabiting two bodies.", author: "Aristotle", cat: "love" }, de: { text: "Liebe besteht aus einer einzigen Seele, die in zwei Körpern wohnt.", author: "Aristoteles", cat: "love" }, ch: { text: "Liebi besteit us ere einzige Seele, wo i zwei Körper woont.", author: "Aristoteles", cat: "love" }, uk: { text: "Любовь складається з єдиної душі, що мешкає в двох тілах.", author: "Аристотель", cat: "love" }, ru: { text: "Любовь состоит из одной души, обитающей в двух телах.", author: "Аристотель", cat: "love" }},
+  { en: { text: "Do not wait for the perfect moment; take the moment and make it perfect.", author: "Zoey Sayward", cat: "success" }, de: { text: "Warte nicht auf den perfekten Moment; nimm den Moment und mache ihn perfekt.", author: "Zoey Sayward", cat: "success" }, ch: { text: "Wart ned uf de perfekt Moment; nimm de Moment und mach ihn perfekt.", author: "Zoey Sayward", cat: "success" }, uk: { text: "Не чекайте на ідеальний момент; візьміть момент і зробіть його ідеальним.", author: "Зое Сейвард", cat: "success" }, ru: { text: "Не ждите идеального момента; возьмите момент и сделайте его идеальным.", author: "Зои Сейвард", cat: "success" }},
+  { en: { text: "Swiss cheese holes are not defects; they are windows to perfection.", author: "Swiss Saying", cat: "swiss" }, de: { text: "Die Löcher im Schweizer Käse sind keine Fehler; sie sind Fenster zur Vollkommenheit.", author: "Schweizer Sprichwort", cat: "swiss" }, ch: { text: "D' Löcher im Schwiizer Chäs sind kei Fehler; si sind Fenschter zur Vollkommeheit.", author: "Schwiizer Sprichwort", cat: "swiss" }, uk: { text: "Дірки у швейцарському сирі — це не дефекти; це вікна до досконалості.", author: "Швейцарський жарт", cat: "swiss" }, ru: { text: "Дырки в швейцарском сыре — это не дефекты; это окна к совершенству.", author: "Швейцарская шутка", cat: "swiss" }},
+  { en: { text: "When the willows sway and the river flows, the Ukrainian heart remembers its homeland.", author: "Ukrainian Poem", cat: "ukrainian" }, de: { text: "Wenn die Weiden sich wiegen und der Fluss fließt, erinnert sich das ukrainische Herz an seine Heimat.", author: "Ukrainisches Gedicht", cat: "ukrainian" }, ch: { text: "Wenn d' Wide sich wiege und de Fluss fliesst, erinnert sich ds ukrainische Herz a sini Heimet.", author: "Ukrainischs Gedicht", cat: "ukrainian" }, uk: { text: "Коли верби хитаються і річка тече, українське серце пам'ятає свою батьківщину.", author: "Український вірш", cat: "ukrainian" }, ru: { text: "Когда ивы качаются и река течёт, украинское сердце помнит свою родину.", author: "Украинское стихотворение", cat: "ukrainian" }},
+  { en: { text: "The universe is not outside of you. Look inside yourself; everything that you want, you already are.", author: "Rumi", cat: "wisdom" }, de: { text: "Das Universum ist nicht außerhalb von dir. Schau in dich hinein; alles, was du willst, bist du bereits.", author: "Rumi", cat: "wisdom" }, ch: { text: "Ds Universum isch nid usserhalb vo dir. Schau i di ine; alles, was du wünschsch, bisch du scho.", author: "Rumi", cat: "wisdom" }, uk: { text: "Всесвіт не знаходиться поза вами. Подивіться всередину себе; все, що ви хочете, ви вже є.", author: "Румі", cat: "wisdom" }, ru: { text: "Вселенная не вне вас. Загляните внутрь себя; всё, что вы хотите, вы уже есть.", author: "Руми", cat: "wisdom" }},
+  { en: { text: "The number 3 represents the triangle, the strongest shape in nature, symbolizing mind, body, and spirit.", author: "Numerology Tradition", cat: "numbers" }, de: { text: "Die Zahl 3 steht für das Dreieck, die stärkste Form in der Natur, und symbolisiert Geist, Körper und Seele.", author: "Numerologie-Tradition", cat: "numbers" }, ch: { text: "D' Zahl 3 steit für ds Dreieck, d' stärkschti Form i de Natur, und symbolisiert Geist, Körper und Seele.", author: "Numerologii-Tradition", cat: "numbers" }, uk: { text: "Число 3 представляє трикутник, найміцнішу форму в природі, символізуючи розум, тіло і дух.", author: "Нумерологічна традиція", cat: "numbers" }, ru: { text: "Число 3 представляет треугольник, самую прочную форму в природе, символизируя разум, тело и дух.", author: "Нумерологическая традиция", cat: "numbers" }},
+  { en: { text: "It does not matter how slowly you go as long as you do not stop.", author: "Confucius", cat: "success" }, de: { text: "Es spielt keine Rolle, wie langsam du gehst, solange du nicht anhältst.", author: "Konfuzius", cat: "success" }, ch: { text: "Es spielt kei Rolle, wie langsam du gahsch, solang du nid ahältst.", author: "Konfuzius", cat: "success" }, uk: { text: "Не важливо, як повільно ви йдете, поки ви не зупиняєтеся.", author: "Конфуцій", cat: "success" }, ru: { text: "Не важно, как медленно вы идете, пока вы не останавливаетесь.", author: "Конфуций", cat: "success" }},
+  { en: { text: "True love is when your soul recognizes its counterpart in another.", author: "Plato", cat: "love" }, de: { text: "Wahre Liebe ist, wenn deine Seele ihr Gegenstück in einem anderen erkennt.", author: "Platon", cat: "love" }, ch: { text: "Wahri Liebi isch, wenn dini Seele ihr Gegendstück in eme andere erkennt.", author: "Platon", cat: "love" }, uk: { text: "Справжня любов — це коли твоя душа впізнає свою пару в іншій.", author: "Платон", cat: "love" }, ru: { text: "Истинная любовь — это когда твоя душа узнаёт свою пару в другом.", author: "Платон", cat: "love" }},
+  { en: { text: "The Alps do not ask why the climber comes; they only test his resolve.", author: "Swiss Proverb", cat: "swiss" }, de: { text: "Die Alpen fragen nicht, warum der Kletterer kommt; sie prüfen nur seine Entschlossenheit.", author: "Schweizer Sprichwort", cat: "swiss" }, ch: { text: "D' Alpe fraged nid, warum de Chletterer chunnt; si prüefed nur sini Entschlossenheit.", author: "Schwiizer Sprichwort", cat: "swiss" }, uk: { text: "Альпи не запитують, чому альпініст приходить; вони лише випробовують його рішучість.", author: "Швейцарське прислів'я", cat: "swiss" }, ru: { text: "Альпы не спрашивают, зачем приходит альпинист; они лишь испытывают его решимость.", author: "Швейцарская пословица", cat: "swiss" }},
+  { en: { text: "Bread and salt — the traditional Ukrainian welcome — speaks of generosity and friendship.", author: "Ukrainian Tradition", cat: "ukrainian" }, de: { text: "Brot und Salz — die traditionelle ukrainische Begrüßung — spricht von Großzügigkeit und Freundschaft.", author: "Ukrainische Tradition", cat: "ukrainian" }, ch: { text: "Brot und Salz — d' traditionelli ukrainischi Begrüessig — redet vo Grosszüegigkeit und Fründschaft.", author: "Ukrainischi Tradition", cat: "ukrainian" }, uk: { text: "Хліб і сіль — традиційне українське вітання — говорить про щедрість і дружбу.", author: "Українська традиція", cat: "ukrainian" }, ru: { text: "Хлеб и соль — традиционное украинское приветствие — говорит о щедрости и дружбе.", author: "Украинская традиция", cat: "ukrainian" }},
+  { en: { text: "What you think, you become. What you feel, you attract. What you imagine, you create.", author: "Buddha", cat: "wisdom" }, de: { text: "Was du denkst, das wirst du. Was du fühlst, das ziehst du an. Was du dir vorstellst, das erschaffst du.", author: "Buddha", cat: "wisdom" }, ch: { text: "Was du dänksch, das wirsch du. Was du fühlisch, das ziehsch du a. Was du dir vorstellsch, das erschaffsch du.", author: "Buddha", cat: "wisdom" }, uk: { text: "Що ти думаєш, тим ти стаєш. Що ти відчуваєш, те ти притягуєш. Що ти уявляєш, те ти створюєш.", author: "Будда", cat: "wisdom" }, ru: { text: "Что ты думаешь, тем ты становишься. Что ты чувствуешь, то ты притягиваешь. Что ты воображаешь, то ты создаёшь.", author: "Будда", cat: "wisdom" }},
+  { en: { text: "The number 4 represents the four seasons, the four directions, and the four elements of nature.", author: "Numerology Tradition", cat: "numbers" }, de: { text: "Die Zahl 4 steht für die vier Jahreszeiten, die vier Himmelsrichtungen und die vier Elemente der Natur.", author: "Numerologie-Tradition", cat: "numbers" }, ch: { text: "D' Zahl 4 steit für d' vier Jahreszite, d' vier Himmelsrichtige und d' vier Element vo de Natur.", author: "Numerologii-Tradition", cat: "numbers" }, uk: { text: "Число 4 представляє чотири пори року, чотири сторони світу і чотири елементи природи.", author: "Нумерологічна традиція", cat: "numbers" }, ru: { text: "Число 4 представляет четыре времени года, четыре стороны света и четыре элемента природы.", author: "Нумерологическая традиция", cat: "numbers" }},
+  { en: { text: "Do what you can, with what you have, where you are.", author: "Theodore Roosevelt", cat: "success" }, de: { text: "Tue, was du kannst, mit dem, was du hast, dort, wo du bist.", author: "Theodore Roosevelt", cat: "success" }, ch: { text: "Tue, was du chasch, mit dem, was du hesch, dört, wo du bisch.", author: "Theodore Roosevelt", cat: "success" }, uk: { text: "Роби те, що можеш, з тим, що маєш, там, де ти є.", author: "Теодор Рузвельт", cat: "success" }, ru: { text: "Делай то, что можешь, с тем, что имеешь, там, где ты есть.", author: "Теодор Рузвельт", cat: "success" }},
+  { en: { text: "The heart has its reasons which reason knows nothing of.", author: "Blaise Pascal", cat: "love" }, de: { text: "Das Herz hat seine Gründe, die die Vernunft nicht kennt.", author: "Blaise Pascal", cat: "love" }, ch: { text: "Ds Herz het sini Gründ, wo d' Vernunft nid kennt.", author: "Blaise Pascal", cat: "love" }, uk: { text: "Серце має свої причини, про які розум нічого не знає.", author: "Блез Паскаль", cat: "love" }, ru: { text: "У сердца есть свои причины, о которых разум ничего не знает.", author: "Блез Паскаль", cat: "love" }},
+  { en: { text: "Precision is not a luxury; it is a way of respecting life itself.", author: "Swiss Wisdom", cat: "swiss" }, de: { text: "Präzision ist kein Luxus; sie ist eine Art, das Leben selbst zu respektieren.", author: "Schweizer Weisheit", cat: "swiss" }, ch: { text: "Präzision isch kei Luxus; si isch e Art, ds Läbe selber z' respektiere.", author: "Schwiizer Wiisheit", cat: "swiss" }, uk: { text: "Точність — це не розкіш; це спосіб поважати саме життя.", author: "Швейцарська мудрість", cat: "swiss" }, ru: { text: "Точность — это не роскошь; это способ уважать саму жизнь.", author: "Швейцарская мудрость", cat: "swiss" }},
+  { en: { text: "The strength of Ukraine lies in the unity of its people and the richness of its soul.", author: "Ukrainian Proverb", cat: "ukrainian" }, de: { text: "Die Stärke der Ukraine liegt in der Einheit ihres Volkes und dem Reichtum ihrer Seele.", author: "Ukrainisches Sprichwort", cat: "ukrainian" }, ch: { text: "D' Stärchi vo de Ukraine ligt i de Einheit vo ihrem Volk und em Riechtum vo ihrer Seele.", author: "Ukrainischs Sprichwort", cat: "ukrainian" }, uk: { text: "Сила України — в єдності її народу та багатстві її душі.", author: "Українське прислів'я", cat: "ukrainian" }, ru: { text: "Сила Украины — в единстве её народа и богатстве её души.", author: "Украинская пословица", cat: "ukrainian" }},
+  { en: { text: "The number 9 represents completion, the end of a cycle, and the beginning of wisdom.", author: "Numerology Tradition", cat: "numbers" }, de: { text: "Die Zahl 9 steht für Vollendung, das Ende eines Zyklus und den Beginn der Weisheit.", author: "Numerologie-Tradition", cat: "numbers" }, ch: { text: "D' Zahl 9 steit für Volländig, ds Endi von eme Zyklus und de Aafang vo de Wiisheit.", author: "Numerologii-Tradition", cat: "numbers" }, uk: { text: "Число 9 представляє завершення, кінець циклу і початок мудрості.", author: "Нумерологічна традиція", cat: "numbers" }, ru: { text: "Число 9 представляет завершение, конец цикла и начало мудрости.", author: "Нумерологическая традиция", cat: "numbers" }},
+  { en: { text: "Believe you can and you're halfway there.", author: "Theodore Roosevelt", cat: "success" }, de: { text: "Glaube, dass du es kannst, und du bist schon auf halber Strecke.", author: "Theodore Roosevelt", cat: "success" }, ch: { text: "Glaub, dass du es chasch, und du bisch scho uf halber Strecki.", author: "Theodore Roosevelt", cat: "success" }, uk: { text: "Вірте, що можете, і ви вже на півдорозі.", author: "Теодор Рузвельт", cat: "success" }, ru: { text: "Верьте, что можете, и вы уже на полпути.", author: "Теодор Рузвельт", cat: "success" }},
+  { en: { text: "We accept the love we think we deserve.", author: "Stephen Chbosky", cat: "love" }, de: { text: "Wir akzeptieren die Liebe, die wir für verdienstwürdig halten.", author: "Stephen Chbosky", cat: "love" }, ch: { text: "Mir akzeptiered d' Liebi, wo mir für verdienstwürdig halted.", author: "Stephen Chbosky", cat: "love" }, uk: { text: "Ми приймаємо ту любов, якої, як нам здається, заслуговуємо.", author: "Стівен Чбоскі", cat: "love" }, ru: { text: "Мы принимаем ту любовь, которой, как нам кажется, заслуживаем.", author: "Стивен Чбоски", cat: "love" }},
+  { en: { text: "The number 5 represents change, freedom, and the five senses through which we experience life.", author: "Numerology Tradition", cat: "numbers" }, de: { text: "Die Zahl 5 steht für Veränderung, Freiheit und die fünf Sinne, durch die wir das Leben erfahren.", author: "Numerologie-Tradition", cat: "numbers" }, ch: { text: "D' Zahl 5 steit für Veränderig, Freiheit und d' fünf Sinn, dure wo mir ds Läbe erfahrä.", author: "Numerologii-Tradition", cat: "numbers" }, uk: { text: "Число 5 представляє зміни, свободу і п'ять відчуттів, через які ми переживаємо життя.", author: "Нумерологічна традиція", cat: "numbers" }, ru: { text: "Число 5 представляет перемены, свободу и пять чувств, через которые мы переживаем жизнь.", author: "Нумерологическая традиция", cat: "numbers" }},
+  { en: { text: "It is during our darkest moments that we must focus to see the light.", author: "Aristotle", cat: "wisdom" }, de: { text: "In unseren dunkelsten Momenten müssen wir uns konzentrieren, um das Licht zu sehen.", author: "Aristoteles", cat: "wisdom" }, ch: { text: "I unsere dunkelschte Momänt müesse mir uns konzentriere, um ds Liecht z' sehe.", author: "Aristoteles", cat: "wisdom" }, uk: { text: "Саме в найтемніші моменти ми повинні зосередитися, щоб побачити світло.", author: "Аристотель", cat: "wisdom" }, ru: { text: "Именно в самые тёмные моменты мы должны сосредоточиться, чтобы увидеть свет.", author: "Аристотель", cat: "wisdom" }},
+  { en: { text: "The Swiss watch: a tiny universe of gears working in perfect harmony.", author: "Swiss Saying", cat: "swiss" }, de: { text: "Die Schweizer Uhr: ein winziges Universum von Zahnrädern, die in perfekter Harmonie arbeiten.", author: "Schweizer Sprichwort", cat: "swiss" }, ch: { text: "D' Schwiizer Uhr: es winzigs Universum vo Zähnrad, wo i perfekter Harmonii schaffed.", author: "Schwiizer Sprichwort", cat: "swiss" }, uk: { text: "Швейцарський годинник: крихітний всесвіт шестерень, що працюють у досконалій гармонії.", author: "Швейцарський жарт", cat: "swiss" }, ru: { text: "Швейцарские часы: крошечная вселенная шестерёнок, работающих в совершенной гармонии.", author: "Швейцарская шутка", cat: "swiss" }},
+  { en: { text: "The soul that loves is always the soul that is loved.", author: "Ukrainian Proverb", cat: "ukrainian" }, de: { text: "Die Seele, die liebt, ist immer die Seele, die geliebt wird.", author: "Ukrainisches Sprichwort", cat: "ukrainian" }, ch: { text: "D' Seele, wo liebt, isch immer d' Seele, wo gliebt wird.", author: "Ukrainischs Sprichwort", cat: "ukrainian" }, uk: { text: "Душа, яка любить, завжди є душею, яку люблять.", author: "Українське прислів'я", cat: "ukrainian" }, ru: { text: "Душа, которая любит, всегда является душой, которую любят.", author: "Украинская пословица", cat: "ukrainian" }},
+  { en: { text: "The number 6 is the number of harmony, representing the perfect balance of creation.", author: "Numerology Tradition", cat: "numbers" }, de: { text: "Die Zahl 6 ist die Zahl der Harmonie und steht für das perfekte Gleichgewicht der Schöpfung.", author: "Numerologie-Tradition", cat: "numbers" }, ch: { text: "D' Zahl 6 isch d' Zahl vo de Harmonii und steit für ds perfekt Gliichgwicht vo de Schöpfig.", author: "Numerologii-Tradition", cat: "numbers" }, uk: { text: "Число 6 — це число гармонії, що представляє ідеальний баланс творіння.", author: "Нумерологічна традиція", cat: "numbers" }, ru: { text: "Число 6 — это число гармонии, представляющее идеальный баланс творения.", author: "Нумерологическая традиция", cat: "numbers" }},
+  { en: { text: "Strive not to be a success, but rather to be of value.", author: "Albert Einstein", cat: "success" }, de: { text: "Strebe nicht danach, ein Erfolg zu sein, sondern von Wert zu sein.", author: "Albert Einstein", cat: "success" }, ch: { text: "Sträb ned, en Erfolg z' si, sondern vo Wert z' si.", author: "Albert Einstein", cat: "success" }, uk: { text: "Стреміться бути не успішним, а корисним.", author: "Альберт Ейнштейн", cat: "success" }, ru: { text: "Стремитесь быть не успешным, а ценным.", author: "Альберт Эйнштейн", cat: "success" }},
+  { en: { text: "The greatest thing you'll ever learn is to love and be loved in return.", author: "Moulin Rouge", cat: "love" }, de: { text: "Das Größte, das du je lernen wirst, ist zu lieben und geliebt zu werden.", author: "Moulin Rouge", cat: "love" }, ch: { text: "Ds Gröschti, was du je lehre wirsch, isch z' liebe und gliebt z' wärde.", author: "Moulin Rouge", cat: "love" }, uk: { text: "Найбільше, що ти коли-небудь дізнаєшся, — це любити і бути коханим у відповідь.", author: "Мулен Руж", cat: "love" }, ru: { text: "Величайшее, что ты когда-либо узнаешь, — это любить и быть любимым в ответ.", author: "Мулен Руж", cat: "love" }},
+  { en: { text: "The number 8, when turned on its side, becomes infinity — the symbol of endless possibility.", author: "Numerology Tradition", cat: "numbers" }, de: { text: "Die Zahl 8 wird, wenn sie auf die Seite gelegt wird, zur Unendlichkeit — dem Symbol endloser Möglichkeiten.", author: "Numerologie-Tradition", cat: "numbers" }, ch: { text: "D' Zahl 8 wird, wenn si uf d' Site glegt wird, zur Unendlichkeit — em Symbol endloser Möglichkeitä.", author: "Numerologii-Tradition", cat: "numbers" }, uk: { text: "Число 8, коли його перевернути на бік, стає нескінченністю — символом безкінечних можливостей.", author: "Нумерологічна традиція", cat: "numbers" }, ru: { text: "Число 8, перевёрнутое на бок, становится бесконечностью — символом безграничных возможностей.", author: "Нумерологическая традиция", cat: "numbers" }},
+  { en: { text: "Wisdom begins in wonder.", author: "Socrates", cat: "wisdom" }, de: { text: "Weisheit beginnt im Staunen.", author: "Sokrates", cat: "wisdom" }, ch: { text: "Wiisheit beginnt im Staune.", author: "Sokrates", cat: "wisdom" }, uk: { text: "Мудрість починається з подиву.", author: "Сократ", cat: "wisdom" }, ru: { text: "Мудрость начинается с удивления.", author: "Сократ", cat: "wisdom" }},
+  { en: { text: "The master number 33 is the master teacher, representing compassion and spiritual blessing.", author: "Numerology Tradition", cat: "numbers" }, de: { text: "Die Meisterzahl 33 ist der Meisterlehrer und steht für Mitgefühl und spirituellen Segen.", author: "Numerologie-Tradition", cat: "numbers" }, ch: { text: "D' Meischterzahl 33 isch de Meischterlehrer und steit für Mitgefühl und spirituelle Säge.", author: "Numerologii-Tradition", cat: "numbers" }, uk: { text: "Майстерне число 33 — це майстер-учитель, що представляє співчуття і духовне благословення.", author: "Нумерологічна традиція", cat: "numbers" }, ru: { text: "Мастер-число 33 — это мастер-учитель, представляющий сострадание и духовное благословение.", author: "Нумерологическая традиция", cat: "numbers" }}
+];
+
+// --- App State ---
+let currentLang = 'en';
+let currentTheme = 'default';
+let currentFont = 'font-modern';
+let currentPage = 'home';
+let currentQuoteIndex = 0;
+let filteredQuotes = QUOTES;
+let effectsEnabled = { meteors: true, stars: true, nebula: true, particles: true };
+
+// --- Initialization ---
+async function init() {
+  await initDB();
+  await loadSettings();
+  createStarfield();
+  if (effectsEnabled.meteors) startMeteors();
+  loadHomeDaily();
+  loadSavedProfiles();
+  showQuote(0);
+
+  // Set today's date
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('dailyDate').value = today;
+
+  // Navigation
+  document.querySelectorAll('[data-page]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      navigateTo(btn.dataset.page);
+    });
+  });
+}
+
+// --- Navigation ---
+function navigateTo(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const target = document.getElementById('page-' + page);
+  if (target) {
+    target.classList.add('active');
+    target.style.animation = 'none';
+    target.offsetHeight;
+    target.style.animation = 'pageIn 0.5s ease-out';
+  }
+
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.nav-btn[data-page="' + page + '"]').forEach(b => b.classList.add('active'));
+
+  document.querySelectorAll('.bottom-nav-item').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.bottom-nav-item[data-page="' + page + '"]').forEach(b => b.classList.add('active'));
+
+  currentPage = page;
+}
+
+// --- Starfield ---
+function createStarfield() {
+  const field = document.getElementById('starfield');
+  field.innerHTML = '';
+  const count = Math.min(200, Math.floor(window.innerWidth * 0.15));
+  for (let i = 0; i < count; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    const size = Math.random() * 3 + 1;
+    star.style.cssText = `
+      width:${size}px; height:${size}px;
+      left:${Math.random()*100}%; top:${Math.random()*100}%;
+      --duration:${Math.random()*3+2}s;
+      --min-opacity:${Math.random()*0.3+0.1};
+      animation-delay:${Math.random()*3}s;
+    `;
+    field.appendChild(star);
+  }
+}
+
+function startMeteors() {
+  setInterval(() => {
+    if (!effectsEnabled.meteors) return;
+    const meteor = document.createElement('div');
+    meteor.className = 'meteor';
+    meteor.style.left = Math.random() * 80 + 10 + '%';
+    meteor.style.top = Math.random() * 30 + '%';
+    document.getElementById('starfield').appendChild(meteor);
+    setTimeout(() => meteor.remove(), 2000);
+  }, 3000);
+}
+
+// --- Numerology Calculations ---
+function reduceNumber(n) {
+  while (n > 9 && n !== 11 && n !== 22 && n !== 33) {
+    n = String(n).split('').reduce((a, b) => a + parseInt(b), 0);
+  }
+  return n;
+}
+
+function calculateLifePath(dateStr) {
+  if (!dateStr) return 0;
+  const parts = dateStr.replace(/-/g, '').split('');
+  let sum = parts.reduce((a, b) => a + parseInt(b), 0);
+  return reduceNumber(sum);
+}
+
+function getLetterValue(letter) {
+  const values = {
+    1: 'aeimjqyAEIMJQY',
+    2: 'bfgkrcvBFGKRCV',
+    3: 'dhlnswDHLNSW',
+    4: 'iotxIOTX',
+    5: 'euEU',
+    6: 'fvyFVY',
+    7: 'gzGZ',
+    8: 'hkHK',
+    9: 'cspCSP'
+  };
+  for (let v = 1; v <= 9; v++) {
+    if (values[v].includes(letter)) return v;
+  }
+  return 0;
+}
+
+function isVowel(letter) {
+  return 'aeiouAEIOUаяоуеиАЯОУЕИäöüÄÖÜ'.includes(letter);
+}
+
+function calculateDestiny(name) {
+  const letters = name.replace(/[^a-zA-Z]/g, '').split('');
+  let sum = letters.reduce((a, l) => a + getLetterValue(l), 0);
+  return reduceNumber(sum);
+}
+
+function calculateSoulUrge(name) {
+  const letters = name.replace(/[^a-zA-Z]/g, '').split('');
+  let sum = letters.filter(l => isVowel(l)).reduce((a, l) => a + getLetterValue(l), 0);
+  return reduceNumber(sum);
+}
+
+function calculatePersonality(name) {
+  const letters = name.replace(/[^a-zA-Z]/g, '').split('');
+  let sum = letters.filter(l => !isVowel(l)).reduce((a, l) => a + getLetterValue(l), 0);
+  return reduceNumber(sum);
+}
+
+function calculateNumerology() {
+  const name = document.getElementById('calcName').value.trim();
+  const birthDate = document.getElementById('calcBirthDate').value;
+
+  if (!name && !birthDate) {
+    showToast(currentLang === 'en' ? 'Please enter your name and birth date' :
+      currentLang === 'de' ? 'Bitte geben Sie Ihren Namen und Ihr Geburtsdatum ein' :
+      currentLang === 'ch' ? 'Bitte gib dine Name und Geburtsdatum i' :
+      currentLang === 'uk' ? 'Будь ласка, введіть своє ім\'я та дату народження' :
+      'Пожалуйста, введите ваше имя и дату рождения');
+    return;
+  }
+
+  const lifePath = birthDate ? calculateLifePath(birthDate) : 0;
+  const destiny = name ? calculateDestiny(name) : 0;
+  const soulUrge = name ? calculateSoulUrge(name) : 0;
+  const personality = name ? calculatePersonality(name) : 0;
+
+  document.getElementById('calcResults').style.display = 'block';
+
+  // Life Path
+  document.getElementById('lifePathNumber').textContent = lifePath || '-';
+  const t = TRANSLATIONS[currentLang];
+  if (lifePath && t.meanings[lifePath]) {
+    document.getElementById('lifePathDesc').innerHTML =
+      `<strong>${t.meanings[lifePath].title}</strong><br>${t.meanings[lifePath].desc}<br>` +
+      t.meanings[lifePath].keywords.map(k => `<span class="meaning-tag">${k}</span>`).join('');
+  }
+
+  // Name chart
+  const chart = document.getElementById('nameChart');
+  chart.innerHTML = '';
+  if (name) {
+    const letters = name.replace(/[^a-zA-Z]/g, '').split('');
+    letters.forEach((l, i) => {
+      const cell = document.createElement('div');
+      cell.className = 'number-cell';
+      const val = getLetterValue(l);
+      cell.textContent = val;
+      cell.style.animationDelay = (i * 0.05) + 's';
+      cell.title = l.toUpperCase() + ' = ' + val;
+      chart.appendChild(cell);
+    });
+  }
+
+  // Progress rings
+  animateRing('destinyRing', destiny);
+  document.getElementById('destinyValue').textContent = destiny || '-';
+  animateRing('soulRing', soulUrge);
+  document.getElementById('soulValue').textContent = soulUrge || '-';
+  animateRing('personalityRing', personality);
+  document.getElementById('personalityValue').textContent = personality || '-';
+
+  // Detailed meaning
+  const detailDiv = document.getElementById('detailedMeaning');
+  detailDiv.style.display = 'block';
+  let meaningHTML = '';
+  if (lifePath && t.lifePathDescriptions[lifePath]) {
+    meaningHTML += `<p style="margin-bottom:12px;"><strong>Life Path ${lifePath}:</strong> ${t.lifePathDescriptions[lifePath]}</p>`;
+  }
+  [
+    { num: destiny, label: 'Destiny', key: 'destinyLabel' },
+    { num: soulUrge, label: 'Soul Urge', key: 'soulLabel' },
+    { num: personality, label: 'Personality', key: 'personalityLabel' }
+  ].forEach(item => {
+    if (item.num && t.meanings[item.num]) {
+      meaningHTML += `<p style="margin-bottom:8px;"><strong>${item.num} (${t[item.key]}):</strong> ${t.meanings[item.num].title} — ${t.meanings[item.num].desc.substring(0, 120)}...</p>`;
+    }
+  });
+  document.getElementById('meaningContent').innerHTML = meaningHTML;
+
+  // Save profile
+  saveProfile(name, birthDate, lifePath, destiny, soulUrge, personality);
+
+  // Scroll to results
+  document.getElementById('calcResults').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function animateRing(id, value) {
+  const ring = document.getElementById(id);
+  const circumference = 2 * Math.PI * 45;
+  const offset = circumference - (value / 9) * circumference;
+  ring.style.strokeDashoffset = circumference;
+  setTimeout(() => {
+    ring.style.strokeDashoffset = offset;
+  }, 100);
+}
+
+// --- Profile Management ---
+async function saveProfile(name, birthDate, lifePath, destiny, soulUrge, personality) {
+  if (!name && !birthDate) return;
+  const profile = {
+    name: name || 'Unknown',
+    birthDate: birthDate || '',
+    lifePath, destiny, soulUrge, personality,
+    createdAt: Date.now()
+  };
+  await dbPut('profiles', profile);
+  loadSavedProfiles();
+  showToast(currentLang === 'en' ? 'Profile saved!' :
+    currentLang === 'de' ? 'Profil gespeichert!' :
+    currentLang === 'ch' ? 'Profil gspicheret!' :
+    currentLang === 'uk' ? 'Профіль збережено!' :
+    'Профиль сохранён!');
+}
+
+async function loadSavedProfiles() {
+  const profiles = await dbGetAll('profiles');
+  const listEl = document.getElementById('profileList');
+
+  if (profiles.length === 0) {
+    listEl.innerHTML = `<div class="text-center text-muted" style="padding:20px;" data-i18n="noProfiles">${TRANSLATIONS[currentLang].noProfiles}</div>`;
+    return;
+  }
+
+  listEl.innerHTML = profiles.slice(-5).reverse().map(p => `
+    <div class="profile-item">
+      <div class="profile-info">
+        <h4>${p.name || 'Unknown'}</h4>
+        <p>LP: ${p.lifePath || '-'} | D: ${p.destiny || '-'} | S: ${p.soulUrge || '-'} | P: ${p.personality || '-'}</p>
+      </div>
+      <div class="profile-actions">
+        <button onclick="loadProfile(${p.id})" title="Load">📂</button>
+        <button class="delete" onclick="deleteProfile(${p.id})" title="Delete">🗑️</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function loadProfile(id) {
+  const profiles = await dbGetAll('profiles');
+  const profile = profiles.find(p => p.id === id);
+  if (profile) {
+    document.getElementById('calcName').value = profile.name || '';
+    document.getElementById('calcBirthDate').value = profile.birthDate || '';
+    showToast(currentLang === 'en' ? 'Profile loaded!' :
+      currentLang === 'de' ? 'Profil geladen!' :
+      currentLang === 'ch' ? 'Profil glade!' :
+      currentLang === 'uk' ? 'Профіль завантажено!' :
+      'Профиль загружен!');
+  }
+}
+
+async function deleteProfile(id) {
+  await dbDelete('profiles', id);
+  loadSavedProfiles();
+  showToast(currentLang === 'en' ? 'Profile deleted' :
+    currentLang === 'de' ? 'Profil gelöscht' :
+    currentLang === 'ch' ? 'Profil glöscht' :
+    currentLang === 'uk' ? 'Профіль видалено' :
+    'Профиль удалён');
+}
+
+function showSavedProfiles() {
+  const modal = document.getElementById('profileModal');
+  modal.classList.add('active');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('active');
+}
+
+// --- Daily Forecast ---
+function generateDailyForecast() {
+  const dateStr = document.getElementById('dailyDate').value;
+  const lifePathInput = parseInt(document.getElementById('dailyLifePathInput').value) || 1;
+
+  if (!dateStr) {
+    showToast('Please select a date');
+    return;
+  }
+
+  const dateNums = dateStr.replace(/-/g, '').split('').map(Number);
+  const dayNum = reduceNumber(dateNums.reduce((a, b) => a + b, 0));
+  const energyNum = reduceNumber(dayNum + lifePathInput);
+
+  document.getElementById('dailyResults').style.display = 'block';
+
+  // Daily numbers
+  const dailyContainer = document.getElementById('dailyForecastNumbers');
+  dailyContainer.innerHTML = '';
+  [lifePathInput, dayNum, energyNum, reduceNumber(lifePathInput + dayNum), reduceNumber(lifePathInput * dayNum % 10 || 9)].forEach((n, i) => {
+    const el = document.createElement('div');
+    el.className = 'daily-num';
+    el.textContent = n || 1;
+    dailyContainer.appendChild(el);
+  });
+
+  // Energy number
+  document.getElementById('dailyEnergyNumber').textContent = energyNum;
+  const t = TRANSLATIONS[currentLang];
+  if (t.meanings[energyNum]) {
+    document.getElementById('dailyEnergyDesc').innerHTML =
+      `<strong>${t.meanings[energyNum].title}</strong><br>${t.meanings[energyNum].desc}`;
+  }
+
+  // Chart
+  const chart = document.getElementById('dailyChart');
+  chart.innerHTML = '';
+  const categories = ['Love', 'Career', 'Health', 'Finance', 'Spiritual'];
+  const values = [1,2,3,4,5].map(() => Math.floor(Math.random() * 70 + 30));
+  categories.forEach((cat, i) => {
+    const bar = document.createElement('div');
+    bar.className = 'chart-bar';
+    bar.style.height = '0%';
+    bar.innerHTML = `<span class="chart-bar-value">${values[i]}%</span><span class="chart-bar-label">${cat}</span>`;
+    chart.appendChild(bar);
+    setTimeout(() => {
+      bar.style.height = values[i] + '%';
+    }, 100 + i * 150);
+  });
+
+  // Advice
+  const adviceIndex = (energyNum - 1 + new Date().getDay()) % t.dailyAdvices.length;
+  document.getElementById('dailyAdviceText').textContent = t.dailyAdvices[adviceIndex];
+}
+
+// --- Compatibility ---
+function calculateCompatibility() {
+  const p1 = parseInt(document.getElementById('compatPerson1').value) || 1;
+  const p2 = parseInt(document.getElementById('compatPerson2').value) || 1;
+  const name1 = document.getElementById('compatName1').value || 'Person 1';
+  const name2 = document.getElementById('compatName2').value || 'Person 2';
+
+  // Compatibility matrix
+  const matrix = {
+    '1-1': 85, '1-2': 70, '1-3': 90, '1-4': 65, '1-5': 80, '1-6': 75, '1-7': 60, '1-8': 85, '1-9': 70,
+    '2-2': 90, '2-3': 75, '2-4': 85, '2-5': 60, '2-6': 95, '2-7': 70, '2-8': 65, '2-9': 80,
+    '3-3': 85, '3-4': 60, '3-5': 90, '3-6': 80, '3-7': 65, '3-8': 70, '3-9': 85,
+    '4-4': 80, '4-5': 60, '4-6': 90, '4-7': 85, '4-8': 75, '4-9': 70,
+    '5-5': 75, '5-6': 65, '5-7': 80, '5-8': 70, '5-9': 85,
+    '6-6': 95, '6-7': 70, '6-8': 75, '6-9': 90,
+    '7-7': 80, '7-8': 65, '7-9': 75,
+    '8-8': 85, '8-9': 70,
+    '9-9': 90
+  };
+
+  const key = Math.min(p1, p2) + '-' + Math.max(p1, p2);
+  let score = matrix[key] || Math.floor(Math.random() * 40 + 50);
+
+  document.getElementById('compatResults').style.display = 'block';
+  document.getElementById('compatNameDisplay1').textContent = name1;
+  document.getElementById('compatNameDisplay2').textContent = name2;
+  document.getElementById('compatNum1').textContent = p1;
+  document.getElementById('compatNum2').textContent = p2;
+  document.getElementById('compatScore').textContent = score;
+
+  const fill = document.getElementById('compatMeterFill');
+  fill.style.width = '0%';
+  setTimeout(() => { fill.style.width = score + '%'; }, 100);
+
+  const t = TRANSLATIONS[currentLang];
+  let analysis = '';
+  if (score >= 80) analysis = t.compatDescriptions.high;
+  else if (score >= 60) analysis = t.compatDescriptions.medium;
+  else analysis = t.compatDescriptions.low;
+  analysis += `<br><br><strong>${name1} (${p1}):</strong> ${t.meanings[p1]?.title || ''}<br>`;
+  analysis += `<strong>${name2} (${p2}):</strong> ${t.meanings[p2]?.title || ''}`;
+  document.getElementById('compatAnalysis').innerHTML = analysis;
+}
+
+// --- Quotes ---
+function showQuote(index) {
+  if (filteredQuotes.length === 0) return;
+  index = ((index % filteredQuotes.length) + filteredQuotes.length) % filteredQuotes.length;
+  currentQuoteIndex = index;
+  const quote = filteredQuotes[index];
+  const langData = quote[currentLang] || quote.en;
+  document.getElementById('quoteText').textContent = langData.text;
+  document.getElementById('quoteAuthor').textContent = '— ' + langData.author;
+  document.getElementById('quoteCounter').textContent = (index + 1) + ' / ' + filteredQuotes.length;
+}
+
+function nextQuote() { showQuote(currentQuoteIndex + 1); }
+function prevQuote() { showQuote(currentQuoteIndex - 1); }
+function randomQuote() {
+  showQuote(Math.floor(Math.random() * filteredQuotes.length));
+  document.getElementById('randomModal').classList.add('active');
+}
+
+function filterQuotes(cat) {
+  if (cat === 'all') {
+    filteredQuotes = QUOTES;
+  } else {
+    filteredQuotes = QUOTES.filter(q => {
+      const langData = q[currentLang] || q.en;
+      return langData.cat === cat;
+    });
+  }
+  currentQuoteIndex = 0;
+  showQuote(0);
+}
+
+// --- Random Number ---
+function generateRandomNumber() {
+  const num = Math.floor(Math.random() * 9) + 1;
+  document.getElementById('randomNumber').textContent = num;
+  const t = TRANSLATIONS[currentLang];
+  if (t.meanings[num]) {
+    document.getElementById('randomMeaning').innerHTML =
+      `<strong>${t.meanings[num].title}</strong><br>${t.meanings[num].desc.substring(0, 150)}...`;
+  }
+  document.getElementById('randomModal').classList.add('active');
+}
+
+// --- Settings ---
+async function setTheme(theme) {
+  currentTheme = theme;
+  document.body.className = theme === 'default' ? '' : 'theme-' + theme;
+  document.querySelectorAll('.theme-option[data-theme]').forEach(el => {
+    el.classList.toggle('active', el.dataset.theme === theme);
+  });
+  await dbPut('settings', { key: 'theme', value: theme });
+}
+
+async function setFont(font) {
+  currentFont = font;
+  document.body.className = document.body.className.replace(/font-\w+/g, '').trim();
+  if (currentTheme !== 'default') document.body.classList.add('theme-' + currentTheme);
+  document.body.classList.add(font);
+  document.querySelectorAll('.theme-option[data-font]').forEach(el => {
+    el.classList.toggle('active', el.dataset.font === font);
+  });
+  await dbPut('settings', { key: 'font', value: font });
+}
+
+async function setLanguage(lang) {
+  currentLang = lang;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    if (TRANSLATIONS[lang] && TRANSLATIONS[lang][key]) {
+      if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+        // Skip inputs with data-i18n
+      } else {
+        el.textContent = TRANSLATIONS[lang][key].replace(/\n/g, '<br>');
+      }
+    }
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.dataset.i18nPlaceholder;
+    if (TRANSLATIONS[lang] && TRANSLATIONS[lang][key]) {
+      el.placeholder = TRANSLATIONS[lang][key];
+    }
+  });
+
+  // Update quotes
+  showQuote(currentQuoteIndex);
+  loadHomeDaily();
+
+  await dbPut('settings', { key: 'language', value: lang });
+  showToast('Language: ' + lang.toUpperCase());
+}
+
+function toggleEffect(effect) {
+  effectsEnabled[effect] = !effectsEnabled[effect];
+  const toggle = document.getElementById('toggle' + effect.charAt(0).toUpperCase() + effect.slice(1));
+  toggle.classList.toggle('active', effectsEnabled[effect]);
+
+  if (effect === 'meteors' && !effectsEnabled.meteors) {
+    document.querySelectorAll('.meteor').forEach(m => m.remove());
+  }
+  if (effect === 'stars') {
+    document.querySelectorAll('.star').forEach(s => s.style.display = effectsEnabled.stars ? '' : 'none');
+  }
+  if (effect === 'nebula') {
+    document.querySelectorAll('.nebula').forEach(n => n.style.display = effectsEnabled.nebula ? '' : 'none');
+  }
+
+  dbPut('settings', { key: 'effects', value: effectsEnabled });
+}
+
+function toggleSettings() {
+  navigateTo('settings');
+}
+
+// --- Home Daily Numbers ---
+function loadHomeDaily() {
+  const today = new Date();
+  const dayNum = today.getDate();
+  const monthNum = today.getMonth() + 1;
+  const yearNum = today.getFullYear();
+  const t = TRANSLATIONS[currentLang];
+
+  const numbers = [
+    reduceNumber(dayNum),
+    reduceNumber(monthNum),
+    reduceNumber(String(yearNum).split('').reduce((a, b) => a + parseInt(b), 0)),
+    reduceNumber(dayNum + monthNum),
+    reduceNumber(dayNum * monthNum % 9 || 9)
+  ];
+
+  const container = document.getElementById('homeDailyNumbers');
+  container.innerHTML = '';
+  numbers.forEach((n, i) => {
+    const el = document.createElement('div');
+    el.className = 'daily-num';
+    el.textContent = n;
+    container.appendChild(el);
+  });
+
+  const energyNum = reduceNumber(numbers.reduce((a, b) => a + b, 0));
+  document.getElementById('homeDayMeaning').textContent =
+    t.meanings[energyNum] ? t.meanings[energyNum].title + ': ' + t.meanings[energyNum].desc.substring(0, 100) + '...' : '';
+}
+
+// --- Data Management ---
+async function exportData() {
+  const profiles = await dbGetAll('profiles');
+  const calculations = await dbGetAll('calculations');
+  const settings = await dbGetAll('settings');
+  const data = { profiles, calculations, settings, exportDate: new Date().toISOString() };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'diana_numerology_backup.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Data exported!');
+}
+
+async function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const text = await file.text();
+  try {
+    const data = JSON.parse(text);
+    if (data.profiles) {
+      for (const p of data.profiles) {
+        await dbPut('profiles', p);
+      }
+    }
+    if (data.settings) {
+      for (const s of data.settings) {
+        await dbPut('settings', s);
+      }
+    }
+    loadSavedProfiles();
+    showToast('Data imported successfully!');
+  } catch (e) {
+    showToast('Error importing data');
+  }
+}
+
+async function clearAllData() {
+  if (!confirm('Are you sure you want to clear all data?')) return;
+  const tx = db.transaction(['profiles', 'calculations'], 'readwrite');
+  tx.objectStore('profiles').clear();
+  tx.objectStore('calculations').clear();
+  tx.oncomplete = () => {
+    loadSavedProfiles();
+    showToast('All data cleared!');
+  };
+}
+
+// --- Load Settings ---
+async function loadSettings() {
+  try {
+    const theme = await dbGet('settings', 'theme');
+    if (theme) setTheme(theme.value);
+
+    const font = await dbGet('settings', 'font');
+    if (font) setFont(font.value);
+
+    const lang = await dbGet('settings', 'language');
+    if (lang) {
+      currentLang = lang.value;
+      document.getElementById('languageSelect').value = lang.value;
+      setLanguage(lang.value);
+    }
+
+    const effects = await dbGet('settings', 'effects');
+    if (effects) {
+      effectsEnabled = effects.value;
+      Object.keys(effectsEnabled).forEach(key => {
+        const toggle = document.getElementById('toggle' + key.charAt(0).toUpperCase() + key.slice(1));
+        if (toggle) toggle.classList.toggle('active', effectsEnabled[key]);
+      });
+    }
+  } catch (e) {
+    console.log('Settings load error:', e);
+  }
+}
+
+// --- Toast ---
+function showToast(message) {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+// --- Click particles ---
+document.addEventListener('click', (e) => {
+  if (!effectsEnabled.particles) return;
+  for (let i = 0; i < 6; i++) {
+    const particle = document.createElement('div');
+    particle.className = 'particle';
+    const size = Math.random() * 6 + 2;
+    particle.style.cssText = `
+      left:${e.clientX}px; top:${e.clientY}px;
+      width:${size}px; height:${size}px;
+      background: var(--primary-light);
+      transform: translate(${(Math.random()-0.5)*60}px, ${(Math.random()-0.5)*60}px);
+    `;
+    document.body.appendChild(particle);
+    setTimeout(() => particle.remove(), 1000);
+  }
+});
+
+// --- Window resize ---
+window.addEventListener('resize', () => {
+  createStarfield();
+});
+
+// --- Initialize ---
+init();
+</script>
+</body>
+</html>

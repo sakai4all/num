@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diana's Swiss Army Knife • Numerology</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&amp;family=Inter:wght@400;500;600&amp;display=swap');
+        
+        :root {
+            --primary: 234 179 8;
+        }
+        
+        .tail-container {
+            font-family: 'Inter', system_ui, sans-serif;
+        }
+        
+        .heading-font {
+            font-family: 'Playfair Display', sans-serif;
+        }
+
+        .celestial-bg {
+            background: radial-gradient(at center bottom, #1e2937 0%, #0f172a 70%);
+        }
+
+        .number-glow {
+            text-shadow: 0 0 20px rgb(234 179 8);
+        }
+
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.4);
+        }
+
+        .nav-active {
+            border-bottom: 3px solid rgb(234 179 8);
+        }
+
+        .star-bg {
+            background-image: 
+                radial-gradient(white, rgba(255,255,255,0.8) 1px, transparent 0),
+                radial-gradient(white, rgba(255,255,255,0.6) 1px, transparent 0);
+            background-position: 20px 30px, 60px 70px;
+            background-size: 4px 4px;
+        }
+    </style>
+</head>
+<body class="tail-container bg-slate-950 text-slate-200 celestial-bg min-h-screen pb-20">
+    <!-- HEADER -->
+    <header class="bg-slate-900 border-b border-slate-700 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo -->
+                <div class="flex items-center gap-x-3">
+                    <div id="logo" class="w-10 h-10 flex items-center justify-center bg-amber-500 text-slate-950 rounded-2xl shadow-inner text-2xl font-bold">🗡️</div>
+                    <div>
+                        <span class="heading-font text-2xl font-bold tracking-tight text-white">Diana's</span>
+                        <span class="text-amber-400 text-xl font-medium">Swiss Army Knife</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-x-6">
+                    <!-- Language -->
+                    <div class="relative group">
+                        <button onclick="toggleLanguageMenu()" 
+                                class="flex items-center gap-x-1.5 text-sm font-medium hover:text-amber-400 transition-colors">
+                            <i class="fa-solid fa-globe"></i>
+                            <span id="current-lang">EN</span>
+                        </button>
+                        <div id="lang-menu" class="hidden absolute right-0 mt-2 w-48 bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl py-2 z-50">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Theme -->
+                    <button onclick="toggleTheme()" class="w-9 h-9 flex items-center justify-center rounded-2xl hover:bg-slate-800 transition-colors">
+                        <i class="fa-solid fa-moon text-amber-400"></i>
+                    </button>
+
+                    <!-- Profile -->
+                    <div onclick="showProfileModal()" class="flex items-center gap-x-2 cursor-pointer">
+                        <div id="user-avatar" class="w-8 h-8 bg-gradient-to-br from-amber-400 to-violet-500 rounded-2xl flex items-center justify-center text-xs font-bold">DS</div>
+                        <div class="hidden md:block">
+                            <div id="user-name" class="text-sm font-semibold">Diana</div>
+                            <div class="text-[10px] text-slate-400 -mt-1">Life Path 7</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Secondary Nav -->
+        <div class="max-w-7xl mx-auto px-4 border-t border-slate-800">
+            <div class="flex items-center text-sm overflow-x-auto hide-scroll">
+                <button onclick="navigateTo(0)" class="nav-btn px-6 py-4 text-amber-400 nav-active flex items-center gap-x-2 whitespace-nowrap">
+                    <i class="fa-solid fa-house"></i>
+                    <span id="nav-home">Home</span>
+                </button>
+                <button onclick="navigateTo(1)" class="nav-btn px-6 py-4 hover:text-amber-400 flex items-center gap-x-2 whitespace-nowrap">
+                    <i class="fa-solid fa-calculator"></i>
+                    <span id="nav-calculate">Calculate</span>
+                </button>
+                <button onclick="navigateTo(2)" class="nav-btn px-6 py-4 hover:text-amber-400 flex items-center gap-x-2 whitespace-nowrap">
+                    <i class="fa-solid fa-sun"></i>
+                    <span id="nav-daily">Daily</span>
+                </button>
+                <button onclick="navigateTo(3)" class="nav-btn px-6 py-4 hover:text-amber-400 flex items-center gap-x-2 whitespace-nowrap">
+                    <i class="fa-solid fa-heart"></i>
+                    <span id="nav-compat">Compatibility</span>
+                </button>
+                <button onclick="navigateTo(4)" class="nav-btn px-6 py-4 hover:text-amber-400 flex items-center gap-x-2 whitespace-nowrap">
+                    <i class="fa-solid fa-book"></i>
+                    <span id="nav-more">More</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 pt-8">
+        
+        <!-- DASHBOARD / HOME -->
+        <div id="screen-0" class="screen">
+            <div class="flex justify-between items-end mb-8">
+                <div>
+                    <h1 id="welcome-title" class="heading-font text-5xl font-bold text-white">Welcome back, Diana</h1>
+                    <p id="welcome-subtitle" class="text-slate-400 mt-2">Your numbers are aligned today</p>
+                </div>
+                <div onclick="newProfile()" 
+                     class="flex items-center gap-x-2 bg-slate-800 hover:bg-slate-700 px-5 py-3 rounded-3xl text-sm cursor-pointer transition-colors">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>New Chart</span>
+                </div>
+            </div>
+
+            <!-- Big Four -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+                <div onclick="showDetail(0)" class="bg-slate-900/70 border border-amber-500/30 rounded-3xl p-6 card-hover cursor-pointer">
+                    <div class="flex justify-between">
+                        <div>
+                            <div class="text-xs tracking-widest text-amber-400">LIFE PATH</div>
+                            <div id="lp-number" class="text-7xl heading-font font-bold number-glow text-amber-400">7</div>
+                        </div>
+                        <div class="text-right">
+                            <i class="fa-solid fa-infinity text-4xl text-slate-600"></i>
+                        </div>
+                    </div>
+                    <div id="lp-desc" class="text-sm text-slate-400 mt-6 line-clamp-2">The seeker. Deep thinker and spiritual explorer.</div>
+                </div>
+                
+                <div onclick="showDetail(1)" class="bg-slate-900/70 border border-violet-500/30 rounded-3xl p-6 card-hover cursor-pointer">
+                    <div class="flex justify-between">
+                        <div>
+                            <div class="text-xs tracking-widest text-violet-400">EXPRESSION</div>
+                            <div id="exp-number" class="text-7xl heading-font font-bold number-glow text-violet-400">11</div>
+                        </div>
+                        <div class="text-right">
+                            <i class="fa-solid fa-feather text-4xl text-slate-600"></i>
+                        </div>
+                    </div>
+                    <div id="exp-desc" class="text-sm text-slate-400 mt-6 line-clamp-2">Master communicator and visionary.</div>
+                </div>
+                
+                <div onclick="showDetail(2)" class="bg-slate-900/70 border border-sky-500/30 rounded-3xl p-6 card-hover cursor-pointer">
+                    <div class="flex justify-between">
+                        <div>
+                            <div class="text-xs tracking-widest text-sky-400">SOUL URGE</div>
+                            <div id="soul-number" class="text-7xl heading-font font-bold number-glow text-sky-400">5</div>
+                        </div>
+                        <div class="text-right">
+                            <i class="fa-solid fa-heart text-4xl text-slate-600"></i>
+                        </div>
+                    </div>
+                    <div id="soul-desc" class="text-sm text-slate-400 mt-6 line-clamp-2">Freedom lover. Adventure calls you.</div>
+                </div>
+                
+                <div onclick="showDetail(3)" class="bg-slate-900/70 border border-emerald-500/30 rounded-3xl p-6 card-hover cursor-pointer">
+                    <div class="flex justify-between">
+                        <div>
+                            <div class="text-xs tracking-widest text-emerald-400">BIRTHDAY</div>
+                            <div id="birth-number" class="text-7xl heading-font font-bold number-glow text-emerald-400">9</div>
+                        </div>
+                        <div class="text-right">
+                            <i class="fa-solid fa-gift text-4xl text-slate-600"></i>
+                        </div>
+                    </div>
+                    <div id="birth-desc" class="text-sm text-slate-400 mt-6 line-clamp-2">Humanitarian with universal love.</div>
+                </div>
+            </div>
+
+            <!-- Daily Energy -->
+            <div class="bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-700 rounded-3xl p-8 mb-8">
+                <div class="flex flex-col md:flex-row gap-8 items-center">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-x-4">
+                            <div class="text-6xl">☀️</div>
+                            <div>
+                                <div class="uppercase tracking-[3px] text-amber-400 text-sm">Today's Energy</div>
+                                <div id="daily-num" class="text-8xl heading-font font-bold text-white">3</div>
+                                <div id="daily-name" class="text-2xl text-slate-300">Creative Expression</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex-1 text-slate-300">
+                        <p id="daily-quote">"The wind of change is blowing. Creativity flows easily today."</p>
+                        <div class="mt-6 flex gap-3">
+                            <button onclick="saveToJournal()" 
+                                    class="px-6 py-3 bg-amber-500 hover:bg-amber-400 transition-colors text-slate-950 rounded-2xl text-sm font-semibold flex-1 md:flex-none">
+                                Journal Insight
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div onclick="navigateTo(1)" class="bg-slate-900 rounded-3xl p-6 flex gap-4 items-center cursor-pointer card-hover">
+                    <div class="w-12 h-12 bg-violet-500/20 rounded-2xl flex items-center justify-center text-3xl">🔢</div>
+                    <div>
+                        <div class="font-semibold">New Calculation</div>
+                        <div class="text-slate-400 text-sm">Name or Date</div>
+                    </div>
+                </div>
+                <div onclick="showCompatibility()" class="bg-slate-900 rounded-3xl p-6 flex gap-4 items-center cursor-pointer card-hover">
+                    <div class="w-12 h-12 bg-rose-500/20 rounded-2xl flex items-center justify-center text-3xl">❤️</div>
+                    <div>
+                        <div class="font-semibold">Compatibility</div>
+                        <div class="text-slate-400 text-sm">With friends &amp; partners</div>
+                    </div>
+                </div>
+                <div onclick="scanAngelNumber()" class="bg-slate-900 rounded-3xl p-6 flex gap-4 items-center cursor-pointer card-hover">
+                    <div class="w-12 h-12 bg-sky-500/20 rounded-2xl flex items-center justify-center text-3xl">📱</div>
+                    <div>
+                        <div class="font-semibold">Angel Scanner</div>
+                        <div class="text-slate-400 text-sm">Spot repeating numbers</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CALCULATE SCREEN -->
+        <div id="screen-1" class="screen hidden">
+            <h2 class="heading-font text-4xl font-bold mb-8">Create New Chart</h2>
+            
+            <div class="max-w-lg mx-auto bg-slate-900 rounded-3xl p-8">
+                <div class="space-y-8">
+                    <div>
+                        <label class="block text-xs uppercase tracking-widest mb-2 text-slate-400">Full Birth Name</label>
+                        <input id="name-input" type="text" value="Diana Swiss" 
+                               class="w-full bg-slate-800 border border-slate-700 focus:border-amber-400 rounded-2xl px-6 py-5 outline-none text-lg">
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs uppercase tracking-widest mb-2 text-slate-400">Birth Date</label>
+                            <input id="date-input" type="date" value="1990-05-15" 
+                                   class="w-full bg-slate-800 border border-slate-700 focus:border-amber-400 rounded-2xl px-6 py-5 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs uppercase tracking-widest mb-2 text-slate-400">System</label>
+                            <select id="system-select" onchange="calculateAll()"
+                                    class="w-full bg-slate-800 border border-slate-700 focus:border-amber-400 rounded-2xl px-6 py-5 outline-none">
+                                <option value="pyth">Pythagorean</option>
+                                <option value="chal">Chaldean</option>
+                                <option value="vedic">Vedic</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button onclick="calculateAll()" 
+                            class="w-full py-6 bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 font-bold text-lg rounded-3xl hover:brightness-110 transition-all active:scale-95">
+                        REVEAL MY NUMBERS
+                    </button>
+                </div>
+            </div>
+
+            <div id="results-panel" class="hidden mt-12">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+
+        <!-- DAILY SCREEN -->
+        <div id="screen-2" class="screen hidden">
+            <div class="text-center">
+                <div class="inline-flex items-center gap-x-3 bg-slate-900 px-8 py-3 rounded-3xl mb-8">
+                    <div class="text-3xl">🌙</div>
+                    <div>
+                        <div class="text-sm text-slate-400">May 8, 2026</div>
+                        <div id="personal-day" class="text-5xl heading-font font-bold">Personal Day 5</div>
+                    </div>
+                </div>
+                
+                <div class="max-w-md mx-auto text-left bg-slate-900/80 rounded-3xl p-8">
+                    <h3 class="text-amber-300 text-xl mb-4">What to expect today</h3>
+                    <ul class="space-y-6 text-slate-300">
+                        <li class="flex gap-4">
+                            <span class="text-emerald-400">↑</span>
+                            <div>Excellent day for travel and new experiences</div>
+                        </li>
+                        <li class="flex gap-4">
+                            <span class="text-rose-400">↓</span>
+                            <div>Avoid signing long-term contracts</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- COMPATIBILITY -->
+        <div id="screen-3" class="screen hidden">
+            <h2 class="heading-font text-4xl font-bold mb-6">Compatibility</h2>
+            <div class="bg-slate-900 rounded-3xl p-8">
+                <input id="partner-name" placeholder="Partner's full name" class="w-full bg-slate-800 px-6 py-6 rounded-3xl mb-6 outline-none">
+                <button onclick="calculateCompatibility()" 
+                        class="w-full py-6 bg-white text-slate-900 font-bold rounded-3xl">CHECK HARMONY</button>
+            </div>
+            <div id="compat-result" class="mt-8 hidden"></div>
+        </div>
+
+        <!-- MORE / GLOSSARY -->
+        <div id="screen-4" class="screen hidden">
+            <h2 class="heading-font text-3xl font-bold mb-8">Wisdom Vault</h2>
+            
+            <div class="space-y-8">
+                <!-- Swiss / Ukrainian quotes -->
+                <div class="bg-slate-900/70 border-l-4 border-amber-400 p-6 rounded-3xl">
+                    <p class="italic">"Jede Person schafft ihr eigenes Schicksal." — Swiss proverb</p>
+                    <p class="text-xs text-slate-500 mt-4">Every person creates their own destiny.</p>
+                </div>
+                
+                <div class="bg-slate-900/70 border-l-4 border-yellow-400 p-6 rounded-3xl">
+                    <p class="italic">"Від долі не втечеш" — Ukrainian wisdom</p>
+                    <p class="text-xs text-slate-500 mt-4">You cannot escape your fate.</p>
+                </div>
+            </div>
+            
+            <button onclick="exportPDF()" 
+                    class="mt-12 w-full flex justify-center items-center gap-x-3 border border-dashed border-slate-600 hover:border-slate-400 py-8 rounded-3xl text-slate-400 hover:text-white">
+                <i class="fa-solid fa-download"></i>
+                <span>Export Full Report (PDF)</span>
+            </button>
+        </div>
+    </main>
+
+    <!-- BOTTOM NAV (mobile) -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-slate-900 border-t border-slate-700 md:hidden">
+        <div class="flex text-xs">
+            <button onclick="navigateTo(0)" class="flex-1 py-4 flex flex-col items-center text-amber-400">
+                <i class="fa-solid fa-house text-lg"></i>
+                <span>Home</span>
+            </button>
+            <button onclick="navigateTo(1)" class="flex-1 py-4 flex flex-col items-center">
+                <i class="fa-solid fa-calculator text-lg"></i>
+                <span>Calc</span>
+            </button>
+            <button onclick="navigateTo(2)" class="flex-1 py-4 flex flex-col items-center">
+                <i class="fa-solid fa-sun text-lg"></i>
+                <span>Daily</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Detail Modal -->
+    <div id="detail-modal" class="hidden fixed inset-0 bg-black/80 flex items-end md:items-center justify-center z-[100]">
+        <div class="bg-slate-900 w-full max-w-lg rounded-t-3xl md:rounded-3xl p-8 max-h-[90vh] overflow-auto">
+            <div class="flex justify-end">
+                <button onclick="closeModal()" class="text-3xl leading-none">×</button>
+            </div>
+            <div id="modal-content">
+                <!-- JS injected -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tailwind script already loaded via CDN
+        
+        function initTailwind() {
+            // Already configured via CDN
+        }
+        
+        // Numerology calculation functions
+        const pythagoreanMap = {
+            'a':1,'b':2,'c':3,'d':4,'e':5,'f':6,'g':7,'h':8,'i':9,
+            'j':1,'k':2,'l':3,'m':4,'n':5,'o':6,'p':7,'q':8,'r':9,
+            's':1,'t':2,'u':3,'v':4,'w':5,'x':6,'y':7,'z':8
+        };
+        
+        const chaldeanMap = {
+            'a':1,'i':1,'j':1,'q':1,'y':1,
+            'b':2,'k':2,'r':2,
+            'c':3,'g':3,'l':3,'s':3,
+            'd':4,'m':4,'t':4,
+            'e':5,'h':5,'n':5,'x':5,
+            'u':6,'v':6,'w':6,
+            'o':7,'z':7,
+            'f':8,'p':8
+        };
+        
+        function reduceNumber(num, master = true) {
+            if (master && (num === 11 || num === 22 || num === 33)) return num;
+            let str = num.toString();
+            while (str.length > 1) {
+                let sum = 0;
+                for (let char of str) sum += parseInt(char);
+                str = sum.toString();
+                if (master && (sum === 11 || sum === 22 || sum === 33)) return sum;
+            }
+            return parseInt(str);
+        }
+        
+        function nameToNumber(name, system = 'pyth') {
+            let map = system === 'chal' ? chaldeanMap : pythagoreanMap;
+            let sum = 0;
+            name = name.toLowerCase().replace(/[^a-z]/g, '');
+            for (let char of name) {
+                if (map[char]) sum += map[char];
+            }
+            return reduceNumber(sum);
+        }
+        
+        function lifePathNumber(dateStr) {
+            let parts = dateStr.split('-').map(Number);
+            let sum = parts[0] + parts[1] + parts[2];
+            return reduceNumber(sum);
+        }
+        
+        // Sample data
+        let currentUser = {
+            name: "Diana Swiss",
+            birthdate: "1990-05-15",
+            lifePath: 7,
+            expression: 11,
+            soulUrge: 5,
+            birthdayNum: 9
+        };
+        
+        function calculateAll() {
+            const name = document.getElementById('name-input').value || "Diana Swiss";
+            const date = document.getElementById('date-input').value || "1990-05-15";
+            const system = document.getElementById('system-select').value;
+            
+            const lp = lifePathNumber(date);
+            const exp = nameToNumber(name, system);
+            const soul = nameToNumber(name.split(' ')[0], system); // rough
+            
+            currentUser = {
+                name: name,
+                birthdate: date,
+                lifePath: lp,
+                expression: exp,
+                soulUrge: soul,
+                birthdayNum: parseInt(date.split('-')[2]) % 9 || 9
+            };
+            
+            // Update dashboard too
+            document.getElementById('lp-number').textContent = lp;
+            document.getElementById('exp-number').textContent = exp;
+            document.getElementById('soul-number').textContent = soul;
+            document.getElementById('birth-number').textContent = currentUser.birthdayNum;
+            
+            // Show results
+            const panel = document.getElementById('results-panel');
+            panel.classList.remove('hidden');
+            panel.innerHTML = `
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="bg-slate-800 rounded-3xl p-6 text-center">
+                        <div class="text-amber-400 text-sm">LIFE PATH</div>
+                        <div class="text-8xl heading-font font-bold my-4">${lp}</div>
+                        <div class="text-slate-300">The path of wisdom and introspection</div>
+                    </div>
+                    <div class="bg-slate-800 rounded-3xl p-6 text-center">
+                        <div class="text-violet-400 text-sm">EXPRESSION</div>
+                        <div class="text-8xl heading-font font-bold my-4">${exp}</div>
+                        <div class="text-slate-300">Your destiny number</div>
+                    </div>
+                </div>
+                <button onclick="saveProfile()" class="mt-8 w-full py-6 bg-emerald-600 hover:bg-emerald-500 rounded-3xl text-white font-semibold">Save to Library</button>
+            `;
+            
+            // Toast
+            showToast("Chart calculated with " + (system === 'pyth' ? 'Pythagorean' : system === 'chal' ? 'Chaldean' : 'Vedic') + " system");
+        }
+        
+        function showDetail(n) {
+            const titles = ["Life Path", "Expression / Destiny", "Soul Urge", "Birthday"];
+            const numbers = [currentUser.lifePath, currentUser.expression, currentUser.soulUrge, currentUser.birthdayNum];
+            const colors = ["amber", "violet", "sky", "emerald"];
+            
+            let html = `
+                <h3 class="heading-font text-4xl mb-6">${titles[n]}</h3>
+                <div class="text-[180px] leading-none heading-font font-black text-${colors[n]}-400 text-center number-glow">${numbers[n]}</div>
+                <p class="text-slate-300 text-center mt-6">Master number interpretations available in full report.</p>
+                <div onclick="closeModal()" class="mt-12 text-center text-slate-400 cursor-pointer">Close</div>
+            `;
+            document.getElementById('modal-content').innerHTML = html;
+            document.getElementById('detail-modal').classList.remove('hidden');
+        }
+        
+        function closeModal() {
+            document.getElementById('detail-modal').classList.add('hidden');
+        }
+        
+        function navigateTo(n) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+            document.getElementById('screen-' + n).classList.remove('hidden');
+            
+            // Update active nav
+            document.querySelectorAll('.nav-btn').forEach((btn, i) => {
+                if (i === n) btn.classList.add('nav-active');
+                else btn.classList.remove('nav-active');
+            });
+        }
+        
+        function toggleLanguageMenu() {
+            const menu = document.getElementById('lang-menu');
+            menu.classList.toggle('hidden');
+            
+            if (!menu.hasChildNodes()) {
+                const langs = [
+                    {code:'EN', name:'English'},
+                    {code:'DE', name:'Deutsch'},
+                    {code:'SWISS', name:'Schwiizerdütsch'},
+                    {code:'UK', name:'Українська'},
+                    {code:'RU', name:'Русский'}
+                ];
+                let str = '';
+                langs.forEach(l => {
+                    str += `<div onclick="setLanguage('${l.code}')" class="px-6 py-3 hover:bg-slate-700 cursor-pointer">${l.name} (${l.code})</div>`;
+                });
+                menu.innerHTML = str;
+            }
+        }
+        
+        function setLanguage(lang) {
+            document.getElementById('current-lang').textContent = lang;
+            document.getElementById('lang-menu').classList.add('hidden');
+            showToast(`Language switched to ${lang}`);
+            // In full app would reload translations
+        }
+        
+        function toggleTheme() {
+            showToast("Celestial theme active (already in dark mode)");
+        }
+        
+        function showProfileModal() {
+            showToast("Profile & Multi-user management coming in v2");
+        }
+        
+        function newProfile() {
+            navigateTo(1);
+        }
+        
+        function saveProfile() {
+            // IndexedDB simulation
+            localStorage.setItem('diana_numerology_profile', JSON.stringify(currentUser));
+            showToast("Profile saved in browser storage");
+        }
+        
+        function showCompatibility() {
+            navigateTo(3);
+        }
+        
+        function calculateCompatibility() {
+            const resultDiv = document.getElementById('compat-result');
+            resultDiv.classList.remove('hidden');
+            resultDiv.innerHTML = `
+                <div class="bg-gradient-to-br from-rose-900/30 to-slate-800 p-8 rounded-3xl text-center">
+                    <div class="text-6xl mb-4">💞</div>
+                    <div class="text-4xl heading-font">92% Harmony</div>
+                    <p class="mt-3">Your numbers complement each other beautifully. Master 11 + Life Path 7 = powerful spiritual connection.</p>
+                </div>
+            `;
+        }
+        
+        function scanAngelNumber() {
+            showToast("📸 Camera would open here. You saw 11:11 today — alignment confirmed!");
+        }
+        
+        function saveToJournal() {
+            showToast("Insight saved. Keep shining ✨");
+        }
+        
+        function exportPDF() {
+            showToast("PDF report would download here (demo)");
+        }
+        
+        function showToast(msg) {
+            const toast = document.createElement('div');
+            toast.style.cssText = 'position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:rgb(234 179 8); color:#0f172a; padding:16px 28px; border-radius:9999px; font-weight:600; box-shadow:0 10px 15px -3px rgb(0 0 0); z-index:9999;';
+            toast.textContent = msg;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.transition = 'all 0.4s';
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 400);
+            }, 2800);
+        }
+        
+        // Load sample data
+        function loadSampleData() {
+            document.getElementById('lp-number').textContent = currentUser.lifePath;
+            document.getElementById('exp-number').textContent = currentUser.expression;
+            document.getElementById('soul-number').textContent = currentUser.soulUrge;
+            document.getElementById('birth-number').textContent = currentUser.birthdayNum;
+        }
+        
+        // IndexedDB stub
+        function initDB() {
+            console.log('%cIndexedDB ready for user profiles (simulated)', 'color:#eab308');
+        }
+        
+        // Keyboard support & init
+        window.onload = function() {
+            initTailwind();
+            loadSampleData();
+            initDB();
+            navigateTo(0);
+            
+            // Demo calculation
+            setTimeout(() => {
+                console.log('🌟 Diana\'s Swiss Army Knife for Numerology ready');
+            }, 1200);
+            
+            // Make logo nicer
+            const logoEl = document.getElementById('logo');
+            logoEl.innerHTML = `<span class="text-3xl">🔪</span>`;
+        };
+        
+        // PWA simulation
+        console.log("%cStandalone Numerology App v2026 • Offline capable", "color:#eab308; font-family:monospace");
+    </script>
+</body>
+</html>

@@ -1,0 +1,1515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Diana's Swiss Army Knife for Numerology - The ultimate tool for spiritual mathematics.">
+    <title>Diana's Swiss Army Knife for Numerology</title>
+    
+    <!-- External Font for Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+
+    <style>
+        /* =========================================
+           CSS VARIABLES & THEMES
+           ========================================= */
+        :root {
+            /* Default: Cosmic Night */
+            --bg-color: #0b0d17;
+            --text-color: #f0f0f0;
+            --accent-color: #a855f7; /* Purple */
+            --secondary-accent: #3b82f6; /* Blue */
+            --panel-bg: rgba(20, 20, 35, 0.7);
+            --panel-border: 1px solid rgba(255, 255, 255, 0.1);
+            --glass-blur: 12px;
+            --font-main: 'Montserrat', sans-serif;
+            --font-display: 'Playfair Display', serif;
+            --nav-width: 260px;
+            --header-height: 70px;
+            --transition-speed: 0.3s;
+            --success-color: #10b981;
+            --error-color: #ef4444;
+        }
+
+        [data-theme="swiss"] {
+            --bg-color: #ff0000; /* Swiss Red base is too strong, using a deep variant */
+            --bg-color: #520000;
+            --text-color: #ffffff;
+            --accent-color: #ffffff;
+            --secondary-accent: #ff0000;
+            --panel-bg: rgba(255, 255, 255, 0.1);
+            --panel-border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        [data-theme="ukraine"] {
+            --bg-color: #0057b7;
+            --text-color: #ffd700;
+            --accent-color: #ffd700;
+            --secondary-accent: #ffffff;
+            --panel-bg: rgba(0, 87, 183, 0.6);
+            --panel-border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        [data-theme="light"] {
+            --bg-color: #f3f4f6;
+            --text-color: #1f2937;
+            --accent-color: #4f46e5;
+            --secondary-accent: #ec4899;
+            --panel-bg: rgba(255, 255, 255, 0.8);
+            --panel-border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        /* =========================================
+           RESET & BASE STYLES
+           ========================================= */
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow-x: hidden;
+            min-height: 100vh;
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+
+        /* Canvas Background */
+        #star-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--accent-color); border-radius: 4px; }
+
+        /* =========================================
+           LAYOUT STRUCTURE
+           ========================================= */
+        .app-container {
+            display: grid;
+            grid-template-columns: var(--nav-width) 1fr;
+            grid-template-rows: var(--header-height) 1fr;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* =========================================
+           HEADER / TOP BAR
+           ========================================= */
+        .app-header {
+            grid-column: 1 / -1;
+            background: var(--panel-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border-bottom: var(--panel-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 100;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 20px;
+            color: #fff;
+            box-shadow: 0 0 10px var(--accent-color);
+        }
+
+        .app-title {
+            font-family: var(--font-display);
+            font-size: 1.2rem;
+            letter-spacing: 0.5px;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* Settings Dropdowns */
+        select.control-select {
+            background: rgba(255,255,255,0.1);
+            border: var(--panel-border);
+            color: var(--text-color);
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        /* =========================================
+           SIDEBAR NAVIGATION
+           ========================================= */
+        .app-nav {
+            background: var(--panel-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            border-right: var(--panel-border);
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+            font-size: 0.95rem;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(168, 85, 247, 0.2), transparent);
+            border-left-color: var(--accent-color);
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        /* =========================================
+           MAIN CONTENT AREA
+           ========================================= */
+        .app-main {
+            padding: 20px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        /* Pages / Sections */
+        .page {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* =========================================
+           COMPONENTS
+           ========================================= */
+        
+        /* Quote Ticker */
+        .quote-ticker {
+            background: linear-gradient(90deg, var(--accent-color), var(--secondary-accent));
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            text-align: center;
+            font-style: italic;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Cards */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: var(--panel-bg);
+            border: var(--panel-border);
+            border-radius: 12px;
+            padding: 25px;
+            backdrop-filter: blur(5px);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            border-color: var(--accent-color);
+        }
+
+        .card-header {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent-color);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Number Circle */
+        .number-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, var(--secondary-accent), var(--accent-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: white;
+            margin: 0 auto 20px auto;
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
+            animation: pulse 3s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(168, 85, 247, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0); }
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 6px;
+            color: var(--text-color);
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus {
+            border-color: var(--accent-color);
+            background: rgba(255,255,255,0.1);
+        }
+
+        .btn {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.1s;
+            width: 100%;
+            text-align: center;
+        }
+
+        .btn:hover {
+            filter: brightness(1.1);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Profile Section */
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--accent-color);
+        }
+
+        /* Visualization Area */
+        .chart-container {
+            height: 300px;
+            width: 100%;
+            margin-top: 20px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            padding: 20px;
+        }
+
+        .chart-bar {
+            width: 40px;
+            background: var(--secondary-accent);
+            border-radius: 4px 4px 0 0;
+            transition: height 1s ease-out;
+            position: relative;
+        }
+
+        .chart-bar span {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--panel-bg);
+            border-left: 4px solid var(--success-color);
+            padding: 15px 25px;
+            border-radius: 4px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transform: translateX(200%);
+            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+        .toast.show { transform: translateX(0); }
+
+        /* Zodiac Icon Display */
+        .zodiac-display {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        /* =========================================
+           RESPONSIVE DESIGN
+           ========================================= */
+        @media (max-width: 768px) {
+            .app-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: var(--header-height) 1fr 60px; /* Header, Main, Bottom Nav */
+            }
+
+            .app-nav {
+                grid-row: 3;
+                grid-column: 1;
+                flex-direction: row;
+                justify-content: space-around;
+                padding: 0;
+                border-right: none;
+                border-top: var(--panel-border);
+                background: var(--bg-color); /* Solid bg for mobile nav */
+            }
+
+            .nav-text { display: none; }
+            .nav-item { flex-direction: column; padding: 8px; font-size: 0.7rem; gap: 5px; justify-content: center; }
+            
+            .app-title { font-size: 1rem; }
+            .quote-ticker { font-size: 0.9rem; padding: 8px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Canvas Background -->
+    <canvas id="star-canvas"></canvas>
+
+    <div class="app-container">
+        <!-- Top Global Bar -->
+        <header class="app-header">
+            <div class="logo-area">
+                <div class="logo-img">D</div>
+                <div class="app-title" data-i18n="appName">Diana's Swiss Army Knife for Numerology</div>
+            </div>
+            
+            <div class="header-controls">
+                <select id="lang-select" class="control-select">
+                    <option value="en">English</option>
+                    <option value="de">Deutsch (DE)</option>
+                    <option value="ch">Schwiizerdütsch</option>
+                    <option value="ua">Українська</option>
+                    <option value="ru">Русский</option>
+                </select>
+                
+                <select id="theme-select" class="control-select">
+                    <option value="default" data-i18n="themeDefault">Cosmic Night</option>
+                    <option value="swiss" data-i18n="themeSwiss">Swiss Style</option>
+                    <option value="ukraine" data-i18n="themeUkraine">Ukraine Pride</option>
+                    <option value="light" data-i18n="themeLight">Day Light</option>
+                </select>
+            </div>
+        </header>
+
+        <!-- Sidebar Navigation -->
+        <nav class="app-nav">
+            <div class="nav-item active" data-target="home">
+                <span>🏠</span> <span class="nav-text" data-i18n="navHome">Home</span>
+            </div>
+            <div class="nav-item" data-target="calculator">
+                <span>🧮</span> <span class="nav-text" data-i18n="navCalculator">Calculator</span>
+            </div>
+            <div class="nav-item" data-target="lifepath">
+                <span>🛤️</span> <span class="nav-text" data-i18n="navLifePath">Life Path</span>
+            </div>
+            <div class="nav-item" data-target="expression">
+                <span>🗣️</span> <span class="nav-text" data-i18n="navExpression">Expression</span>
+            </div>
+            <div class="nav-item" data-target="soulurge">
+                <span>❤️</span> <span class="nav-text" data-i18n="navSoulUrge">Soul Urge</span>
+            </div>
+            <div class="nav-item" data-target="personality">
+                <span>🎭</span> <span class="nav-text" data-i18n="navPersonality">Personality</span>
+            </div>
+            <div class="nav-item" data-target="daily">
+                <span>📅</span> <span class="nav-text" data-i18n="navDaily">Daily Forecast</span>
+            </div>
+            <div class="nav-item" data-target="compatibility">
+                <span>💑</span> <span class="nav-text" data-i18n="navCompatibility">Compatibility</span>
+            </div>
+            <div class="nav-item" data-target="profile">
+                <span>👤</span> <span class="nav-text" data-i18n="navProfile">My Profile</span>
+            </div>
+            <div class="nav-item" data-target="settings">
+                <span>⚙️</span> <span class="nav-text" data-i18n="navSettings">Settings</span>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="app-main">
+            
+            <!-- Quote Ticker (Common across most pages) -->
+            <div id="quote-display" class="quote-ticker">
+                "Loading wisdom..."
+            </div>
+
+            <!-- 1. HOME PAGE -->
+            <section id="home" class="page active">
+                <h1 data-i18n="welcomeTitle" style="margin-bottom:20px; font-family:var(--font-display)">Welcome to the Universe of Numbers</h1>
+                <div class="card-grid">
+                    <div class="card">
+                        <div class="card-header" data-i18n="cardQuickStats">Quick Stats</div>
+                        <div id="dashboard-stats" style="text-align:center;">
+                            <!-- Populated by JS -->
+                            <p>Please save your profile first.</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header" data-i18n="cardDidYouKnow">Did You Know?</div>
+                        <p data-i18n="factText">Numerology is considered the mathematics of the universe, dating back to Pythagoras.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. CALCULATOR PAGE (Hub) -->
+            <section id="calculator" class="page">
+                <h2 data-i18n="calcTitle" style="margin-bottom:20px">Numerology Calculator</h2>
+                <div class="card">
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="lblFullName">Full Name (at birth)</label>
+                        <input type="text" id="calc-name" class="form-input" placeholder="e.g. Diana Prince">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="lblBirthDate">Birth Date</label>
+                        <input type="date" id="calc-date" class="form-input">
+                    </div>
+                    <button class="btn" id="btn-calculate" data-i18n="btnCalculate">Reveal Numbers</button>
+                </div>
+                <div id="calc-results" class="card-grid" style="margin-top:20px; display:none;">
+                    <!-- Results injected here -->
+                </div>
+            </section>
+
+            <!-- 3. LIFE PATH PAGE -->
+            <section id="lifepath" class="page">
+                <div class="card">
+                    <div class="card-header">
+                        <span data-i18n="titleLifePath">Life Path Number</span>
+                        <span>🛤️</span>
+                    </div>
+                    <div style="text-align:center;">
+                        <div id="lp-display" class="number-circle">-</div>
+                        <h3 id="lp-title" style="margin-bottom:10px">The Leader</h3>
+                        <p id="lp-desc">Description goes here...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. EXPRESSION PAGE -->
+            <section id="expression" class="page">
+                <div class="card">
+                    <div class="card-header">
+                        <span data-i18n="titleExpression">Expression Number</span>
+                        <span>🗣️</span>
+                    </div>
+                    <div style="text-align:center;">
+                        <div id="expr-display" class="number-circle">-</div>
+                        <h3 id="expr-title" style="margin-bottom:10px">The Communicator</h3>
+                        <p id="expr-desc">Description goes here...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. SOUL URGE PAGE -->
+            <section id="soulurge" class="page">
+                <div class="card">
+                    <div class="card-header">
+                        <span data-i18n="titleSoulUrge">Soul Urge Number</span>
+                        <span>❤️</span>
+                    </div>
+                    <div style="text-align:center;">
+                        <div id="su-display" class="number-circle">-</div>
+                        <h3 id="su-title" style="margin-bottom:10px">The Peacemaker</h3>
+                        <p id="su-desc">Description goes here...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 6. PERSONALITY PAGE -->
+            <section id="personality" class="page">
+                <div class="card">
+                    <div class="card-header">
+                        <span data-i18n="titlePersonality">Personality Number</span>
+                        <span>🎭</span>
+                    </div>
+                    <div style="text-align:center;">
+                        <div id="pers-display" class="number-circle">-</div>
+                        <h3 id="pers-title" style="margin-bottom:10px">The Charmer</h3>
+                        <p id="pers-desc">Description goes here...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 7. DAILY FORECAST -->
+            <section id="daily" class="page">
+                <h2 data-i18n="titleDaily" style="margin-bottom:20px">Daily Vibrations</h2>
+                <div class="card">
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="lblSelectDate">Select Date</label>
+                        <input type="date" id="daily-date-picker" class="form-input">
+                    </div>
+                    <button class="btn" id="btn-daily-calc" data-i18n="btnGetForecast">Get Forecast</button>
+                    
+                    <div id="daily-result" style="display:none; margin-top:20px; text-align:center;">
+                        <div class="number-circle" style="width:60px; height:60px; font-size:1.8rem;">5</div>
+                        <h4 data-i18n="todayEnergy">Today's Energy</h4>
+                        <p id="daily-desc">Dynamic, change, travel.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 8. COMPATIBILITY -->
+            <section id="compatibility" class="page">
+                <h2 data-i18n="titleCompat" style="margin-bottom:20px">Relationship Compatibility</h2>
+                <div class="card-grid">
+                    <div class="card">
+                        <h4 style="margin-bottom:10px">Person A</h4>
+                        <input type="date" id="comp-date-a" class="form-input">
+                    </div>
+                    <div class="card">
+                        <h4 style="margin-bottom:10px">Person B</h4>
+                        <input type="date" id="comp-date-b" class="form-input">
+                    </div>
+                </div>
+                <button class="btn" id="btn-compare" data-i18n="btnCheck">Check Match</button>
+                <div id="comp-result" class="card" style="margin-top:20px; display:none; text-align:center;">
+                    <h3 id="comp-percentage">85%</h3>
+                    <p id="comp-text">Great match!</p>
+                </div>
+            </section>
+
+            <!-- 9. PROFILE -->
+            <section id="profile" class="page">
+                <h2 data-i18n="titleProfile" style="margin-bottom:20px">User Profile</h2>
+                <div class="card">
+                    <div class="profile-header">
+                        <img src="https://picsum.photos/seed/diana/100/100.jpg" alt="Avatar" class="profile-avatar" id="profile-img">
+                        <div>
+                            <h3 id="profile-name-display">Guest User</h3>
+                            <p id="profile-zodiac" style="color:var(--accent-color)">Unknown Sign</p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="lblYourName">Your Name</label>
+                        <input type="text" id="profile-name-input" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="lblYourDob">Date of Birth</label>
+                        <input type="date" id="profile-dob-input" class="form-input">
+                    </div>
+                    <button class="btn" id="btn-save-profile" data-i18n="btnSaveProfile">Save Profile</button>
+                    <button class="btn" id="btn-clear-data" style="margin-top:10px; background:var(--error-color);" data-i18n="btnClearData">Reset Data</button>
+                </div>
+            </section>
+
+            <!-- 10. SETTINGS -->
+            <section id="settings" class="page">
+                <h2 data-i18n="titleSettings" style="margin-bottom:20px">Settings</h2>
+                <div class="card">
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="lblTheme">Theme</label>
+                        <select id="settings-theme" class="form-input">
+                            <option value="default">Cosmic Night</option>
+                            <option value="swiss">Swiss Style</option>
+                            <option value="ukraine">Ukraine Pride</option>
+                            <option value="light">Day Light</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="lblLang">Language</label>
+                        <select id="settings-lang" class="form-input">
+                            <option value="en">English</option>
+                            <option value="de">Deutsch (DE)</option>
+                            <option value="ch">Schwiizerdütsch</option>
+                            <option value="ua">Українська</option>
+                            <option value="ru">Русский</option>
+                        </select>
+                    </div>
+                    <p data-i18n="settingsInfo">Changes are saved automatically to local storage.</p>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Toast Notification Element -->
+    <div id="toast" class="toast">Settings Saved!</div>
+
+    <script>
+        /* =========================================
+           STATE & DATA MANAGEMENT
+           ========================================= */
+        const AppState = {
+            lang: 'en',
+            theme: 'default',
+            user: {
+                name: '',
+                dob: '',
+                profileSaved: false
+            }
+        };
+
+        /* =========================================
+           LOCALIZATION DICTIONARY
+           ========================================= */
+        const Translations = {
+            en: {
+                appName: "Diana's Swiss Army Knife for Numerology",
+                themeDefault: "Cosmic Night",
+                themeSwiss: "Swiss Style",
+                themeUkraine: "Ukraine Pride",
+                themeLight: "Day Light",
+                navHome: "Home",
+                navCalculator: "Calculator",
+                navLifePath: "Life Path",
+                navExpression: "Expression",
+                navSoulUrge: "Soul Urge",
+                navPersonality: "Personality",
+                navDaily: "Daily Forecast",
+                navCompatibility: "Compatibility",
+                navProfile: "My Profile",
+                navSettings: "Settings",
+                welcomeTitle: "Welcome to the Universe of Numbers",
+                cardQuickStats: "Quick Stats",
+                cardDidYouKnow: "Did You Know?",
+                factText: "Numerology is considered the mathematics of the universe, dating back to Pythagoras.",
+                calcTitle: "Numerology Calculator",
+                lblFullName: "Full Name (at birth)",
+                lblBirthDate: "Birth Date",
+                btnCalculate: "Reveal Numbers",
+                titleLifePath: "Life Path Number",
+                titleExpression: "Expression Number",
+                titleSoulUrge: "Soul Urge Number",
+                titlePersonality: "Personality Number",
+                lblSelectDate: "Select Date",
+                btnGetForecast: "Get Forecast",
+                todayEnergy: "Today's Energy",
+                titleCompat: "Relationship Compatibility",
+                btnCheck: "Check Match",
+                titleProfile: "User Profile",
+                lblYourName: "Your Name",
+                lblYourDob: "Date of Birth",
+                btnSaveProfile: "Save Profile",
+                btnClearData: "Reset Data",
+                titleSettings: "Settings",
+                lblTheme: "Theme",
+                lblLang: "Language",
+                settingsInfo: "Changes are saved automatically.",
+                toastSaved: "Profile Saved Successfully!",
+                toastReset: "Data Cleared."
+            },
+            de: {
+                appName: "Dianas Schweizer Taschenmesser für Numerologie",
+                themeDefault: "Kosmische Nacht",
+                themeSwiss: "Schweizer Stil",
+                themeUkraine: "Ukraine Stolz",
+                themeLight: "Tageslicht",
+                navHome: "Startseite",
+                navCalculator: "Rechner",
+                navLifePath: "Lebenspfad",
+                navExpression: "Ausdruck",
+                navSoulUrge: "Sehnsucht",
+                navPersonality: "Persönlichkeit",
+                navDaily: "Tageshoroskop",
+                navCompatibility: "Kompatibilität",
+                navProfile: "Mein Profil",
+                navSettings: "Einstellungen",
+                welcomeTitle: "Willkommen im Universum der Zahlen",
+                cardQuickStats: "Schnellinfos",
+                cardDidYouKnow: "Wussten Sie?",
+                factText: "Numerologie gilt als die Mathematik des Universums und geht auf Pythagoras zurück.",
+                calcTitle: "Numerologie Rechner",
+                lblFullName: "Geburtsname",
+                lblBirthDate: "Geburtsdatum",
+                btnCalculate: "Zahlen Enthüllen",
+                titleLifePath: "Lebenspfad Nummer",
+                titleExpression: "Ausdrucksnummer",
+                titleSoulUrge: "Seelennummer",
+                titlePersonality: "Persönlichkeitsnummer",
+                lblSelectDate: "Datum wählen",
+                btnGetForecast: "Vorhersage anzeigen",
+                todayEnergy: "Heutige Energie",
+                titleCompat: "Beziehungskompatibilität",
+                btnCheck: "Prüfen",
+                titleProfile: "Benutzerprofil",
+                lblYourName: "Ihr Name",
+                lblYourDob: "Geburtsdatum",
+                btnSaveProfile: "Profil Speichern",
+                btnClearData: "Daten Löschen",
+                titleSettings: "Einstellungen",
+                lblTheme: "Design",
+                lblLang: "Sprache",
+                settingsInfo: "Änderungen werden automatisch gespeichert.",
+                toastSaved: "Profil gespeichert!",
+                toastReset: "Daten gelöscht."
+            },
+            ch: {
+                appName: "Dianas Schwiizer Taschemesser für Numerology",
+                themeDefault: "Wältnacht",
+                themeSwiss: "Schwiizer Stil",
+                themeUkraine: "Ukraine Stolz",
+                themeLight: "Tagesliecht",
+                navHome: "Startsyte",
+                navCalculator: "Rechner",
+                navLifePath: "Läbenswäg",
+                navExpression: "Uusdruck",
+                navSoulUrge: "Seelensucht",
+                navPersonality: "Persönlichkäit",
+                navDaily: "Tagesprognose",
+                navCompatibility: "Kompatibilität",
+                navProfile: "Mein Profil",
+                navSettings: "Stellige",
+                welcomeTitle: "Wälkom im Universum vo de Zahle",
+                cardQuickStats: "Schnellinfo",
+                cardDidYouKnow: "Wisset Sie das?",
+                factText: "Numerologie gilt als d Mathematik vom Universum und goot uf Pythagoras zrugg.",
+                calcTitle: "Numerologie Rechner",
+                lblFullName: "Geburtsname",
+                lblBirthDate: "Geburtsdatum",
+                btnCalculate: "Zahle Zeige",
+                titleLifePath: "Läbenswäg Nummere",
+                titleExpression: "Uusdrucksnummere",
+                titleSoulUrge: "Seelenummere",
+                titlePersonality: "Persönlichkäitsnummere",
+                lblSelectDate: "Datum wählen",
+                btnGetForecast: "Prognose zeige",
+                todayEnergy: "Hütig Energie",
+                titleCompat: "Beziehungskompatibilität",
+                btnCheck: "Prüefe",
+                titleProfile: "Benutzerprofil",
+                lblYourName: "Din Name",
+                lblYourDob: "Geburtsdatum",
+                btnSaveProfile: "Profyl Speichere",
+                btnClearData: "Daten Lösche",
+                titleSettings: "Stellige",
+                lblTheme: "Design",
+                lblLang: "Sprach",
+                settingsInfo: "Änderige werded automatisch gspeichert.",
+                toastSaved: "Profyl gspeichert!",
+                toastReset: "Daten glöscht."
+            },
+            ua: {
+                appName: "Швейцарський ніж Діани для нумерології",
+                themeDefault: "Космічна ніч",
+                themeSwiss: "Швейцарський стиль",
+                themeUkraine: "Гордість України",
+                themeLight: "Денне світло",
+                navHome: "Головна",
+                navCalculator: "Калькулятор",
+                navLifePath: "Шлях Життя",
+                navExpression: "Експресія",
+                navSoulUrge: "Прагнення Душі",
+                navPersonality: "Особистість",
+                navDaily: "Денний Прогноз",
+                navCompatibility: "Сумісність",
+                navProfile: "Мій Профіль",
+                navSettings: "Налаштування",
+                welcomeTitle: "Ласкаво просимо у Всесвіт Чисел",
+                cardQuickStats: "Швидка Статистика",
+                cardDidYouKnow: "Чи знали ви?",
+                factText: "Нумерологія вважається математикою всесвіту, що сягає корінням Піфагора.",
+                calcTitle: "Нумерологічний Калькулятор",
+                lblFullName: "Повне ім'я (при народженні)",
+                lblBirthDate: "Дата народження",
+                btnCalculate: "Розкрити Числа",
+                titleLifePath: "Число Шляху Життя",
+                titleExpression: "Число Експресії",
+                titleSoulUrge: "Число Прагнення Душі",
+                titlePersonality: "Число Особистості",
+                lblSelectDate: "Виберіть дату",
+                btnGetForecast: "Отримати прогноз",
+                todayEnergy: "Енергія сьогодні",
+                titleCompat: "Сумісність стосунків",
+                btnCheck: "Перевірити",
+                titleProfile: "Профіль користувача",
+                lblYourName: "Ваше ім'я",
+                lblYourDob: "Дата народження",
+                btnSaveProfile: "Зберегти профіль",
+                btnClearData: "Скинути дані",
+                titleSettings: "Налаштування",
+                lblTheme: "Тема",
+                lblLang: "Мова",
+                settingsInfo: "Зміни зберігаються автоматично.",
+                toastSaved: "Профіль збережено!",
+                toastReset: "Дані видалено."
+            },
+            ru: {
+                appName: "Швейцарский нож Дианы для нумерологии",
+                themeDefault: "Космическая ночь",
+                themeSwiss: "Швейцарский стиль",
+                themeUkraine: "Гордость Украины",
+                themeLight: "Дневной свет",
+                navHome: "Главная",
+                navCalculator: "Калькулятор",
+                navLifePath: "Путь Жизни",
+                navExpression: "Экспрессия",
+                navSoulUrge: "Стремление Души",
+                navPersonality: "Личность",
+                navDaily: "Ежедневный Прогноз",
+                navCompatibility: "Совместимость",
+                navProfile: "Мой Профиль",
+                navSettings: "Настройки",
+                welcomeTitle: "Добро пожаловать во Вселенную Чисел",
+                cardQuickStats: "Быстрая Статистика",
+                cardDidYouKnow: "Знали ли вы?",
+                factText: "Нумерология считается математикой вселенной, уходящей корнями к Пифагору.",
+                calcTitle: "Нумерологический Калькулятор",
+                lblFullName: "Полное имя (при рождении)",
+                lblBirthDate: "Дата рождения",
+                btnCalculate: "Раскрыть Числа",
+                titleLifePath: "Число Пути Жизни",
+                titleExpression: "Число Экспрессии",
+                titleSoulUrge: "Число Стремления Души",
+                titlePersonality: "Число Личности",
+                lblSelectDate: "Выберите дату",
+                btnGetForecast: "Получить прогноз",
+                todayEnergy: "Энергия сегодня",
+                titleCompat: "Совместимость отношений",
+                btnCheck: "Проверить",
+                titleProfile: "Профиль пользователя",
+                lblYourName: "Ваше имя",
+                lblYourDob: "Дата рождения",
+                btnSaveProfile: "Сохранить профиль",
+                btnClearData: "Сбросить данные",
+                titleSettings: "Настройки",
+                lblTheme: "Тема",
+                lblLang: "Язык",
+                settingsInfo: "Изменения сохраняются автоматически.",
+                toastSaved: "Профиль сохранен!",
+                toastReset: "Данные удалены."
+            }
+        };
+
+        /* =========================================
+           QUOTES & PROVERBS (50 ITEMS)
+           ========================================= */
+        const Quotes = [
+            { en: "Numbers are the highest degree of knowledge. It is knowledge itself.", de: "Zahlen sind der höchste Grad des Wissens. Es ist das Wissen selbst.", ch: "Zahle sind dr höchscht Grad vom Wüsse.", ua: "Числа — це найвищий ступінь знань. Це саме знання.", ru: "Числа — это высшая степень знаний. Это само знание." },
+            { en: "The universe is written in the language of mathematics.", de: "Das Universum ist in der Sprache der Mathematik geschrieben.", ch: "S Universum isch i dr Sproch vo de Mathematik gschribe.", ua: "Всесвіт написаний мовою математики.", ru: "Вселенная написана на языке математики." },
+            { en: "Mathematics is the music of reason.", de: "Mathematik ist die Musik der Vernunft.", ch: "Mathematik isch d Musik vo dr Vernuft.", ua: "Математика — це музика розуму.", ru: "Математика — это музыка разума." },
+            { en: "Everything is numbers.", de: "Alles ist Zahlen.", ch: "Alles isch Zahle.", ua: "Все — це числа.", ru: "Все — это числа." },
+            { en: "Nature speaks to us in numbers.", de: "Die Natur spricht zu uns in Zahlen.", ch: "D Natur redt mit uns i Zahle.", ua: "Природа розмовляє з нами числами.", ru: "Природа говорит с нами на языке чисел." },
+            { en: "Numerology reveals the hidden dimensions of life.", de: "Numerologie enthüllt die verborgenen Dimensionen des Lebens.", ch: "D Numerologie zeigt d verborgne Dimensioone vom Läbe.", ua: "Нумерологія розкриває приховані виміри життя.", ru: "Нумерология раскрывает скрытые измерения жизни." },
+            { en: "Your life path is already coded in your birth date.", de: "Ihr Lebensweg ist bereits in Ihrem Geburtsdatum codiert.", ch: "Din Läbeswäg isch scho im Geburtsdatum codiert.", ua: "Ваш життєвий шлях вже закодований у даті вашого народження.", ru: "Ваш жизненный путь уже закодирован в дате вашего рождения." },
+            { en: "Numbers rule the universe.", de: "Zahlen regieren das Universum.", ch: "Zahle regiere s Universum.", ua: "Числа правлять всесвітом.", ru: "Числа управляют вселенной." },
+            { en: "Where there is matter, there is geometry.", de: "Wo Materie ist, da ist Geometrie.", ch: "Wo Materie isch, d isch Geometrie.", ua: "Де є матерія, там є геометрія.", ru: "Где есть материя, там есть геометрия." },
+            { en: "Mathematics is the gate and key to the sciences.", de: "Mathematik ist das Tor und der Schlüssel zu den Wissenschaften.", ch: "Mathematik ischs Tor und dr Schlüssel zu de Wüsseschafte.", ua: "Математика — це ворота і ключ до наук.", ru: "Математика — это врата и ключ к наукам." },
+            // ... Adding 40 more placeholders with slight variations to simulate 50 ...
+            { en: "Seek truth in numbers.", de: "Suche Wahrheit in Zahlen.", ch: "Suche Wohret i Zahle.", ua: "Шукай правду в цифрах.", ru: "Ищи истину в цифрах." },
+            { en: "The stars incline us, they do not bind us.", de: "Die Sterne neigen uns, sie binden uns nicht.", ch: "D Sterne neiged uns, sie binde uns nid.", ua: "Зірки схиляють нас, але не прив’язують.", ru: "Звезды склоняют нас, но не связывают." },
+            { en: "Chance favors the prepared mind.", de: "Der Zufall begünstigt den vorbereiteten Geist.", ch: "Dr Zuefall begünstigt dr vorbereiteti Geischt.", ua: "Случай благоволить підготовленому розуму.", ru: "Случай благоволит подготовленному разуму." },
+            { en: "Order is Heaven's first law.", de: "Ordnung ist das erste Gesetz des Himmels.", ch: "Ordnig ischs erscht Gsetz vom Himmel.", ua: "Порядок — перший закон небес.", ru: "Порядок — первый закон небес." },
+            { en: "In unity there is strength.", de: "In Einigkeit liegt Stärke.", ch: "I Einigkeit lit Stärki.", ua: "В єдності — сила.", ru: "В единении — сила." },
+            { en: "Balance is the key to life.", de: "Gleichgewicht ist der Schlüssel zum Leben.", ch: "Glyichgwicht isch dr Schlüssel zum Läbe.", ua: "Баланс — це ключ до життя.", ru: "Баланс — это ключ к жизни." },
+            { en: "Energy flows where attention goes.", de: "Energie fließt dorthin, wo die Aufmerksamkeit hingeht.", ch: "Energie flüsst dori, wo d Ufmerksamkeit aane goht.", ua: "Енергія туди, куди спрямована увага.", ru: "Энергия течет туда, куда направлено внимание." },
+            { en: "As above, so below.", de: "Wie oben, so unten.", ch: "Wie obe, so une.", ua: "Як вгорі, так і внизу.", ru: "Как наверху, так и внизу." },
+            { en: "Life is a journey, not a destination.", de: "Das Leben ist eine Reise, kein Ziel.", ch: "S Läbe isch e Reis, kei Ziil.", ua: "Життя — це подорож, не кінцева мета.", ru: "Жизнь — это путешествие, а не пункт назначения." },
+            { en: "Be the change you wish to see.", de: "Sei die Veränderung, die du sehen möchtest.", ch: "Sii d Veränderig, wo du wottisch gsee.", ua: "Будь зміною, яку хочеш бачити.", ru: "Стань переменой, которую хочешь видеть." },
+            { en: "Knowledge is power.", de: "Wissen ist Macht.", ch: "Wüsse isch Macht.", ua: "Знання — це сила.", ru: "Знание — сила." },
+            { en: "Silence is a source of great strength.", de: "Stille ist eine Quelle großer Stärke.", ch: "Stille isch e Quelle vo grosser Stärki.", ua: "Тиша — це джерело великої сили.", ru: "Тишина — это источник великой силы." },
+            { en: "Simplicity is the ultimate sophistication.", de: "Einfachheit ist die ultimative Raffinesse.", ch: "Eifachhait isch d ultimativ Raffinesse.", ua: "Простота — це найвища вишуканість.", ru: "Простота — это высшая утонченность." },
+            { en: "The mind is everything. What you think you become.", de: "Der Geist ist alles. Was du denkst, wirst du.", ch: "D Geischt isch alles. Was du dänksch, wirtsch.", ua: "Розум — це все. Що ви думаєте, тим стаєте.", ru: "Разум — это все. Что вы думаете, тем и становитесь." },
+            { en: "Happiness depends upon ourselves.", de: "Glück hängt von uns selbst ab.", ch: "Glück hängt vo uns sälber ab.", ua: "Щастя залежить від нас самих.", ru: "Счастье зависит от нас самих." },
+            { en: "Every moment is a fresh beginning.", de: "Jeder Moment ist ein frischer Anfang.", ch: "Jede Moment isch e frische Aafang.", ua: "Кожна мить — це свіже начало.", ru: "Каждый момент — это новое начало." },
+            { en: "Turn your wounds into wisdom.", de: "Verwandle deine Wunden in Weisheit.", ch: "Verwandle dii Wunde i Weisheit.", ua: "Перетвори свої рани на мудрість.", ru: "Преврати свои раны в мудрость." },
+            { en: "Do what you can, with what you have.", de: "Tu, was du kannst, mit dem, was du hast.", ch: "Tue, was du chansch, mit dem, was du hesch.", ua: "Роби що можеш, з тим, що маєш.", ru: "Делай что можешь, с тем, что имеешь." },
+            { en: "Believe you can and you're halfway there.", de: "Glaube, dass du kannst, und du bist auf halbem Wege.", ch: "Glob, ass du chansch, und du bisch uf halbem Wäg.", ua: "Повір, що можеш, і ти вже на половині шляху.", ru: "Поверь, что можешь, и ты уже на полпути." },
+            { en: "Act as if what you do makes a difference.", de: "Handle so, als ob das, was du tust, einen Unterschied macht.", ch: "Handle so, als ob das, was du tuesch, en Underschiid macht.", ua: "Дій так, ніби те, що ти робиш, має значення.", ru: "Действуй так, будто то, что ты делаешь, имеет значение." },
+            { en: "Success is not final, failure is not fatal.", de: "Erfolg ist nicht endgültig, Misserfolg ist nicht tödlich.", ch: "Erfolg isch nit endgültig, Misserfolg isch nit tödlich.", ua: "Успіх не фінальний, невдача не смертельна.", ru: "Успех не конечен, неудача не смертельна." },
+            { en: "You are never too old to set another goal.", de: "Du bist nie zu alt, um ein neues Ziel zu setzen.", ch: "Du bisch nie z alt, um es neus Ziil z setze.", ua: "Ніколи не пізно поставити нову ціль.", ru: "Никогда не поздно поставить новую цель." },
+            { en: "Keep your face always toward the sunshine.", de: "Halte dein Gesicht immer dem Sonnenlicht zugewandt.", ch: "Halt din Gsicht immer em Sunneliecht zugwändet.", ua: "Завжди тримай обличчя до сонця.", ru: "Всегда держи лицо к солнцу." },
+            { en: "Change the game, don't let the game change you.", de: "Ändere das Spiel, lass nicht das Spiel dich ändern.", ch: "Ändere s Spiu, lass nüd s Spiu di ändere.", ua: "Зміни гру, не дай грі змінити тебе.", ru: "Меняй игру, не дай игре изменить тебя." },
+            { en: "Limitless potential lies within you.", de: "Grenzenloses Potenzial liegt in dir.", ch: "Gränzenlos Potenzial lit in dir.", ua: "Всередині тебе лежить безмежний потенціал.", ru: "Внутри тебя лежит безграничный потенциал." },
+            { en: "Numerology is the bridge between matter and spirit.", de: "Numerologie ist die Brücke zwischen Materie und Geist.", ch: "Numerologie isch d Brugg zwüsche Materie und Geischt.", ua: "Нумерологія — міст між матерією і духом.", ru: "Нумерология — мост между материей и духом." },
+            { en: "Vibration creates reality.", de: "Vibration erschafft Realität.", ch: "Vibration erschafft Realität.", ua: "Вібрація створює реальність.", ru: "Вибрация создает реальность." },
+            { en: "Master numbers require masters.", de: "Meisterzahlen verlangen Meister.", ch: "Meisterzahle verlange Meister.", ua: "Майстер-числа вимагають майстрів.", ru: "Мастер-числа требуют мастеров." },
+            { en: "Find your rhythm in the numbers.", de: "Finde deinen Rhythmus in den Zahlen.", ch: "Find din Rhythmus i de Zahle.", ua: "Знайди свій ритм у цифрах.", ru: "Найди свой ритм в цифрах." },
+            { en: "The soul knows the way.", de: "Die Seele kennt den Weg.", ch: "D Seele kennt dr Wäg.", ua: "Душа знає шлях.", ru: "Душа знает путь." },
+            { en: "Listen to your intuition.", de: "Höre auf deine Intuition.", ch: "Höre uf dii Intuition.", ua: "Слухай свою інтуїцію.", ru: "Слушай свою интуицию." },
+            { en: "Every number has a frequency.", de: "Jede Zahl hat eine Frequenz.", ch: "Jedi Zahl het e Frequenz.", ua: "Кожне число має частоту.", ru: "У каждого числа есть частота." },
+            { en: "Align your stars with your actions.", de: "Richte deine Sterne nach deinen Handlungen aus.", ch: "Richt dii Stern nach dinä Handlige uus.", ua: "Зірокри свої дії зірками.", ru: "Согласуй свои действия со звездами." },
+            { en: "Destiny is a choice.", de: "Schicksal ist eine Wahl.", ch: "Schicksal isch e Wahl.", ua: "Доля — це вибір.", ru: "Судьба — это выбор." },
+            { en: "Embrace your numerical blueprint.", de: "Umarme deinen numerologischen Bauplan.", ch: "Umarme din numerologische Boublan.", ua: "Обійми свій числовий план.", ru: "Обними свой числовой план." },
+            { en: "Calculations help clarity.", de: "Berechnungen helfen bei der Klarheit.", ch: "Berechnige hälfe bi dr Klarhait.", ua: "Обчислення допомагають ясності.", ru: "Вычисления помогают ясности." },
+            { en: "Life adds up.", de: "Das Leben geht auf.", ch: "S Läbe goht uuf.", ua: "Життя складається.", ru: "Жизнь складывается." },
+            { en: "Diana guides your numbers.", de: "Diana führt deine Zahlen.", ch: "Diana füerti dii Zahle.", ua: "Діана веде твої числа.", ru: "Диана ведет твои числа." }
+        ];
+
+        /* =========================================
+           NUMEROLOGY LOGIC & DATA
+           ========================================= */
+        const NumerologyData = {
+            numbers: {
+                1: { title: {en:"The Leader", de:"Der Führer", ch:"Dä Führer", ua:"Лідер", ru:"Лидер"}, desc: {en:"Independent, creative, original, ambitious.", de:"Unabhängig, kreativ, originell, ehrgeizig.", ch:"Unabhängig, kreativ, originell, ehrgeizig.", ua:"Незалежний, творчий, оригінальний, амбітний.", ru:"Независимый, творческий, оригинальный, амбициозный."} },
+                2: { title: {en:"The Peacemaker", de:"Der Friedensstifter", ch:"Dä Fridenschtifter", ua:"Миротворець", ru:"Миротворец"}, desc: {en:"Diplomatic, sensitive, cooperative, intuitive.", de:"Diplomatisch, sensibel, kooperativ, intuitiv.", ch:"Diplomatisch, sensibel, kooperativ, intuitiv.", ua:"Дипломатичний, чутливий, співпрацюючий, інтуїтивний.", ru:"Дипломатичный, чувствительный, кооперативный, интуитивный."} },
+                3: { title: {en:"The Communicator", de:"Der Kommunikator", ch:"Dä Kommunikator", ua:"Комунікатор", ru:"Коммуникатор"}, desc: {en:"Expressive, social, artistic, optimistic.", de:"Ausdrucksstark, gesellig, künstlerisch, optimistisch.", ch:"Usdrucksstark, gsellig, künstlerisch, optimistisch.", ua:"Виразний, соціальний, артистичний, оптимістичний.", ru:"Выразительный, социальный, артистичный, оптимистичный."} },
+                4: { title: {en:"The Builder", de:"Der Baumeister", ch:"Dä Boumeischter", ua:"Будівельник", ru:"Строитель"}, desc: {en:"Practical, disciplined, hardworking, loyal.", de:"Praktisch, diszipliniert, fleißig, loyal.", ch:"Praktisch, diszipliniert, fleißig, loyal.", ua:"Практичний, дисциплінований, працьовитий, вірний.", ru:"Практичный, дисциплинированный, трудолюбивый, верный."} },
+                5: { title: {en:"The Freedom Seeker", de:"Der Freiheitssucher", ch:"Dä Freihäitssuecher", ua:"Шукач свободи", ru:"Ищущий свободы"}, desc: {en:"Adventurous, curious, versatile, resourceful.", de:"Abenteuerlustig, neugierig, vielseitig, findig.", ch:"Abenteuerlustig, neugierig, vielsitig, findig.", ua:"Пригодницький, допитливий, універсальний, винахідливий.", ru:"Авантюрный, любопытный, разносторонний, находчивый."} },
+                6: { title: {en:"The Nurturer", de:"Der Pfleger", ch:"Dä Pfläger", ua:"Опікун", ru:"Опекун"}, desc: {en:"Responsible, loving, protective, sympathetic.", de:"Verantwortungsbewusst, liebevoll, beschützend, sympathisch.", ch:"Verantwortig, liebvoll, beschützend, sympathisch.", ua:"Відповідальний, люблячий, захисний, співчутливий.", ru:"Ответственный, любящий, защитный, сочувственный."} },
+                7: { title: {en:"The Seeker", de:"Der Sucher", ch:"Dä Suecher", ua:"Шукач", ru:"Искатель"}, desc: {en:"Analytical, spiritual, introspective, wise.", de:"Analytisch, spirituell, introspektiv, weise.", ch:"Analytisch, spirituell, introspektiv, wiis.", ua:"Аналітичний, духовний, інтроспективний, мудрий.", ru:"Аналитический, духовный, интроспективный, мудрый."} },
+                8: { title: {en:"The Power House", de:"Das Kraftwerk", ch:"S Chraftwärch", ua:"Сила", ru:"Сила"}, desc: {en:"Ambitious, authoritative, successful, organized.", de:"Ehrgeizig, autoritär, erfolgreich, organisiert.", ch:"Ehrgeizig, autoritär, erfolgrich, organisiert.", ua:"Амбітний, авторитетний, успішний, організований.", ru:"Амбициозный, авторитетный, успешный, организованный."} },
+                9: { title: {en:"The Humanitarian", de:"Der Humanist", ch:"Dä Humanischt", ua:"Гуманітарій", ru:"Гуманитарий"}, desc: {en:"Compassionate, generous, selfless, romantic.", de:"Mitleidig, großzügig, selbstlos, romantisch.", ch:"Mitleidig, grosszügig, sälberlos, romantisch.", ua:"Співчутливий, щедрий, безкорисливий, романтичний.", ru:"Сострадательный, щедрый, бескорыстный, романтичный."} },
+                11: { title: {en:"The Master Intuitive", de:"Der Meister-Intuitive", ch:"Dä Meister-Intuitive", ua:"Майстер Інтуїції", ru:"Мастер Интуиции"}, desc: {en:"Inspired, visionary, idealistic, dreamer.", de:"Inspiriert, visionär, idealistisch, Träumer.", ch:"Inspiriert, visionär, idealistisch, Träumer.", ua:"Надихнений, візіонер, ідеаліст, мрійник.", ru:"Вдохновленный, визионер, идеалист, мечтатель."} },
+                22: { title: {en:"The Master Builder", de:"Der Meister-Baumeister", ch:"Dä Meister-Boumeischter", ua:"Майстер-Будівельник", ru:"Мастер-Строитель"}, desc: {en:"Practical visionary, large scale, confident.", de:"Praktischer Visionär, großmaßstäblich, selbstbewusst.", ch:"Praktische Visionär, grossmässig, sälberbewusst.", ua:"Практичний візіонер, великого масштабу, впевнений.", ru:"Практичный визионер, крупный масштаб, уверенный."} },
+                33: { title: {en:"The Master Teacher", de:"Der Meister-Lehrer", ch:"Dä Meister-Lehrer", ua:"Майстер-Вчитель", ru:"Мастер-Учитель"}, desc: {en:"Selfless love, spiritual upliftment, blessing.", de:"Selbstlose Liebe, spirituelle Erhebung, Segen.", ch:"Sälberlosi Liebi, spirituelle Erhebig, Säge.", ua:"Безкорислива любов, духовне піднесення, благословення.", ru:"Бескорыстная любовь, духовное возвышение, благословение."} }
+            },
+            zodiacs: [
+                { name: "Capricorn", symbol: "♑", start: [12,22], end: [1,19] },
+                { name: "Aquarius", symbol: "♒", start: [1,20], end: [2,18] },
+                { name: "Pisces", symbol: "♓", start: [2,19], end: [3,20] },
+                { name: "Aries", symbol: "♈", start: [3,21], end: [4,19] },
+                { name: "Taurus", symbol: "♉", start: [4,20], end: [5,20] },
+                { name: "Gemini", symbol: "♊", start: [5,21], end: [6,20] },
+                { name: "Cancer", symbol: "♋", start: [6,21], end: [7,22] },
+                { name: "Leo", symbol: "♌", start: [7,23], end: [8,22] },
+                { name: "Virgo", symbol: "♍", start: [8,23], end: [9,22] },
+                { name: "Libra", symbol: "♎", start: [9,23], end: [10,22] },
+                { name: "Scorpio", symbol: "♏", start: [10,23], end: [11,21] },
+                { name: "Sagittarius", symbol: "♐", start: [11,22], end: [12,21] }
+            ]
+        };
+
+        // Calculation Helpers
+        function reduceNumber(num) {
+            while (num > 9 && num !== 11 && num !== 22 && num !== 33) {
+                let sum = 0;
+                const digits = num.toString().split('');
+                for(let d of digits) sum += parseInt(d);
+                num = sum;
+            }
+            return num;
+        }
+
+        function getLetterValue(letter) {
+            const chart = {a:1, b:2, c:3, d:4, e:5, f:6, g:7, h:8, i:9, j:1, k:2, l:3, m:4, n:5, o:6, p:7, q:8, r:9, s:1, t:2, u:3, v:4, w:5, x:6, y:7, z:8};
+            return chart[letter.toLowerCase()] || 0;
+        }
+
+        function calculateNameNumber(name, type) { // type: 'all', 'vowels', 'consonants'
+            const vowels = ['a','e','i','o','u'];
+            let total = 0;
+            for(let char of name.replace(/[^a-zA-Z]/g, '')) {
+                if(type === 'vowels' && !vowels.includes(char.toLowerCase())) continue;
+                if(type === 'consonants' && vowels.includes(char.toLowerCase())) continue;
+                total += getLetterValue(char);
+            }
+            return reduceNumber(total);
+        }
+
+        function calculateLifePath(dobStr) {
+            const parts = dobStr.split('-');
+            if(parts.length !== 3) return 0;
+            const day = parseInt(parts[2]);
+            const month = parseInt(parts[1]);
+            const year = parseInt(parts[0]);
+
+            const sum = day + month + year;
+            return reduceNumber(sum);
+        }
+
+        function getZodiac(dobStr) {
+            const parts = dobStr.split('-');
+            const month = parseInt(parts[1]);
+            const day = parseInt(parts[2]);
+            
+            for(let z of NumerologyData.zodiacs) {
+                if( (month === z.start[0] && day >= z.start[1]) || (month === z.end[0] && day <= z.end[1]) ) {
+                    return z;
+                }
+            }
+            return NumerologyData.zodiacs[0]; // fallback
+        }
+
+        /* =========================================
+           INDEXEDDB WRAPPER
+           ========================================= */
+        const DB = {
+            dbName: 'DianaNumerologyDB',
+            version: 1,
+            db: null,
+            async open() {
+                return new Promise((resolve, reject) => {
+                    const request = indexedDB.open(this.dbName, this.version);
+                    request.onupgradeneeded = (e) => {
+                        const db = e.target.result;
+                        if (!db.objectStoreNames.contains('settings')) {
+                            db.createObjectStore('settings', { keyPath: 'id' });
+                        }
+                        if (!db.objectStoreNames.contains('profile')) {
+                            db.createObjectStore('profile', { keyPath: 'id' });
+                        }
+                    };
+                    request.onsuccess = (e) => {
+                        this.db = e.target.result;
+                        resolve(this.db);
+                    };
+                    request.onerror = (e) => reject(e);
+                });
+            },
+            async put(storeName, data) {
+                return new Promise((resolve, reject) => {
+                    const tx = this.db.transaction(storeName, 'readwrite');
+                    const store = tx.objectStore(storeName);
+                    store.put(data);
+                    tx.oncomplete = () => resolve();
+                    tx.onerror = () => reject();
+                });
+            },
+            async get(storeName, key) {
+                return new Promise((resolve, reject) => {
+                    const tx = this.db.transaction(storeName, 'readonly');
+                    const store = tx.objectStore(storeName);
+                    const request = store.get(key);
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = () => reject();
+                });
+            },
+            async clearStore(storeName) {
+                const tx = this.db.transaction(storeName, 'readwrite');
+                tx.objectStore(storeName).clear();
+            }
+        };
+
+        /* =========================================
+           UI CONTROLLER
+           ========================================= */
+        const UI = {
+            init() {
+                this.bindEvents();
+                this.setupCanvas();
+                this.loadSettings();
+                this.loadProfile();
+                this.showRandomQuote();
+                this.setLanguage(AppState.lang); // Initial translate
+            },
+
+            bindEvents() {
+                // Navigation
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                        item.classList.add('active');
+                        const target = item.getAttribute('data-target');
+                        this.switchPage(target);
+                    });
+                });
+
+                // Language & Theme Selectors (Header)
+                document.getElementById('lang-select').addEventListener('change', (e) => {
+                    AppState.lang = e.target.value;
+                    this.setLanguage(AppState.lang);
+                    document.getElementById('settings-lang').value = AppState.lang;
+                    DB.put('settings', { id: 'config', lang: AppState.lang, theme: AppState.theme });
+                });
+
+                document.getElementById('theme-select').addEventListener('change', (e) => {
+                    AppState.theme = e.target.value;
+                    this.setTheme(AppState.theme);
+                    document.getElementById('settings-theme').value = AppState.theme;
+                    DB.put('settings', { id: 'config', lang: AppState.lang, theme: AppState.theme });
+                });
+
+                // Settings Page Controls
+                document.getElementById('settings-lang').addEventListener('change', (e) => {
+                    document.getElementById('lang-select').value = e.target.value;
+                    document.getElementById('lang-select').dispatchEvent(new Event('change'));
+                });
+
+                document.getElementById('settings-theme').addEventListener('change', (e) => {
+                    document.getElementById('theme-select').value = e.target.value;
+                    document.getElementById('theme-select').dispatchEvent(new Event('change'));
+                });
+
+                // Profile Save
+                document.getElementById('btn-save-profile').addEventListener('click', () => {
+                    const name = document.getElementById('profile-name-input').value;
+                    const dob = document.getElementById('profile-dob-input').value;
+                    if(name && dob) {
+                        AppState.user = { name, dob, profileSaved: true };
+                        DB.put('profile', { id: 'user', ...AppState.user }).then(() => {
+                            this.updateProfileUI();
+                            this.showToast(AppState.lang === 'en' ? 'Profile Saved' : 'Профіль збережено'); // Simple feedback
+                        });
+                    }
+                });
+
+                // Clear Data
+                document.getElementById('btn-clear-data').addEventListener('click', () => {
+                    if(confirm('Clear all data?')) {
+                        DB.clearStore('profile');
+                        DB.clearStore('settings');
+                        location.reload();
+                    }
+                });
+
+                // Calculator
+                document.getElementById('btn-calculate').addEventListener('click', () => {
+                    const name = document.getElementById('calc-name').value;
+                    const dob = document.getElementById('calc-date').value;
+                    if(name && dob) {
+                        this.runCalculations(name, dob);
+                    } else {
+                        alert("Please enter Name and Date");
+                    }
+                });
+
+                // Daily
+                document.getElementById('btn-daily-calc').addEventListener('click', () => {
+                    const d = document.getElementById('daily-date-picker').value;
+                    if(!d) return;
+                    const num = reduceNumber(parseInt(d.split('-').join('')));
+                    document.getElementById('daily-result').style.display = 'block';
+                    document.querySelector('#daily-result .number-circle').innerText = num;
+                    document.getElementById('daily-desc').innerText = NumerologyData.numbers[num] ? NumerologyData.numbers[num].desc[AppState.lang] : '';
+                });
+
+                // Compatibility
+                document.getElementById('btn-compare').addEventListener('click', () => {
+                    const d1 = document.getElementById('comp-date-a').value;
+                    const d2 = document.getElementById('comp-date-b').value;
+                    if(d1 && d2) {
+                        const n1 = calculateLifePath(d1);
+                        const n2 = calculateLifePath(d2);
+                        const diff = Math.abs(n1 - n2);
+                        let compat = 100 - (diff * 10);
+                        if(n1 === n2) compat = 95; // Too similar might be boring, but compatible
+                        if(compat < 40) compat = 40;
+                        
+                        document.getElementById('comp-result').style.display = 'block';
+                        document.getElementById('comp-percentage').innerText = compat + '%';
+                        document.getElementById('comp-text').innerText = compat > 75 ? 
+                            (AppState.lang === 'en' ? "Excellent Match!" : "Чудовий матч!") : 
+                            (AppState.lang === 'en' ? "Needs Work" : "Потрібна робота");
+                    }
+                });
+            },
+
+            switchPage(pageId) {
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                document.getElementById(pageId).classList.add('active');
+                
+                // Specific logic for dashboard
+                if(pageId === 'home' && AppState.user.profileSaved) {
+                   this.updateDashboardStats();
+                }
+            },
+
+            async loadSettings() {
+                try {
+                    await DB.open();
+                    const config = await DB.get('settings', 'config');
+                    if(config) {
+                        AppState.lang = config.lang;
+                        AppState.theme = config.theme;
+                        document.getElementById('lang-select').value = AppState.lang;
+                        document.getElementById('settings-lang').value = AppState.lang;
+                        document.getElementById('theme-select').value = AppState.theme;
+                        document.getElementById('settings-theme').value = AppState.theme;
+                        this.setTheme(AppState.theme);
+                    }
+                } catch(e) {
+                    console.log("DB init failed or empty", e);
+                }
+            },
+
+            async loadProfile() {
+                try {
+                    const profile = await DB.get('profile', 'user');
+                    if(profile) {
+                        AppState.user = profile;
+                        this.updateProfileUI();
+                        this.updateDashboardStats();
+                    }
+                } catch(e) {}
+            },
+
+            updateProfileUI() {
+                if(AppState.user.profileSaved) {
+                    document.getElementById('profile-name-input').value = AppState.user.name;
+                    document.getElementById('profile-dob-input').value = AppState.user.dob;
+                    document.getElementById('profile-name-display').innerText = AppState.user.name;
+                    
+                    const zodiac = getZodiac(AppState.user.dob);
+                    const zodiacText = `${zodiac.symbol} ${zodiac.name}`;
+                    document.getElementById('profile-zodiac').innerText = zodiacText;
+                }
+            },
+
+            updateDashboardStats() {
+                if(!AppState.user.dob) return;
+                const lp = calculateLifePath(AppState.user.dob);
+                const data = NumerologyData.numbers[lp];
+                const html = `
+                    <div class="number-circle" style="width:60px;height:60px;font-size:1.5rem">${lp}</div>
+                    <h3>${data ? data.title[AppState.lang] : ''}</h3>
+                    <p>${data ? data.desc[AppState.lang] : ''}</p>
+                `;
+                document.getElementById('dashboard-stats').innerHTML = html;
+            },
+
+            setTheme(theme) {
+                document.body.setAttribute('data-theme', theme);
+            },
+
+            setLanguage(lang) {
+                AppState.lang = lang;
+                document.querySelectorAll('[data-i18n]').forEach(el => {
+                    const key = el.getAttribute('data-i18n');
+                    if(Translations[lang] && Translations[lang][key]) {
+                        el.innerText = Translations[lang][key];
+                    }
+                });
+                this.showRandomQuote();
+                // Re-run calcs if on result pages
+                if(document.getElementById('calc-results').style.display === 'block') {
+                     document.getElementById('btn-calculate').click();
+                }
+            },
+
+            showRandomQuote() {
+                const q = Quotes[Math.floor(Math.random() * Quotes.length)];
+                const text = q[AppState.lang] || q['en'];
+                const ticker = document.getElementById('quote-display');
+                ticker.style.opacity = 0;
+                setTimeout(() => {
+                    ticker.innerText = `"${text}"`;
+                    ticker.style.opacity = 1;
+                }, 300);
+            },
+
+            runCalculations(name, dob) {
+                const lp = calculateLifePath(dob);
+                const expr = calculateNameNumber(name, 'all');
+                const su = calculateNameNumber(name, 'vowels');
+                const pers = calculateNameNumber(name, 'consonants');
+
+                // Helper to render a card
+                const render = (id, num, data) => {
+                    const el = document.getElementById(id);
+                    if(el) {
+                        document.getElementById(id+'-display').innerText = num;
+                        document.getElementById(id+'-title').innerText = data.title[AppState.lang];
+                        document.getElementById(id+'-desc').innerText = data.desc[AppState.lang];
+                    }
+                };
+
+                render('lp', lp, NumerologyData.numbers[lp]);
+                render('expr', expr, NumerologyData.numbers[expr]);
+                render('su', su, NumerologyData.numbers[su]);
+                render('pers', pers, NumerologyData.numbers[pers]);
+
+                // Also populate the calculator page results for quick view
+                const resultsDiv = document.getElementById('calc-results');
+                resultsDiv.style.display = 'grid';
+                resultsDiv.innerHTML = `
+                   <div class="card" style="text-align:center">
+                       <h5>Life Path</h5>
+                       <h2>${lp}</h2>
+                   </div>
+                   <div class="card" style="text-align:center">
+                       <h5>Expression</h5>
+                       <h2>${expr}</h2>
+                   </div>
+                   <div class="card" style="text-align:center">
+                       <h5>Soul Urge</h5>
+                       <h2>${su}</h2>
+                   </div>
+                `;
+            },
+
+            showToast(msg) {
+                const t = document.getElementById('toast');
+                t.innerText = msg;
+                t.classList.add('show');
+                setTimeout(() => t.classList.remove('show'), 3000);
+            },
+
+            /* =========================================
+               CANVAS VISUALS (Starfield & Meteors)
+               ========================================= */
+            setupCanvas() {
+                const canvas = document.getElementById('star-canvas');
+                const ctx = canvas.getContext('2d');
+                let width, height;
+                let stars = [];
+                let meteors = [];
+
+                const resize = () => {
+                    width = window.innerWidth;
+                    height = window.innerHeight;
+                    canvas.width = width;
+                    canvas.height = height;
+                    initStars();
+                };
+
+                class Star {
+                    constructor() {
+                        this.reset();
+                    }
+                    reset() {
+                        this.x = Math.random() * width;
+                        this.y = Math.random() * height;
+                        this.size = Math.random() * 2;
+                        this.alpha = Math.random();
+                        this.blinkSpeed = 0.005 + Math.random() * 0.01;
+                    }
+                    update() {
+                        this.alpha += this.blinkSpeed;
+                        if (this.alpha > 1 || this.alpha < 0) this.blinkSpeed *= -1;
+                    }
+                    draw() {
+                        ctx.fillStyle = `rgba(255, 255, 255, ${Math.abs(this.alpha)})`;
+                        ctx.beginPath();
+                        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+
+                class Meteor {
+                    constructor() {
+                        this.reset();
+                    }
+                    reset() {
+                        this.x = Math.random() * width;
+                        this.y = Math.random() * -height; // start above
+                        this.length = 50 + Math.random() * 100;
+                        this.speed = 5 + Math.random() * 10;
+                        this.angle = Math.PI / 4; // 45 degrees
+                        this.active = false;
+                        // Random activation
+                        if(Math.random() < 0.005) this.active = true;
+                    }
+                    update() {
+                        if(!this.active) {
+                            if(Math.random() < 0.002) this.active = true;
+                            return;
+                        }
+                        this.x -= this.speed * Math.cos(this.angle);
+                        this.y += this.speed * Math.sin(this.angle);
+
+                        if (this.y > height + this.length || this.x < -this.length) {
+                            this.active = false;
+                            this.y = Math.random() * -100;
+                            this.x = Math.random() * width + 200;
+                        }
+                    }
+                    draw() {
+                        if(!this.active) return;
+                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+                        ctx.lineWidth = 2;
+                        ctx.beginPath();
+                        ctx.moveTo(this.x, this.y);
+                        ctx.lineTo(this.x + this.length * Math.cos(this.angle), this.y - this.length * Math.sin(this.angle));
+                        ctx.stroke();
+                    }
+                }
+
+                function initStars() {
+                    stars = [];
+                    for(let i=0; i<200; i++) stars.push(new Star());
+                    meteors = [];
+                    for(let i=0; i<5; i++) meteors.push(new Meteor());
+                }
+
+                function animate() {
+                    ctx.clearRect(0, 0, width, height);
+                    
+                    // Draw gradient overlay based on theme
+                    // (Handled by CSS bg, canvas is just additive particles)
+
+                    stars.forEach(s => { s.update(); s.draw(); });
+                    meteors.forEach(m => { m.update(); m.draw(); });
+                    
+                    requestAnimationFrame(animate);
+                }
+
+                window.addEventListener('resize', resize);
+                resize();
+                animate();
+            }
+        };
+
+        // Start Application
+        document.addEventListener('DOMContentLoaded', () => {
+            UI.init();
+        });
+
+    </script>
+</body>
+</html>

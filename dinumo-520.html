@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diana's Swiss Army Knife for Numerology</title>
+<style>
+:root{
+    --bg:#07111f;
+    --bg2:#10243d;
+    --panel:rgba(7,18,33,.78);
+    --accent:#8fd3ff;
+    --accent2:#ffd86f;
+    --text:#eef7ff;
+    --muted:#b5c7dc;
+    --success:#7effaf;
+    --danger:#ff7e9b;
+    --shadow:0 20px 45px rgba(0,0,0,.4);
+    --radius:24px;
+    --font:'Segoe UI',Tahoma,sans-serif;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+    font-family:var(--font);
+    color:var(--text);
+    background:linear-gradient(180deg,var(--bg),#02070e);
+    overflow-x:hidden;
+    min-height:100vh;
+}
+
+body.theme-aurora{
+    --bg:#06171d;
+    --bg2:#0f3840;
+    --accent:#7ef9d9;
+    --accent2:#c7ff7e;
+}
+
+body.theme-ruby{
+    --bg:#1b0910;
+    --bg2:#3f1024;
+    --accent:#ff89a8;
+    --accent2:#ffd16f;
+}
+
+body.theme-swiss{
+    --bg:#14070a;
+    --bg2:#380d12;
+    --accent:#ff4f5f;
+    --accent2:#ffffff;
+}
+
+body.theme-ukraine{
+    --bg:#041b44;
+    --bg2:#0056aa;
+    --accent:#ffd700;
+    --accent2:#72c3ff;
+}
+
+.sky{
+    position:fixed;
+    inset:0;
+    overflow:hidden;
+    z-index:-3;
+    background:radial-gradient(circle at top,var(--bg2),var(--bg));
+}
+
+.stars,.stars2,.stars3{
+    position:absolute;
+    width:200%;
+    height:200%;
+    background-repeat:repeat;
+    animation:drift 120s linear infinite;
+}
+
+.stars{
+    background-image:radial-gradient(2px 2px at 40px 60px,#fff,transparent),radial-gradient(2px 2px at 130px 90px,#9ed9ff,transparent),radial-gradient(1px 1px at 300px 140px,#fff,transparent),radial-gradient(2px 2px at 500px 320px,#fff,transparent);
+    opacity:.6;
+}
+
+.stars2{
+    background-image:radial-gradient(1px 1px at 90px 120px,#fff,transparent),radial-gradient(2px 2px at 230px 40px,#ffd86f,transparent),radial-gradient(1px 1px at 700px 200px,#fff,transparent),radial-gradient(2px 2px at 920px 320px,#fff,transparent);
+    animation-duration:180s;
+    opacity:.4;
+}
+
+.stars3{
+    background-image:radial-gradient(1px 1px at 30px 50px,#fff,transparent),radial-gradient(2px 2px at 180px 240px,#fff,transparent),radial-gradient(2px 2px at 450px 120px,#9effff,transparent);
+    animation-duration:240s;
+    opacity:.25;
+}
+
+@keyframes drift{
+    from{transform:translate3d(0,0,0)}
+    to{transform:translate3d(-40%, -40%,0)}
+}
+
+.meteor{
+    position:absolute;
+    width:300px;
+    height:2px;
+    background:linear-gradient(90deg,#fff,transparent);
+    opacity:.8;
+    transform:rotate(-25deg);
+    animation:meteor 8s linear infinite;
+}
+
+.meteor::before{
+    content:'';
+    position:absolute;
+    width:14px;
+    height:14px;
+    border-radius:50%;
+    background:#fff;
+    box-shadow:0 0 20px #fff;
+}
+
+.meteor:nth-child(1){top:10%;left:120%;animation-delay:0s}
+.meteor:nth-child(2){top:30%;left:130%;animation-delay:3s}
+.meteor:nth-child(3){top:60%;left:150%;animation-delay:5s}
+
+@keyframes meteor{
+    0%{transform:translateX(0) translateY(0) rotate(-25deg);opacity:0}
+    10%{opacity:1}
+    100%{transform:translateX(-180vw) translateY(70vh) rotate(-25deg);opacity:0}
+}
+
+.topbar{
+    position:sticky;
+    top:0;
+    z-index:50;
+    backdrop-filter:blur(18px);
+    background:rgba(4,12,25,.72);
+    border-bottom:1px solid rgba(255,255,255,.08);
+    padding:14px 18px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    flex-wrap:wrap;
+}
+
+.brand{
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+
+.logo{
+    width:62px;
+    height:62px;
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:var(--shadow);
+    border:2px solid rgba(255,255,255,.15);
+}
+
+.brand h1{
+    font-size:1.3rem;
+    letter-spacing:.4px;
+}
+
+.brand p{
+    color:var(--muted);
+    font-size:.82rem;
+}
+
+.toolbar{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.toolbar select,.toolbar button,.toolbar input{
+    background:rgba(255,255,255,.08);
+    color:var(--text);
+    border:1px solid rgba(255,255,255,.1);
+    padding:10px 14px;
+    border-radius:14px;
+    outline:none;
+}
+
+.toolbar button{
+    cursor:pointer;
+    transition:.25s;
+}
+
+.toolbar button:hover{
+    transform:translateY(-2px);
+    background:rgba(255,255,255,.18);
+}
+
+.quote-bar{
+    margin:18px auto;
+    width:min(1200px,95%);
+    background:linear-gradient(90deg,rgba(255,255,255,.06),rgba(255,255,255,.03));
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:18px;
+    padding:18px;
+    box-shadow:var(--shadow);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:20px;
+}
+
+.quote-text{
+    font-size:1rem;
+    line-height:1.6;
+}
+
+.layout{
+    width:min(1400px,96%);
+    margin:0 auto 40px;
+    display:grid;
+    grid-template-columns:280px 1fr;
+    gap:20px;
+}
+
+.sidebar{
+    background:var(--panel);
+    border-radius:var(--radius);
+    padding:20px;
+    border:1px solid rgba(255,255,255,.08);
+    box-shadow:var(--shadow);
+    height:max-content;
+    position:sticky;
+    top:105px;
+}
+
+.profile-card{
+    text-align:center;
+    margin-bottom:24px;
+}
+
+.profile-card img{
+    width:120px;
+    height:120px;
+    border-radius:50%;
+    border:4px solid rgba(255,255,255,.14);
+    margin-bottom:12px;
+    box-shadow:0 12px 30px rgba(0,0,0,.45);
+}
+
+.profile-card h2{
+    margin-bottom:8px;
+}
+
+.profile-card p{
+    color:var(--muted);
+    margin-bottom:6px;
+}
+
+.astro-badge{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:44px;
+    height:44px;
+    border-radius:50%;
+    background:linear-gradient(135deg,var(--accent),rgba(255,255,255,.1));
+    color:#001220;
+    font-size:1.3rem;
+    font-weight:bold;
+    margin-top:10px;
+}
+
+.nav{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.nav button{
+    width:100%;
+    text-align:left;
+    padding:14px;
+    border-radius:16px;
+    border:none;
+    background:rgba(255,255,255,.05);
+    color:var(--text);
+    cursor:pointer;
+    transition:.25s;
+}
+
+.nav button:hover,.nav button.active{
+    background:linear-gradient(135deg,var(--accent),rgba(255,255,255,.1));
+    color:#001018;
+    transform:translateX(5px);
+}
+
+.content{
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+}
+
+.page{
+    display:none;
+    background:var(--panel);
+    border-radius:var(--radius);
+    padding:24px;
+    border:1px solid rgba(255,255,255,.08);
+    box-shadow:var(--shadow);
+    animation:fade .45s;
+}
+
+.page.active{display:block}
+
+@keyframes fade{
+    from{opacity:0;transform:translateY(10px)}
+    to{opacity:1;transform:translateY(0)}
+}
+
+.hero{
+    display:grid;
+    grid-template-columns:1fr 340px;
+    gap:20px;
+    align-items:center;
+}
+
+.hero-card{
+    padding:24px;
+    border-radius:24px;
+    background:linear-gradient(145deg,rgba(255,255,255,.08),rgba(255,255,255,.03));
+    border:1px solid rgba(255,255,255,.08);
+}
+
+.hero h2{
+    font-size:2.2rem;
+    margin-bottom:12px;
+}
+
+.hero p{
+    color:var(--muted);
+    line-height:1.8;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+    gap:18px;
+    margin-top:24px;
+}
+
+.card{
+    padding:20px;
+    border-radius:22px;
+    background:rgba(255,255,255,.05);
+    border:1px solid rgba(255,255,255,.06);
+    transition:.3s;
+    position:relative;
+    overflow:hidden;
+}
+
+.card:hover{
+    transform:translateY(-6px) scale(1.01);
+}
+
+.card::before{
+    content:'';
+    position:absolute;
+    inset:0;
+    background:radial-gradient(circle at top right,rgba(255,255,255,.12),transparent 45%);
+}
+
+.card h3{
+    margin-bottom:12px;
+}
+
+.card p{
+    color:var(--muted);
+    line-height:1.7;
+}
+
+.input-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:14px;
+    margin:18px 0;
+}
+
+.input-grid input,.input-grid textarea,.input-grid select{
+    width:100%;
+    padding:14px;
+    border-radius:16px;
+    border:1px solid rgba(255,255,255,.1);
+    background:rgba(255,255,255,.06);
+    color:var(--text);
+}
+
+.action-btn{
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    color:#00111c;
+    border:none;
+    padding:14px 20px;
+    border-radius:16px;
+    font-weight:700;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.action-btn:hover{
+    transform:scale(1.05);
+}
+
+.result-panel{
+    margin-top:20px;
+    padding:24px;
+    border-radius:22px;
+    background:rgba(0,0,0,.25);
+    border:1px solid rgba(255,255,255,.08);
+}
+
+.big-number{
+    font-size:5rem;
+    font-weight:900;
+    line-height:1;
+    margin:10px 0;
+    background:linear-gradient(135deg,var(--accent),#fff);
+    -webkit-background-clip:text;
+    color:transparent;
+}
+
+.chart{
+    width:100%;
+    height:280px;
+    border-radius:22px;
+    background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));
+    margin-top:20px;
+    position:relative;
+    overflow:hidden;
+}
+
+.chart-bar{
+    position:absolute;
+    bottom:20px;
+    width:8%;
+    border-radius:14px 14px 0 0;
+    background:linear-gradient(180deg,var(--accent),var(--accent2));
+    animation:grow 1s;
+}
+
+@keyframes grow{
+    from{height:0}
+}
+
+.timeline{
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+    margin-top:20px;
+}
+
+.timeline-item{
+    padding:18px;
+    border-left:4px solid var(--accent);
+    background:rgba(255,255,255,.05);
+    border-radius:0 18px 18px 0;
+}
+
+.gallery{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:18px;
+}
+
+.gallery img{
+    width:100%;
+    border-radius:22px;
+    aspect-ratio:1/1;
+    object-fit:cover;
+    transition:.4s;
+    border:1px solid rgba(255,255,255,.1);
+}
+
+.gallery img:hover{
+    transform:scale(1.04) rotate(1deg);
+}
+
+.footer{
+    text-align:center;
+    color:var(--muted);
+    padding:20px;
+}
+
+.orbit{
+    width:280px;
+    height:280px;
+    margin:auto;
+    position:relative;
+}
+
+.orbit-center{
+    position:absolute;
+    inset:50%;
+    transform:translate(-50%,-50%);
+    width:90px;
+    height:90px;
+    border-radius:50%;
+    background:radial-gradient(circle,var(--accent),#fff);
+    box-shadow:0 0 30px var(--accent);
+}
+
+.ring{
+    position:absolute;
+    inset:0;
+    border:1px dashed rgba(255,255,255,.3);
+    border-radius:50%;
+    animation:spin 20s linear infinite;
+}
+
+.ring::before{
+    content:'';
+    position:absolute;
+    top:50%;
+    left:-8px;
+    width:16px;
+    height:16px;
+    background:var(--accent2);
+    border-radius:50%;
+}
+
+.ring.two{inset:40px;animation-duration:14s;animation-direction:reverse}
+.ring.three{inset:80px;animation-duration:9s}
+
+@keyframes spin{
+    from{transform:rotate(0)}
+    to{transform:rotate(360deg)}
+}
+
+@media(max-width:980px){
+    .layout{grid-template-columns:1fr}
+    .sidebar{position:relative;top:0}
+    .hero{grid-template-columns:1fr}
+}
+
+@media(max-width:680px){
+    .topbar{justify-content:center}
+    .quote-bar{flex-direction:column;text-align:center}
+    .brand h1{font-size:1rem}
+    .hero h2{font-size:1.6rem}
+    .big-number{font-size:3rem}
+}
+</style>
+</head>
+<body class="theme-ukraine">
+<div class="sky">
+<div class="stars"></div>
+<div class="stars2"></div>
+<div class="stars3"></div>
+<div class="meteor"></div>
+<div class="meteor"></div>
+<div class="meteor"></div>
+</div>
+
+<div class="topbar">
+    <div class="brand">
+        <img class="logo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAQAAAAAYLlVAAABy0lEQVR4Ae2YMW7CQBBFX4QAOYBT2IAkNqAENiAJjYAS2IAQ2IAktgAnOAt7s9vZ2d7fP4+4J8s4r2f6N3e0M6m3qM4yR0wA6r7x1VwA6o6X2Y0uT8N2i4f8oYj9w1sR6N7N0eW2R7kP6F4B0k8x5wB3Q2v6J9Q9V8C4cM6dM7gJfYV9z8s6r0h2xg7V8s5s4B2p3T6xvA6P2m7v0YQ0Yt2mQ7mN4M5fQjvKfG0R6iNwY9i4v1qQWwM0v2x8k7mKk0fV3Y4lq0x7VxkQm2sP0F8g1k0l7W7Yg1Q4gk8m6cM6W7n0V6mJ3n2M9t4l3aW0l4f7f8cM8f0X4mN0Yx6tW9n6n4t0j7r9m2S3Vx4l5n4r6f9h3o8l8b3y8i9x7f4R9V1r4f7h8r3v8S9m0f6t7Q4m7g6r8s7V9i8x5l7v8n9l6m4Q4z9n4Y7c5m5r4Q8i6q5P6x7v5T6h7L6V7d7r5S7d8n7M7v6l7r7M7QAAAP//AwC1c8W9wZ3zNwAAAABJRU5ErkJggg==" alt="logo">
+        <div>
+            <h1 data-i18n="appTitle">Diana's Swiss Army Knife for Numerology</h1>
+            <p data-i18n="subtitle">Swiss precision meets Ukrainian cosmic intuition</p>
+        </div>
+    </div>
+
+    <div class="toolbar">
+        <select id="languageSelect">
+            <option value="en">English</option>
+            <option value="de">Deutsch</option>
+            <option value="gsw">Schwiizerdütsch</option>
+            <option value="uk">Українська</option>
+            <option value="ru">Русский</option>
+        </select>
+
+        <select id="themeSelect">
+            <option value="theme-ukraine">Ukraine Sky</option>
+            <option value="theme-swiss">Swiss Ruby</option>
+            <option value="theme-aurora">Aurora</option>
+            <option value="theme-ruby">Mystic Ruby</option>
+        </select>
+
+        <select id="fontSelect">
+            <option value="Segoe UI">Segoe UI</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Trebuchet MS">Trebuchet</option>
+            <option value="Verdana">Verdana</option>
+        </select>
+
+        <button id="saveSettingsBtn">💾 Save</button>
+    </div>
+</div>
+
+<div class="quote-bar">
+    <div>
+        <div class="quote-text" id="quoteText"></div>
+    </div>
+    <button class="action-btn" id="newQuoteBtn">✨ New Cosmic Quote</button>
+</div>
+
+<div class="layout">
+    <aside class="sidebar">
+        <div class="profile-card">
+            <img id="profilePhoto" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHgAAAB4CAMAAAAOusbgAAAAUVBMVEU8T2M2RFj////8/Pz7+/v5+fnv7+/o6Oj4+Pj39/f09PTv7+/5+fn19fXt7e3n5+fZ2dnR0dG4uLiUlJQ4ODgYGBgAAAB/f39kZGQ9PT0zMzN4N4+UAAABm0lEQVR4nO3a2XKCMBBAUVFQUFBQ/P9fZ4SEIu4X6bJm1V0L9k5x0i7i3B4AAAAAAAAAAAD4cM9sN3zKf1qv7Y6v3g7N1Y8mQ4f7r9k8x2x6n3y7k2x5V3c8m4x7k6m7b4j5s8k3o9g2o9m5r6f7v8h3u9j4m5f8o3n9m6t7k8h5o9m6s7f8l4m9k5s7v8h6m9n5u8g5q9m6s7f8h4m8m4x4Qm2P2b6f4h6m9r6w8k4m8n4z5T0l1j4f5n7g8r4s9u6v8x9z7v5n4m7f5s7q8k6m9r6u8w7y9Q4V9k6f8u7m9r7v8x8z8f6m5s8o7l9Q4g6d8q7v9x8z8f6m5r7u8w9y8t6n4m7p9s8v7x8z7v6n5m8q9t7w8y9a7Q4AAAAAAAAAAAD4Xf0B9rH1f8e4P6YAAAAASUVORK5CYII=" alt="profile">
+            <h2 id="profileName">Anonymous Seeker</h2>
+            <p id="profileBirth">Unknown Birthday</p>
+            <div class="astro-badge" id="astroBadge">✦</div>
+        </div>
+
+        <div class="nav">
+            <button class="active" data-page="dashboard">🏠 Dashboard</button>
+            <button data-page="calculator">🔢 Numerology Calculator</button>
+            <button data-page="destiny">🌌 Destiny Matrix</button>
+            <button data-page="compatibility">💞 Compatibility</button>
+            <button data-page="yearly">📆 Personal Year</button>
+            <button data-page="tarot">🃏 Tarot Energy</button>
+            <button data-page="astrology">♈ Astrology</button>
+            <button data-page="journal">📔 Cosmic Journal</button>
+            <button data-page="quotes">💬 Wisdom Vault</button>
+            <button data-page="gallery">🖼️ Inspiration Gallery</button>
+            <button data-page="settings">⚙️ Settings</button>
+        </div>
+    </aside>
+
+    <main class="content">
+
+        <section class="page active" id="dashboard">
+            <div class="hero">
+                <div class="hero-card">
+                    <h2 data-i18n="welcomeTitle">Welcome Cosmic Explorer</h2>
+                    <p data-i18n="welcomeText">This immersive numerology suite combines Swiss harmony, Ukrainian symbolism, animated celestial visuals, and deep personality calculations. Explore your life path, soul urge, destiny frequencies, compatibility maps, and cosmic timeline with rich offline experiences.</p>
+                    <div class="grid">
+                        <div class="card">
+                            <h3>🔮 Life Path</h3>
+                            <p>Your birth vibration reveals hidden direction, opportunities, and karmic lessons.</p>
+                        </div>
+                        <div class="card">
+                            <h3>✨ Cosmic Aura</h3>
+                            <p>Animated celestial energy fields react to your numerological profile in real time.</p>
+                        </div>
+                        <div class="card">
+                            <h3>🧠 AI Inspired Guidance</h3>
+                            <p>Inspired by elite numerology experiences and handcrafted spiritual wisdom.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hero-card">
+                    <div class="orbit">
+                        <div class="ring"></div>
+                        <div class="ring two"></div>
+                        <div class="ring three"></div>
+                        <div class="orbit-center"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="page" id="calculator">
+            <h2>🔢 Numerology Calculator</h2>
+            <div class="input-grid">
+                <input type="text" id="fullName" placeholder="Full Name">
+                <input type="date" id="birthDate">
+                <button class="action-btn" id="calculateBtn">Calculate Destiny</button>
+            </div>
+
+            <div class="result-panel">
+                <div id="lifePathText">Your life path will appear here.</div>
+                <div class="big-number" id="lifePathNumber">0</div>
+                <div id="destinyDescription">Enter your data to reveal your destiny vibration.</div>
+
+                <div class="chart" id="chart">
+                    <div class="chart-bar" style="left:5%;height:50%"></div>
+                    <div class="chart-bar" style="left:18%;height:65%"></div>
+                    <div class="chart-bar" style="left:31%;height:20%"></div>
+                    <div class="chart-bar" style="left:44%;height:85%"></div>
+                    <div class="chart-bar" style="left:57%;height:55%"></div>
+                    <div class="chart-bar" style="left:70%;height:95%"></div>
+                    <div class="chart-bar" style="left:83%;height:35%"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="page" id="destiny">
+            <h2>🌌 Destiny Matrix</h2>
+            <div class="grid">
+                <div class="card"><h3>Mind Frequency</h3><p id="mindFreq">Balanced intuitive logic with strategic precision.</p></div>
+                <div class="card"><h3>Heart Resonance</h3><p id="heartFreq">Deep emotional wisdom and empathetic healing energy.</p></div>
+                <div class="card"><h3>Prosperity Channel</h3><p id="prosFreq">Material abundance increases through courage and originality.</p></div>
+                <div class="card"><h3>Spiritual Vector</h3><p id="spiritFreq">Soul lessons encourage self-discovery and compassionate leadership.</p></div>
+            </div>
+            <div class="timeline">
+                <div class="timeline-item">Age 18–24: Discovery cycle and educational awakening.</div>
+                <div class="timeline-item">Age 25–36: Career alignment and destiny acceleration.</div>
+                <div class="timeline-item">Age 37–49: Spiritual refinement and mentorship phase.</div>
+                <div class="timeline-item">Age 50+: Wisdom transmission and cosmic legacy.</div>
+            </div>
+        </section>
+
+        <section class="page" id="compatibility">
+            <h2>💞 Relationship Compatibility</h2>
+            <div class="input-grid">
+                <input type="text" id="partnerName" placeholder="Partner Name">
+                <input type="date" id="partnerBirth">
+                <button class="action-btn" id="compatibilityBtn">Analyze Bond</button>
+            </div>
+            <div class="result-panel">
+                <div class="big-number" id="compatibilityScore">88%</div>
+                <p id="compatibilityText">Your cosmic signatures suggest passionate understanding and magnetic emotional alignment.</p>
+            </div>
+        </section>
+
+        <section class="page" id="yearly">
+            <h2>📆 Personal Year Forecast</h2>
+            <div class="grid">
+                <div class="card"><h3>January</h3><p>Initiation and new strategic opportunities.</p></div>
+                <div class="card"><h3>February</h3><p>Partnerships deepen with emotional honesty.</p></div>
+                <div class="card"><h3>March</h3><p>Creative expression expands rapidly.</p></div>
+                <div class="card"><h3>April</h3><p>Structure and discipline create momentum.</p></div>
+                <div class="card"><h3>May</h3><p>Adventure and movement reshape perspective.</p></div>
+                <div class="card"><h3>June</h3><p>Family energy and healing conversations emerge.</p></div>
+                <div class="card"><h3>July</h3><p>Inner wisdom and solitude become powerful.</p></div>
+                <div class="card"><h3>August</h3><p>Financial progress and leadership shine.</p></div>
+                <div class="card"><h3>September</h3><p>Completion and reflection bring clarity.</p></div>
+                <div class="card"><h3>October</h3><p>Transformation unlocks hidden talents.</p></div>
+                <div class="card"><h3>November</h3><p>Intuition intensifies and synchronicities appear.</p></div>
+                <div class="card"><h3>December</h3><p>Celebration, gratitude, and spiritual renewal.</p></div>
+            </div>
+        </section>
+
+        <section class="page" id="tarot">
+            <h2>🃏 Tarot Energy Spread</h2>
+            <div class="grid">
+                <div class="card"><h3>The Star</h3><p>Hope, inspiration, and celestial guidance.</p></div>
+                <div class="card"><h3>The Hermit</h3><p>Introspection and wisdom through solitude.</p></div>
+                <div class="card"><h3>The Chariot</h3><p>Focused willpower and victorious movement.</p></div>
+                <div class="card"><h3>The Empress</h3><p>Creativity, abundance, and nurturing energy.</p></div>
+            </div>
+        </section>
+
+        <section class="page" id="astrology">
+            <h2>♈ Astrology Fusion</h2>
+            <div class="result-panel">
+                <div class="big-number" id="zodiacSymbol">♒</div>
+                <p id="zodiacText">Your astrological sign harmonizes with your numerology profile, balancing logic and intuition.</p>
+            </div>
+        </section>
+
+        <section class="page" id="journal">
+            <h2>📔 Cosmic Journal</h2>
+            <div class="input-grid">
+                <textarea id="journalEntry" rows="10" placeholder="Write your cosmic reflections..."></textarea>
+            </div>
+            <button class="action-btn" id="saveJournalBtn">Save Journal Entry</button>
+            <div class="result-panel" id="journalList"></div>
+        </section>
+
+        <section class="page" id="quotes">
+            <h2>💬 Wisdom Vault</h2>
+            <div class="timeline" id="quotesList"></div>
+        </section>
+
+        <section class="page" id="gallery">
+            <h2>🖼️ Inspiration Gallery</h2>
+            <div class="gallery">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc0MDAnIGhlaWdodD0nNDAwJz48cmVjdCBmaWxsPScjMDA0ZmZmJyB3aWR0aD0nNDAwJyBoZWlnaHQ9JzQwMCcvPjxjaXJjbGUgY3g9JzIwMCcgY3k9JzE1MCcgcj0nNzAnIGZpbGw9JyNmZmQ3MDAnLz48cGF0aCBkPSdNMCwyNjAgTDEwMCwyMjAgTDIwMCwyNjAgTDMwMCwyMTAgTDQwMCwyNjAgTDQwMCw0MDAgTDAsNDAwIFonIGZpbGw9JyMwMDY2Y2MnLz48L3N2Zz4">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc0MDAnIGhlaWdodD0nNDAwJz48cmVjdCBmaWxsPScjMTAxODMwJyB3aWR0aD0nNDAwJyBoZWlnaHQ9JzQwMCcvPjxwYXRoIGQ9J00wLDMwMCBMMTAwLDE1MCBMMjAwLDI3MCBMMzAwLDEzMCBMNDAwLDI4MCBMNDAwLDQwMCBMMCw0MDAgWicgZmlsbD0nI2ZmZmZmZicvPjx0ZXh0IHg9JzIwMCcgeT0nMTAwJyBmaWxsPScjZmZkNzAwJyBmb250LXNpemU9JzQwJyB0ZXh0LWFuY2hvcj0nbWlkZGxlJz7inKg8L3RleHQ+PC9zdmc+">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc0MDAnIGhlaWdodD0nNDAwJz48cmVjdCBmaWxsPScjMmIyMjIyJyB3aWR0aD0nNDAwJyBoZWlnaHQ9JzQwMCcvPjxjaXJjbGUgY3g9JzIwMCcgY3k9JzIwMCcgcj0nMTAwJyBmaWxsPScjZmY0ZjVmJy8+PHRleHQgeD0nMjAwJyB5PScyMjAnIGZpbGw9J3doaXRlJyBmb250LXNpemU9JzUwJyB0ZXh0LWFuY2hvcj0nbWlkZGxlJz7inJk8L3RleHQ+PC9zdmc+">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc0MDAnIGhlaWdodD0nNDAwJz48cmVjdCBmaWxsPScjMDExMjIwJyB3aWR0aD0nNDAwJyBoZWlnaHQ9JzQwMCcvPjxjaXJjbGUgY3g9JzIwMCcgY3k9JzIwMCcgcj0nMTIwJyBmaWxsPSdub25lJyBzdHJva2U9JyM4ZmQzZmYnIHN0cm9rZS13aWR0aD0nMTAnLz48Y2lyY2xlIGN4PScyMDAnIGN5PScyMDAnIHI9JzQwJyBmaWxsPScjOGZkM2ZmJy8+PC9zdmc+">
+            </div>
+        </section>
+
+        <section class="page" id="settings">
+            <h2>⚙️ User Settings</h2>
+            <div class="input-grid">
+                <input type="text" id="userNameSetting" placeholder="Your Name">
+                <input type="date" id="userBirthdaySetting">
+                <button class="action-btn" id="saveProfileBtn">Save Profile</button>
+            </div>
+            <div class="result-panel">
+                <p>All settings are stored locally using IndexedDB for secure offline access.</p>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<div class="footer">
+    Diana's Swiss Army Knife for Numerology • Offline Cosmic Experience • Animated Celestial Interface
+</div>
+
+<script>
+const translations={
+    en:{
+        appTitle:"Diana's Swiss Army Knife for Numerology",
+        subtitle:"Swiss precision meets Ukrainian cosmic intuition",
+        welcomeTitle:"Welcome Cosmic Explorer",
+        welcomeText:"This immersive numerology suite combines Swiss harmony, Ukrainian symbolism, animated celestial visuals, and deep personality calculations."
+    },
+    de:{
+        appTitle:"Dianas Schweizer Taschenmesser für Numerologie",
+        subtitle:"Schweizer Präzision trifft ukrainische kosmische Intuition",
+        welcomeTitle:"Willkommen kosmischer Entdecker",
+        welcomeText:"Diese immersive Numerologie-Suite verbindet Schweizer Harmonie, ukrainische Symbolik und tiefe Persönlichkeitsberechnungen."
+    },
+    gsw:{
+        appTitle:"Dianas Schwiizer Sackmässer für Numerologie",
+        subtitle:"Schwiizer Präzision trifft ukrainischi kosmischi Intuition",
+        welcomeTitle:"Willkomme kosmische Entdecker",
+        welcomeText:"Die immersive Numerologie-Suite verbindet Schwiizer Harmonie und ukrainischi Symbolik."
+    },
+    uk:{
+        appTitle:"Швейцарський ніж Діани для нумерології",
+        subtitle:"Швейцарська точність та українська космічна інтуїція",
+        welcomeTitle:"Ласкаво просимо, космічний досліднику",
+        welcomeText:"Цей захопливий набір нумерології поєднує швейцарську гармонію та українську символіку."
+    },
+    ru:{
+        appTitle:"Швейцарский нож Дианы для нумерологии",
+        subtitle:"Швейцарская точность и украинская космическая интуиция",
+        welcomeTitle:"Добро пожаловать, космический исследователь",
+        welcomeText:"Этот захватывающий набор нумерологии объединяет швейцарскую гармонию и украинскую символику."
+    }
+};
+
+const quotes={
+    en:[
+        "The stars whisper to those who listen.",
+        "Every number carries a vibration.",
+        "Destiny favors courageous hearts.",
+        "Swiss mountains teach silent wisdom.",
+        "The soul always recognizes truth.",
+        "The cosmos rewards patience.",
+        "Numbers reveal hidden harmony.",
+        "Your intuition is sacred navigation.",
+        "Hope shines brighter than fear.",
+        "Ukrainian spirit rises like the dawn."
+    ],
+    de:[
+        "Die Sterne flüstern denen, die zuhören.",
+        "Jede Zahl trägt eine Schwingung.",
+        "Das Schicksal bevorzugt mutige Herzen.",
+        "Die Alpen lehren stille Weisheit.",
+        "Die Seele erkennt immer die Wahrheit.",
+        "Der Kosmos belohnt Geduld.",
+        "Zahlen enthüllen Harmonie.",
+        "Intuition ist heilige Navigation.",
+        "Hoffnung leuchtet stärker als Angst.",
+        "Der ukrainische Geist erhebt sich wie die Morgendämmerung."
+    ],
+    gsw:[
+        "D'Stärne flüschtered däne wo lose.",
+        "Jedi Zahl het e Schwingig.",
+        "S'Schicksal liebt muetigi Herze.",
+        "D'Alpe lehred stilli Wiisheit.",
+        "D'Seel erkennt d'Wahrheit.",
+        "Dr Kosmos belohnt Geduld.",
+        "Zahle zeiged Harmonie.",
+        "Dini Intuition isch heilig.",
+        "Hoffnig lüchtet stärker als Angst.",
+        "Dr ukrainischi Geischt stoht uuf wie d'Morge."
+    ],
+    uk:[
+        "Зірки шепочуть тим, хто слухає.",
+        "Кожне число має свою вібрацію.",
+        "Доля любить сміливі серця.",
+        "Альпи навчають тихої мудрості.",
+        "Душа завжди впізнає правду.",
+        "Космос винагороджує терпіння.",
+        "Числа відкривають гармонію.",
+        "Інтуїція — священний компас.",
+        "Надія сильніша за страх.",
+        "Український дух піднімається як світанок."
+    ],
+    ru:[
+        "Звезды шепчут тем, кто слушает.",
+        "Каждое число несет вибрацию.",
+        "Судьба любит смелые сердца.",
+        "Альпы учат тихой мудрости.",
+        "Душа всегда узнает правду.",
+        "Космос награждает терпение.",
+        "Числа раскрывают гармонию.",
+        "Интуиция — священный компас.",
+        "Надежда сильнее страха.",
+        "Украинский дух поднимается как рассвет."
+    ]
+};
+
+for(let i=0;i<40;i++){
+    quotes.en.push(`Cosmic proverb ${i+11}: Align your energy with purpose.`);
+    quotes.de.push(`Kosmisches Sprichwort ${i+11}: Richte deine Energie auf deinen Zweck.`);
+    quotes.gsw.push(`Kosmischi Wiisheit ${i+11}: Richte dini Energie uf dis Ziel.`);
+    quotes.uk.push(`Космічна мудрість ${i+11}: Спрямуй енергію на свою мету.`);
+    quotes.ru.push(`Космическая мудрость ${i+11}: Направь энергию на свою цель.`);
+}
+
+const zodiac=[
+    {sign:'♑',name:'Capricorn'},
+    {sign:'♒',name:'Aquarius'},
+    {sign:'♓',name:'Pisces'},
+    {sign:'♈',name:'Aries'},
+    {sign:'♉',name:'Taurus'},
+    {sign:'♊',name:'Gemini'},
+    {sign:'♋',name:'Cancer'},
+    {sign:'♌',name:'Leo'},
+    {sign:'♍',name:'Virgo'},
+    {sign:'♎',name:'Libra'},
+    {sign:'♏',name:'Scorpio'},
+    {sign:'♐',name:'Sagittarius'}
+];
+
+const pages=document.querySelectorAll('.page');
+const navButtons=document.querySelectorAll('.nav button');
+navButtons.forEach(btn=>{
+    btn.addEventListener('click',()=>{
+        navButtons.forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        pages.forEach(p=>p.classList.remove('active'));
+        document.getElementById(btn.dataset.page).classList.add('active');
+        window.scrollTo({top:0,behavior:'smooth'});
+    });
+});
+
+function reduceNumber(num){
+    while(num>9 && ![11,22,33].includes(num)){
+        num=num.toString().split('').reduce((a,b)=>a+Number(b),0);
+    }
+    return num;
+}
+
+function calculateLifePath(dateString){
+    const digits=dateString.replace(/-/g,'').split('').reduce((a,b)=>a+Number(b),0);
+    return reduceNumber(digits);
+}
+
+const descriptions={
+    1:'Leader, pioneer, and independent visionary.',
+    2:'Diplomatic soul with emotional intelligence.',
+    3:'Creative communicator radiating optimism.',
+    4:'Practical builder with strong foundations.',
+    5:'Freedom seeker driven by adventure.',
+    6:'Nurturing healer focused on harmony.',
+    7:'Mystical thinker and spiritual analyst.',
+    8:'Powerful achiever with material mastery.',
+    9:'Compassionate humanitarian with wisdom.',
+    11:'Master intuitive channeling inspiration.',
+    22:'Master builder creating large visions.',
+    33:'Master teacher spreading universal love.'
+};
+
+function calculate(){
+    const name=document.getElementById('fullName').value || 'Anonymous';
+    const birth=document.getElementById('birthDate').value;
+    if(!birth)return;
+
+    const lifePath=calculateLifePath(birth);
+    document.getElementById('lifePathNumber').innerText=lifePath;
+    document.getElementById('destinyDescription').innerText=descriptions[lifePath] || descriptions[9];
+    document.getElementById('lifePathText').innerText=`${name}, your cosmic blueprint resonates with frequency ${lifePath}.`;
+
+    saveProfile(name,birth);
+}
+
+function compatibility(){
+    const birth=document.getElementById('birthDate').value;
+    const partner=document.getElementById('partnerBirth').value;
+    if(!birth || !partner)return;
+
+    const score=Math.abs(calculateLifePath(birth)-calculateLifePath(partner));
+    const compatibilityScore=100-(score*8);
+    document.getElementById('compatibilityScore').innerText=`${compatibilityScore}%`;
+    document.getElementById('compatibilityText').innerText='Your frequencies align through emotional understanding, curiosity, and cosmic chemistry.';
+}
+
+function randomQuote(){
+    const lang=document.getElementById('languageSelect').value;
+    const pool=quotes[lang];
+    const q=pool[Math.floor(Math.random()*pool.length)];
+    document.getElementById('quoteText').innerText=q;
+}
+
+function applyLanguage(){
+    const lang=document.getElementById('languageSelect').value;
+    document.querySelectorAll('[data-i18n]').forEach(el=>{
+        const key=el.dataset.i18n;
+        if(translations[lang] && translations[lang][key]){
+            el.innerText=translations[lang][key];
+        }
+    });
+    randomQuote();
+}
+
+function applyTheme(){
+    document.body.className=document.getElementById('themeSelect').value;
+}
+
+function applyFont(){
+    document.documentElement.style.setProperty('--font',document.getElementById('fontSelect').value);
+}
+
+function zodiacSign(dateString){
+    if(!dateString)return '✦';
+    const d=new Date(dateString);
+    const m=d.getMonth()+1;
+    if(m===1)return '♑';
+    if(m===2)return '♒';
+    if(m===3)return '♓';
+    if(m===4)return '♈';
+    if(m===5)return '♉';
+    if(m===6)return '♊';
+    if(m===7)return '♋';
+    if(m===8)return '♌';
+    if(m===9)return '♍';
+    if(m===10)return '♎';
+    if(m===11)return '♏';
+    return '♐';
+}
+
+const dbName='DianaNumerologyDB';
+let db;
+
+function initDB(){
+    const request=indexedDB.open(dbName,1);
+
+    request.onupgradeneeded=(event)=>{
+        db=event.target.result;
+        if(!db.objectStoreNames.contains('settings')){
+            db.createObjectStore('settings',{keyPath:'id'});
+        }
+        if(!db.objectStoreNames.contains('journal')){
+            db.createObjectStore('journal',{keyPath:'time'});
+        }
+    };
+
+    request.onsuccess=(event)=>{
+        db=event.target.result;
+        loadSettings();
+        loadJournal();
+    };
+}
+
+function saveSettings(){
+    const tx=db.transaction(['settings'],'readwrite');
+    const store=tx.objectStore('settings');
+
+    const payload={
+        id:'main',
+        language:document.getElementById('languageSelect').value,
+        theme:document.getElementById('themeSelect').value,
+        font:document.getElementById('fontSelect').value,
+        name:document.getElementById('userNameSetting').value,
+        birthday:document.getElementById('userBirthdaySetting').value
+    };
+
+    store.put(payload);
+}
+
+function loadSettings(){
+    const tx=db.transaction(['settings'],'readonly');
+    const store=tx.objectStore('settings');
+    const request=store.get('main');
+
+    request.onsuccess=()=>{
+        const data=request.result;
+        if(!data)return;
+
+        document.getElementById('languageSelect').value=data.language || 'en';
+        document.getElementById('themeSelect').value=data.theme || 'theme-ukraine';
+        document.getElementById('fontSelect').value=data.font || 'Segoe UI';
+        document.getElementById('userNameSetting').value=data.name || '';
+        document.getElementById('userBirthdaySetting').value=data.birthday || '';
+
+        applyLanguage();
+        applyTheme();
+        applyFont();
+
+        if(data.name){
+            document.getElementById('profileName').innerText=data.name;
+        }
+
+        if(data.birthday){
+            document.getElementById('profileBirth').innerText=data.birthday;
+            document.getElementById('astroBadge').innerText=zodiacSign(data.birthday);
+            document.getElementById('zodiacSymbol').innerText=zodiacSign(data.birthday);
+        }
+    };
+}
+
+function saveProfile(name,birthday){
+    document.getElementById('profileName').innerText=name;
+    document.getElementById('profileBirth').innerText=birthday;
+    document.getElementById('astroBadge').innerText=zodiacSign(birthday);
+    document.getElementById('zodiacSymbol').innerText=zodiacSign(birthday);
+}
+
+function saveJournal(){
+    const entry=document.getElementById('journalEntry').value.trim();
+    if(!entry)return;
+
+    const tx=db.transaction(['journal'],'readwrite');
+    const store=tx.objectStore('journal');
+    store.put({time:Date.now(),entry});
+    document.getElementById('journalEntry').value='';
+
+    setTimeout(loadJournal,200);
+}
+
+function loadJournal(){
+    const list=document.getElementById('journalList');
+    list.innerHTML='';
+
+    const tx=db.transaction(['journal'],'readonly');
+    const store=tx.objectStore('journal');
+    const request=store.openCursor();
+
+    request.onsuccess=(event)=>{
+        const cursor=event.target.result;
+        if(cursor){
+            const div=document.createElement('div');
+            div.className='timeline-item';
+            div.innerHTML=`<strong>${new Date(cursor.value.time).toLocaleString()}</strong><br>${cursor.value.entry}`;
+            list.prepend(div);
+            cursor.continue();
+        }
+    };
+}
+
+function fillQuotes(){
+    const list=document.getElementById('quotesList');
+    list.innerHTML='';
+    quotes.en.slice(0,50).forEach(q=>{
+        const item=document.createElement('div');
+        item.className='timeline-item';
+        item.innerText=q;
+        list.appendChild(item);
+    });
+}
+
+function cosmicPulse(){
+    document.querySelectorAll('.card').forEach(card=>{
+        card.addEventListener('mousemove',e=>{
+            const rect=card.getBoundingClientRect();
+            const x=e.clientX-rect.left;
+            const y=e.clientY-rect.top;
+            card.style.background=`radial-gradient(circle at ${x}px ${y}px, rgba(255,255,255,.15), rgba(255,255,255,.05))`;
+        });
+
+        card.addEventListener('mouseleave',()=>{
+            card.style.background='rgba(255,255,255,.05)';
+        });
+    });
+}
+
+function startAmbient(){
+    setInterval(randomQuote,12000);
+}
+
+document.getElementById('calculateBtn').addEventListener('click',calculate);
+document.getElementById('compatibilityBtn').addEventListener('click',compatibility);
+document.getElementById('newQuoteBtn').addEventListener('click',randomQuote);
+document.getElementById('languageSelect').addEventListener('change',applyLanguage);
+document.getElementById('themeSelect').addEventListener('change',applyTheme);
+document.getElementById('fontSelect').addEventListener('change',applyFont);
+document.getElementById('saveSettingsBtn').addEventListener('click',saveSettings);
+document.getElementById('saveProfileBtn').addEventListener('click',()=>{
+    saveProfile(
+        document.getElementById('userNameSetting').value || 'Anonymous Seeker',
+        document.getElementById('userBirthdaySetting').value || 'Unknown'
+    );
+    saveSettings();
+});
+document.getElementById('saveJournalBtn').addEventListener('click',saveJournal);
+
+randomQuote();
+fillQuotes();
+cosmicPulse();
+startAmbient();
+initDB();
+</script>
+</body>
+</html>

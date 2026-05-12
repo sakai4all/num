@@ -1,0 +1,2582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diana's Swiss Army Knife for Numerology ✦</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;700&family=Lato:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+/* ===== CSS VARIABLES & THEMES ===== */
+:root {
+  --bg-dark: #02020f;
+  --gold: #f0c040;
+  --gold2: #ffd700;
+  --silver: #c8d8e8;
+  --deep-blue: #0a1628;
+  --navy: #0d1f3c;
+  --accent: #4fc3f7;
+  --accent2: #e040fb;
+  --text: #e8eaf6;
+  --text-dim: #90a4ae;
+  --card-bg: rgba(10,22,50,0.82);
+  --card-border: rgba(240,192,64,0.3);
+  --btn-bg: linear-gradient(135deg,#1a237e,#0d47a1);
+  --btn-hover: linear-gradient(135deg,#283593,#1565c0);
+  --panel-bg: rgba(5,12,30,0.92);
+  --header-bg: rgba(2,4,20,0.96);
+  --swiss-red: #d62828;
+  --ukraine-blue: #005bbb;
+  --ukraine-yellow: #ffd500;
+  --glow: 0 0 20px rgba(240,192,64,0.4);
+  --glow2: 0 0 30px rgba(79,195,247,0.3);
+  --radius: 16px;
+  --font-display: 'Cinzel Decorative', serif;
+  --font-heading: 'Cinzel', serif;
+  --font-body: 'Lato', sans-serif;
+  --font-elegant: 'Playfair Display', serif;
+  --transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
+}
+[data-theme="swiss"] {
+  --gold: #d62828; --gold2: #ff4444; --accent: #ffffff; --accent2: #d62828;
+  --card-border: rgba(214,40,40,0.4); --glow: 0 0 20px rgba(214,40,40,0.4);
+}
+[data-theme="ukraine"] {
+  --gold: #ffd500; --gold2: #ffd500; --accent: #4fc3f7; --accent2: #005bbb;
+  --card-border: rgba(255,213,0,0.4); --glow: 0 0 20px rgba(255,213,0,0.4);
+  --deep-blue: #001a4d; --navy: #002266;
+}
+[data-theme="mystic"] {
+  --gold: #b39ddb; --gold2: #ce93d8; --accent: #80cbc4; --accent2: #f48fb1;
+  --card-border: rgba(179,157,219,0.4); --glow: 0 0 20px rgba(179,157,219,0.4);
+}
+[data-theme="fire"] {
+  --gold: #ff6f00; --gold2: #ffab40; --accent: #ff5252; --accent2: #ff6d00;
+  --card-border: rgba(255,111,0,0.4); --glow: 0 0 20px rgba(255,111,0,0.5);
+}
+[data-theme="emerald"] {
+  --gold: #00e676; --gold2: #69f0ae; --accent: #40c4ff; --accent2: #00bfa5;
+  --card-border: rgba(0,230,118,0.3); --glow: 0 0 20px rgba(0,230,118,0.4);
+}
+[data-font="serif"] { --font-body: 'Playfair Display', serif; }
+[data-font="mono"] { --font-body: 'Courier New', monospace; }
+[data-font="cinzel"] { --font-body: 'Cinzel', serif; }
+
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+html { scroll-behavior:smooth; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg-dark);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* ===== WEBGL CANVAS ===== */
+#bgCanvas {
+  position: fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  z-index:0;
+  pointer-events:none;
+}
+
+/* ===== QUOTE BAR ===== */
+#quoteBar {
+  position: fixed;
+  top:0; left:0; right:0;
+  z-index: 200;
+  background: linear-gradient(90deg, rgba(2,4,20,0.97) 0%, rgba(10,22,50,0.97) 50%, rgba(2,4,20,0.97) 100%);
+  border-bottom: 1px solid var(--card-border);
+  padding: 7px 16px;
+  display: flex;
+  align-items: center;
+  gap:10px;
+  min-height: 36px;
+  overflow:hidden;
+}
+#quoteText {
+  flex:1;
+  font-family: var(--font-elegant);
+  font-style:italic;
+  font-size:0.82rem;
+  color: var(--gold);
+  text-align:center;
+  opacity:1;
+  transition: opacity 0.8s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.quote-icon { color: var(--gold); font-size:1rem; flex-shrink:0; }
+
+/* ===== GLOBAL HEADER ===== */
+#globalHeader {
+  position: fixed;
+  top: 36px; left:0; right:0;
+  z-index: 190;
+  background: var(--header-bg);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--card-border);
+  padding: 0 16px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  gap:10px;
+}
+#appLogo {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight:900;
+  background: linear-gradient(90deg, var(--gold), var(--accent), var(--gold2));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  white-space:nowrap;
+  letter-spacing:0.02em;
+  cursor:pointer;
+  flex-shrink:0;
+  text-shadow:none;
+  filter: drop-shadow(0 0 8px var(--gold));
+}
+#appLogo span { font-size:1.2rem; }
+
+.header-spacer { flex:1; }
+
+/* Header controls */
+.header-controls {
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.hbtn {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--card-border);
+  color: var(--text);
+  border-radius:8px;
+  padding:5px 10px;
+  font-size:0.75rem;
+  cursor:pointer;
+  transition: var(--transition);
+  font-family: var(--font-body);
+  white-space:nowrap;
+}
+.hbtn:hover { background: rgba(240,192,64,0.15); border-color:var(--gold); color:var(--gold); }
+.hbtn.active { background: rgba(240,192,64,0.2); border-color:var(--gold); color:var(--gold); }
+
+#settingsBtn {
+  width:38px; height:38px;
+  background: linear-gradient(135deg,rgba(240,192,64,0.2),rgba(79,195,247,0.1));
+  border: 1px solid var(--card-border);
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer;
+  font-size:1.1rem;
+  transition:var(--transition);
+  flex-shrink:0;
+}
+#settingsBtn:hover { transform:rotate(60deg); border-color:var(--gold); box-shadow:var(--glow); }
+
+/* ===== SETTINGS PANEL ===== */
+#settingsPanel {
+  position:fixed;
+  top:96px; right:10px;
+  width:280px;
+  background: var(--panel-bg);
+  border:1px solid var(--card-border);
+  border-radius:var(--radius);
+  padding:20px;
+  z-index:500;
+  display:none;
+  backdrop-filter:blur(20px);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6), var(--glow);
+  animation: slideDown 0.3s ease;
+}
+#settingsPanel.open { display:block; }
+@keyframes slideDown { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
+.sp-title {
+  font-family:var(--font-heading);
+  font-size:1rem;
+  color:var(--gold);
+  margin-bottom:16px;
+  text-align:center;
+  letter-spacing:0.1em;
+}
+.sp-section { margin-bottom:14px; }
+.sp-label { font-size:0.72rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:7px; }
+.sp-row { display:flex; gap:6px; flex-wrap:wrap; }
+.sp-chip {
+  padding:4px 10px;
+  border-radius:20px;
+  border:1px solid var(--card-border);
+  font-size:0.73rem;
+  cursor:pointer;
+  transition:var(--transition);
+  color:var(--text-dim);
+  background:rgba(255,255,255,0.04);
+}
+.sp-chip:hover,.sp-chip.active { background:rgba(240,192,64,0.2); color:var(--gold); border-color:var(--gold); }
+.theme-dot {
+  width:26px; height:26px;
+  border-radius:50%;
+  cursor:pointer;
+  border:2px solid transparent;
+  transition:var(--transition);
+  display:inline-block;
+  flex-shrink:0;
+}
+.theme-dot:hover,.theme-dot.active { border-color:var(--gold); transform:scale(1.2); box-shadow:var(--glow); }
+
+/* ===== SIDEBAR NAV ===== */
+#sidebar {
+  position:fixed;
+  top:96px; left:0;
+  bottom:0;
+  width:220px;
+  background: var(--panel-bg);
+  border-right:1px solid var(--card-border);
+  z-index:150;
+  display:flex;
+  flex-direction:column;
+  padding:16px 0;
+  backdrop-filter:blur(12px);
+  overflow-y:auto;
+  transition:transform 0.35s cubic-bezier(0.4,0,0.2,1);
+}
+.nav-item {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:11px 20px;
+  cursor:pointer;
+  transition:var(--transition);
+  font-family:var(--font-heading);
+  font-size:0.82rem;
+  letter-spacing:0.05em;
+  color:var(--text-dim);
+  border-left:3px solid transparent;
+  position:relative;
+}
+.nav-item:hover { color:var(--text); background:rgba(240,192,64,0.07); }
+.nav-item.active { color:var(--gold); border-left-color:var(--gold); background:rgba(240,192,64,0.1); }
+.nav-icon { font-size:1.1rem; width:22px; text-align:center; }
+.nav-badge {
+  position:absolute; right:12px; top:50%;transform:translateY(-50%);
+  background:var(--accent2); color:#fff; border-radius:10px;
+  font-size:0.6rem; padding:1px 6px; font-family:var(--font-body);
+}
+.nav-divider { height:1px; background:var(--card-border); margin:8px 16px; }
+
+/* ===== MAIN CONTENT ===== */
+#mainContent {
+  margin-left:220px;
+  margin-top:96px;
+  min-height:calc(100vh - 96px);
+  padding:24px;
+  position:relative;
+  z-index:10;
+}
+
+/* ===== PAGES ===== */
+.page { display:none; animation:fadeIn 0.4s ease; }
+.page.active { display:block; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+
+/* ===== CARDS ===== */
+.card {
+  background:var(--card-bg);
+  border:1px solid var(--card-border);
+  border-radius:var(--radius);
+  padding:24px;
+  backdrop-filter:blur(12px);
+  box-shadow:0 8px 32px rgba(0,0,0,0.3);
+  transition:var(--transition);
+  position:relative;
+  overflow:hidden;
+}
+.card::before {
+  content:'';
+  position:absolute;
+  top:-1px;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  opacity:0;transition:opacity 0.3s;
+}
+.card:hover::before { opacity:1; }
+.card:hover { box-shadow:0 12px 48px rgba(0,0,0,0.4), var(--glow); transform:translateY(-2px); }
+
+.card-title {
+  font-family:var(--font-heading);
+  font-size:1rem;
+  color:var(--gold);
+  margin-bottom:16px;
+  letter-spacing:0.08em;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.grid-2 { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
+.grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+.grid-4 { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
+
+/* ===== BIG NUMBER DISPLAY ===== */
+.big-num {
+  font-family:var(--font-display);
+  font-size:4rem;
+  font-weight:900;
+  background:linear-gradient(135deg,var(--gold),var(--accent),var(--gold2));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  text-align:center;
+  line-height:1;
+  filter:drop-shadow(0 0 12px var(--gold));
+  animation:numPulse 3s ease-in-out infinite;
+}
+@keyframes numPulse {
+  0%,100%{filter:drop-shadow(0 0 8px var(--gold));}
+  50%{filter:drop-shadow(0 0 24px var(--gold)) drop-shadow(0 0 48px var(--accent));}
+}
+
+.num-label {
+  font-family:var(--font-heading);
+  font-size:0.75rem;
+  color:var(--text-dim);
+  text-align:center;
+  letter-spacing:0.15em;
+  text-transform:uppercase;
+  margin-top:6px;
+}
+
+/* ===== INPUTS ===== */
+.input-field {
+  width:100%;
+  background:rgba(255,255,255,0.06);
+  border:1px solid var(--card-border);
+  border-radius:10px;
+  padding:10px 14px;
+  color:var(--text);
+  font-family:var(--font-body);
+  font-size:0.9rem;
+  transition:var(--transition);
+  outline:none;
+}
+.input-field:focus { border-color:var(--gold); box-shadow:0 0 0 3px rgba(240,192,64,0.15); background:rgba(255,255,255,0.09); }
+.input-field::placeholder { color:var(--text-dim); }
+.input-label { font-size:0.75rem; color:var(--text-dim); margin-bottom:6px; letter-spacing:0.08em; text-transform:uppercase; }
+
+/* ===== BUTTONS ===== */
+.btn {
+  background:var(--btn-bg);
+  border:1px solid var(--card-border);
+  color:var(--text);
+  border-radius:10px;
+  padding:10px 20px;
+  font-family:var(--font-heading);
+  font-size:0.82rem;
+  letter-spacing:0.08em;
+  cursor:pointer;
+  transition:var(--transition);
+  text-transform:uppercase;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+}
+.btn:hover { background:var(--btn-hover); border-color:var(--gold); box-shadow:var(--glow); transform:translateY(-1px); }
+.btn-gold {
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:#000;
+  border-color:var(--gold);
+  font-weight:700;
+}
+.btn-gold:hover { box-shadow:0 0 20px rgba(240,192,64,0.6); }
+
+/* ===== PAGE HEADER ===== */
+.page-header {
+  margin-bottom:28px;
+  text-align:center;
+}
+.page-title {
+  font-family:var(--font-display);
+  font-size:1.8rem;
+  font-weight:900;
+  background:linear-gradient(135deg,var(--gold),var(--accent),var(--gold2));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  filter:drop-shadow(0 0 10px var(--gold));
+  letter-spacing:0.04em;
+}
+.page-subtitle {
+  font-family:var(--font-elegant);
+  font-style:italic;
+  color:var(--text-dim);
+  font-size:0.9rem;
+  margin-top:6px;
+}
+
+/* ===== ZODIAC & SYMBOLS ===== */
+.zodiac-symbol {
+  font-size:3.5rem;
+  text-align:center;
+  line-height:1;
+  filter:drop-shadow(0 0 12px var(--gold));
+  animation:zodiacFloat 4s ease-in-out infinite;
+}
+@keyframes zodiacFloat {
+  0%,100%{transform:translateY(0) rotate(0deg)}
+  50%{transform:translateY(-8px) rotate(3deg)}
+}
+
+/* ===== PROGRESS BARS ===== */
+.progress-wrap { margin-bottom:12px; }
+.progress-label { display:flex; justify-content:space-between; font-size:0.75rem; color:var(--text-dim); margin-bottom:5px; }
+.progress-bar {
+  height:8px;
+  background:rgba(255,255,255,0.08);
+  border-radius:4px;
+  overflow:hidden;
+}
+.progress-fill {
+  height:100%;
+  background:linear-gradient(90deg,var(--gold),var(--accent));
+  border-radius:4px;
+  transition:width 1.2s cubic-bezier(0.4,0,0.2,1);
+  box-shadow:0 0 8px var(--gold);
+}
+
+/* ===== TAGS ===== */
+.tag {
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  padding:4px 10px;
+  border-radius:20px;
+  font-size:0.72rem;
+  border:1px solid var(--card-border);
+  background:rgba(240,192,64,0.08);
+  color:var(--gold);
+  font-family:var(--font-heading);
+  letter-spacing:0.06em;
+}
+
+/* ===== NUMBER GRID (animation) ===== */
+.num-orbit {
+  position:relative;
+  width:180px;height:180px;
+  margin:0 auto;
+}
+.orbit-center {
+  position:absolute;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  font-family:var(--font-display);
+  font-size:3rem;
+  font-weight:900;
+  background:linear-gradient(135deg,var(--gold),var(--accent));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  filter:drop-shadow(0 0 16px var(--gold));
+}
+.orbit-ring {
+  position:absolute;
+  top:50%;left:50%;
+  width:160px;height:160px;
+  margin:-80px 0 0 -80px;
+  border:1px dashed rgba(240,192,64,0.2);
+  border-radius:50%;
+  animation:spinRing 12s linear infinite;
+}
+@keyframes spinRing { to{transform:rotate(360deg)} }
+.orbit-num {
+  position:absolute;
+  font-family:var(--font-display);
+  font-size:0.9rem;
+  color:var(--gold);
+  transform-origin:80px 80px;
+}
+
+/* ===== COMPATIBILITY METER ===== */
+.compat-meter {
+  position:relative;
+  width:160px;height:80px;
+  margin:0 auto;
+  overflow:hidden;
+}
+.compat-arc {
+  width:160px;height:160px;
+  border-radius:50%;
+  border:10px solid rgba(255,255,255,0.06);
+  position:absolute;
+  top:0;
+  clip-path:inset(0 0 50% 0);
+  overflow:hidden;
+}
+.compat-fill {
+  position:absolute;
+  top:0;left:0;
+  width:100%;height:100%;
+  border-radius:50%;
+  border:10px solid var(--gold);
+  clip-path:inset(0 0 50% 0);
+  transform-origin:center center;
+  transition:transform 1.5s cubic-bezier(0.4,0,0.2,1);
+  box-shadow:0 0 12px var(--gold);
+}
+.compat-needle {
+  position:absolute;
+  bottom:0;left:50%;
+  width:3px;height:68px;
+  background:linear-gradient(to top,var(--gold),transparent);
+  transform-origin:bottom center;
+  transition:transform 1.5s cubic-bezier(0.4,0,0.2,1);
+}
+.compat-pct {
+  position:absolute;
+  bottom:-4px;width:100%;
+  text-align:center;
+  font-family:var(--font-display);
+  font-size:1.3rem;
+  color:var(--gold);
+}
+
+/* ===== SPIN WHEEL ===== */
+#wheelCanvas { display:block; margin:0 auto; max-width:100%; }
+.wheel-wrap { text-align:center; }
+.spin-btn {
+  margin-top:16px;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:#000;
+  border:none;
+  border-radius:50px;
+  padding:12px 36px;
+  font-family:var(--font-display);
+  font-size:0.9rem;
+  font-weight:900;
+  cursor:pointer;
+  letter-spacing:0.08em;
+  transition:var(--transition);
+  box-shadow:0 4px 20px rgba(240,192,64,0.4);
+}
+.spin-btn:hover { transform:scale(1.05); box-shadow:0 6px 30px rgba(240,192,64,0.6); }
+.spin-btn:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+
+/* ===== PROFILE ===== */
+.avatar-wrap {
+  width:100px;height:100px;
+  margin:0 auto 16px;
+  position:relative;
+}
+.avatar-img {
+  width:100%;height:100%;
+  border-radius:50%;
+  border:3px solid var(--gold);
+  object-fit:cover;
+  box-shadow:var(--glow);
+}
+.avatar-ring {
+  position:absolute;inset:-6px;
+  border-radius:50%;
+  border:2px dashed var(--gold);
+  animation:spinRing 8s linear infinite;
+  opacity:0.5;
+}
+.avatar-edit {
+  position:absolute;
+  bottom:0;right:0;
+  width:28px;height:28px;
+  background:var(--gold);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.75rem;
+  cursor:pointer;
+  color:#000;
+  border:2px solid var(--bg-dark);
+}
+
+/* ===== FLOATING NUMBERS (CSS animation layer) ===== */
+.float-nums {
+  position:fixed;inset:0;
+  pointer-events:none;z-index:1;
+  overflow:hidden;
+}
+.fn {
+  position:absolute;
+  font-family:var(--font-display);
+  font-weight:900;
+  color:var(--gold);
+  opacity:0;
+  animation:floatNum linear infinite;
+  filter:blur(0.5px);
+}
+@keyframes floatNum {
+  0%{opacity:0;transform:translateY(100vh) scale(0.5);}
+  10%{opacity:0.15;}
+  90%{opacity:0.08;}
+  100%{opacity:0;transform:translateY(-100px) scale(1.2) rotate(20deg);}
+}
+
+/* ===== DAILY NUMBER CARD ===== */
+.daily-glow {
+  text-align:center;
+  padding:30px;
+  background:radial-gradient(ellipse at center,rgba(240,192,64,0.12) 0%,rgba(10,22,50,0.9) 70%);
+  border-radius:var(--radius);
+  border:1px solid var(--card-border);
+}
+
+/* ===== MODAL ===== */
+.modal-overlay {
+  position:fixed;inset:0;
+  background:rgba(0,0,0,0.7);
+  z-index:800;
+  display:flex;align-items:center;justify-content:center;
+  backdrop-filter:blur(6px);
+  display:none;
+}
+.modal-overlay.open { display:flex; }
+.modal {
+  background:var(--panel-bg);
+  border:1px solid var(--card-border);
+  border-radius:var(--radius);
+  padding:28px;
+  max-width:440px;width:90%;
+  position:relative;
+  animation:zoomIn 0.3s cubic-bezier(0.4,0,0.2,1);
+  box-shadow:0 24px 80px rgba(0,0,0,0.6),var(--glow);
+}
+@keyframes zoomIn{from{opacity:0;transform:scale(0.85)}to{opacity:1;transform:scale(1)}}
+.modal-close {
+  position:absolute;top:12px;right:14px;
+  background:none;border:none;color:var(--text-dim);
+  font-size:1.2rem;cursor:pointer;
+  transition:var(--transition);
+}
+.modal-close:hover { color:var(--gold); transform:rotate(90deg); }
+
+/* ===== MOBILE HAMBURGER ===== */
+#menuToggle {
+  display:none;
+  background:none;border:none;
+  color:var(--gold);font-size:1.4rem;
+  cursor:pointer;padding:4px;
+}
+.sidebar-overlay {
+  position:fixed;inset:0;background:rgba(0,0,0,0.5);
+  z-index:149;display:none;
+}
+.sidebar-overlay.open { display:block; }
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:900px){
+  #sidebar { transform:translateX(-100%); z-index:160; }
+  #sidebar.open { transform:translateX(0); }
+  #mainContent { margin-left:0; }
+  #menuToggle { display:block; }
+  .grid-3,.grid-4 { grid-template-columns:repeat(2,1fr); }
+  #appLogo { font-size:0.82rem; }
+}
+@media(max-width:600px){
+  #mainContent { padding:14px; }
+  .grid-2,.grid-3,.grid-4 { grid-template-columns:1fr; }
+  .page-title { font-size:1.3rem; }
+  #quoteText { font-size:0.72rem; }
+}
+
+/* ===== SPECIAL ELEMENTS ===== */
+.divider { height:1px; background:linear-gradient(90deg,transparent,var(--card-border),transparent); margin:16px 0; }
+
+.tooltip { position:relative; }
+.tooltip .tip {
+  display:none;
+  position:absolute;bottom:120%;left:50%;transform:translateX(-50%);
+  background:var(--panel-bg);border:1px solid var(--card-border);
+  border-radius:8px;padding:6px 12px;
+  font-size:0.72rem;color:var(--text);white-space:nowrap;
+  z-index:999;pointer-events:none;
+}
+.tooltip:hover .tip { display:block; }
+
+.result-box {
+  background:rgba(240,192,64,0.07);
+  border:1px solid rgba(240,192,64,0.25);
+  border-radius:12px;
+  padding:16px 20px;
+  margin-top:12px;
+}
+.result-box .r-title {
+  font-family:var(--font-heading);
+  color:var(--gold);
+  font-size:0.8rem;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  margin-bottom:8px;
+}
+.result-box .r-text {
+  font-family:var(--font-elegant);
+  color:var(--text);
+  font-size:0.9rem;
+  line-height:1.6;
+}
+
+/* ===== CHART PIE SVG ===== */
+.pie-wrap { position:relative; width:160px;height:160px;margin:0 auto; }
+.pie-wrap svg { width:100%;height:100%; }
+.pie-label {
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  text-align:center;
+}
+
+/* ===== NUMBER CHART BARS ===== */
+.bar-chart { display:flex; gap:6px; align-items:flex-end; height:100px; }
+.bar-item { flex:1; display:flex;flex-direction:column;align-items:center;gap:4px; }
+.bar-fill {
+  width:100%;
+  background:linear-gradient(to top,var(--gold),var(--accent));
+  border-radius:4px 4px 0 0;
+  transition:height 1.2s cubic-bezier(0.4,0,0.2,1);
+  box-shadow:0 0 8px var(--gold);
+  min-height:4px;
+}
+.bar-label { font-size:0.65rem;color:var(--text-dim); }
+.bar-val { font-size:0.65rem;color:var(--gold);font-family:var(--font-heading); }
+
+/* ===== LUCKY SECTION ===== */
+.lucky-grid {
+  display:flex;gap:10px;flex-wrap:wrap;justify-content:center;
+}
+.lucky-ball {
+  width:44px;height:44px;
+  border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,var(--gold2),var(--gold));
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-display);
+  font-size:1rem;
+  font-weight:900;
+  color:#000;
+  box-shadow:0 4px 16px rgba(240,192,64,0.4), inset 0 2px 4px rgba(255,255,255,0.4);
+  animation:ballPop 0.5s cubic-bezier(0.4,0,0.2,1) backwards;
+}
+@keyframes ballPop{from{transform:scale(0)}to{transform:scale(1)}}
+
+/* ===== LIFE PATH LINE ===== */
+.timeline {
+  position:relative;
+  padding-left:30px;
+}
+.timeline::before {
+  content:'';
+  position:absolute;left:10px;top:0;bottom:0;
+  width:2px;
+  background:linear-gradient(to bottom,var(--gold),var(--accent),transparent);
+}
+.tl-item {
+  position:relative;
+  margin-bottom:20px;
+}
+.tl-dot {
+  position:absolute;left:-24px;top:3px;
+  width:12px;height:12px;
+  border-radius:50%;
+  background:var(--gold);
+  box-shadow:0 0 8px var(--gold);
+  border:2px solid var(--bg-dark);
+}
+.tl-title { font-family:var(--font-heading);color:var(--gold);font-size:0.82rem;letter-spacing:0.06em;margin-bottom:4px; }
+.tl-desc { font-size:0.8rem;color:var(--text-dim);line-height:1.5; }
+
+/* ===== KALEIDOSCOPE SVG ===== */
+#kaleido { display:block;margin:0 auto;filter:drop-shadow(0 0 16px var(--gold)); }
+
+/* ===== SCROLL REVEAL ===== */
+.reveal { opacity:0;transform:translateY(20px);transition:opacity 0.6s ease,transform 0.6s ease; }
+.reveal.visible { opacity:1;transform:translateY(0); }
+
+/* ===== TOAST ===== */
+#toast {
+  position:fixed;bottom:24px;right:24px;
+  background:var(--panel-bg);
+  border:1px solid var(--gold);
+  border-radius:10px;padding:12px 20px;
+  color:var(--gold);font-family:var(--font-heading);
+  font-size:0.82rem;letter-spacing:0.06em;
+  z-index:9999;opacity:0;
+  transform:translateY(20px);
+  transition:all 0.3s ease;
+  max-width:280px;
+  box-shadow:var(--glow);
+}
+#toast.show{opacity:1;transform:translateY(0);}
+
+/* ===== HAMBURGER icon ===== */
+.ham { display:flex;flex-direction:column;gap:4px;width:20px; }
+.ham span { display:block;height:2px;background:var(--gold);border-radius:2px;transition:var(--transition); }
+
+/* ===== GAME score ===== */
+.score-ring {
+  width:80px;height:80px;
+  border-radius:50%;
+  border:3px solid var(--gold);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  box-shadow:var(--glow);
+  margin:0 auto;
+}
+.score-ring .sr-num { font-family:var(--font-display);font-size:1.5rem;color:var(--gold); }
+.score-ring .sr-label { font-size:0.6rem;color:var(--text-dim);letter-spacing:0.08em; }
+</style>
+</head>
+<body>
+
+<!-- WebGL Canvas -->
+<canvas id="bgCanvas"></canvas>
+
+<!-- Floating CSS numbers layer -->
+<div class="float-nums" id="floatNums"></div>
+
+<!-- Quote Bar -->
+<div id="quoteBar">
+  <span class="quote-icon">✦</span>
+  <div id="quoteText">Loading wisdom...</div>
+  <span class="quote-icon">✦</span>
+</div>
+
+<!-- Global Header -->
+<div id="globalHeader">
+  <button id="menuToggle" aria-label="Menu"><div class="ham"><span></span><span></span><span></span></div></button>
+  <div id="appLogo" onclick="navigateTo('home')"><span>🔱</span> Diana's Swiss Army Knife</div>
+  <div class="header-spacer"></div>
+  <div class="header-controls">
+    <button class="hbtn" id="btnBgCycle" title="Change Background">🌌 BG</button>
+    <button class="hbtn" id="btnLang">🌐 EN</button>
+    <button class="hbtn" id="btnThemeCycle">🎨</button>
+    <div id="settingsBtn" title="Settings">⚙️</div>
+  </div>
+</div>
+
+<!-- Settings Panel -->
+<div id="settingsPanel">
+  <div class="sp-title">⚙ Settings</div>
+  <div class="sp-section">
+    <div class="sp-label">Color Theme</div>
+    <div class="sp-row">
+      <div class="theme-dot active" style="background:linear-gradient(135deg,#f0c040,#4fc3f7)" data-theme="default" title="Cosmic Gold"></div>
+      <div class="theme-dot" style="background:linear-gradient(135deg,#d62828,#fff)" data-theme="swiss" title="Swiss Red"></div>
+      <div class="theme-dot" style="background:linear-gradient(135deg,#005bbb,#ffd500)" data-theme="ukraine" title="Ukraine Blue"></div>
+      <div class="theme-dot" style="background:linear-gradient(135deg,#b39ddb,#80cbc4)" data-theme="mystic" title="Mystic Purple"></div>
+      <div class="theme-dot" style="background:linear-gradient(135deg,#ff6f00,#ff5252)" data-theme="fire" title="Fire"></div>
+      <div class="theme-dot" style="background:linear-gradient(135deg,#00e676,#40c4ff)" data-theme="emerald" title="Emerald"></div>
+    </div>
+  </div>
+  <div class="sp-section">
+    <div class="sp-label">Font Style</div>
+    <div class="sp-row">
+      <div class="sp-chip active" data-font="default">Default</div>
+      <div class="sp-chip" data-font="serif">Serif</div>
+      <div class="sp-chip" data-font="cinzel">Cinzel</div>
+      <div class="sp-chip" data-font="mono">Mono</div>
+    </div>
+  </div>
+  <div class="sp-section">
+    <div class="sp-label">Background</div>
+    <div class="sp-row">
+      <div class="sp-chip active" data-bg="stars">🌌 Stars</div>
+      <div class="sp-chip" data-bg="numbers">🔢 Numbers</div>
+      <div class="sp-chip" data-bg="matrix">💚 Matrix</div>
+      <div class="sp-chip" data-bg="nebula">🌈 Nebula</div>
+    </div>
+  </div>
+  <div class="sp-section">
+    <div class="sp-label">Language</div>
+    <div class="sp-row">
+      <div class="sp-chip active" data-lang="en">🇬🇧 English</div>
+      <div class="sp-chip" data-lang="de">🇨🇭 Deutsch</div>
+      <div class="sp-chip" data-lang="uk">🇺🇦 Українська</div>
+    </div>
+  </div>
+</div>
+
+<!-- Sidebar Nav -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<nav id="sidebar">
+  <div class="nav-item active" data-page="home"><span class="nav-icon">🏠</span> Dashboard</div>
+  <div class="nav-item" data-page="lifepath"><span class="nav-icon">🌟</span> Life Path</div>
+  <div class="nav-item" data-page="name"><span class="nav-icon">📝</span> Name Analysis</div>
+  <div class="nav-item" data-page="birthday"><span class="nav-icon">🎂</span> Birth Chart</div>
+  <div class="nav-item" data-page="compatibility"><span class="nav-icon">💑</span> Compatibility</div>
+  <div class="nav-item" data-page="daily"><span class="nav-icon">📅</span> Daily Numbers</div>
+  <div class="nav-item" data-page="astro"><span class="nav-icon">♈</span> Astrology</div>
+  <div class="nav-item" data-page="lucky"><span class="nav-icon">🍀</span> Lucky Numbers<span class="nav-badge">NEW</span></div>
+  <div class="nav-divider"></div>
+  <div class="nav-item" data-page="wheel"><span class="nav-icon">🎡</span> Spin the Wheel</div>
+  <div class="nav-item" data-page="gallery"><span class="nav-icon">🖼</span> Readings Gallery</div>
+  <div class="nav-divider"></div>
+  <div class="nav-item" data-page="profile"><span class="nav-icon">👤</span> My Profile</div>
+  <div class="nav-item" data-page="guide"><span class="nav-icon">📖</span> Numerology Guide</div>
+</nav>
+
+<!-- Main Content -->
+<div id="mainContent">
+
+<!-- ========== PAGE: HOME ========== -->
+<div class="page active" id="page-home">
+  <div class="page-header">
+    <div class="page-title">✦ Welcome to Diana's Universe ✦</div>
+    <div class="page-subtitle">The numbers speak. Are you listening?</div>
+  </div>
+  <div id="welcomeCard" class="card" style="margin-bottom:20px;text-align:center;background:radial-gradient(ellipse at 30% 30%,rgba(240,192,64,0.12),rgba(10,22,50,0.9))">
+    <div style="font-size:2.5rem;margin-bottom:8px">🔱</div>
+    <div id="welcomeMsg" style="font-family:var(--font-heading);font-size:1.2rem;color:var(--gold);margin-bottom:6px">Welcome, Seeker</div>
+    <div id="todayInfo" style="font-size:0.82rem;color:var(--text-dim)">Today's cosmic date loading...</div>
+  </div>
+  <div class="grid-3" style="margin-bottom:20px">
+    <div class="card" style="text-align:center;cursor:pointer" onclick="navigateTo('lifepath')">
+      <div style="font-size:1.8rem">🌟</div>
+      <div id="homeLifePath" class="big-num" style="font-size:2.5rem">?</div>
+      <div class="num-label">Life Path</div>
+    </div>
+    <div class="card" style="text-align:center;cursor:pointer" onclick="navigateTo('daily')">
+      <div style="font-size:1.8rem">📅</div>
+      <div id="homeDailyNum" class="big-num" style="font-size:2.5rem">?</div>
+      <div class="num-label">Personal Day</div>
+    </div>
+    <div class="card" style="text-align:center;cursor:pointer" onclick="navigateTo('astro')">
+      <div id="homeZodiac" class="zodiac-symbol">✦</div>
+      <div class="num-label" id="homeZodiacName">Your Sign</div>
+    </div>
+  </div>
+  <div class="grid-2" style="margin-bottom:20px">
+    <div class="card">
+      <div class="card-title">⚡ Quick Calculate</div>
+      <div class="input-label">Your Birthday</div>
+      <input type="date" class="input-field" id="quickBirth" style="margin-bottom:10px">
+      <button class="btn btn-gold" onclick="quickCalc()" style="width:100%">✦ Calculate Now</button>
+      <div id="quickResult" style="margin-top:12px"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">🌈 Cosmic Numbers</div>
+      <div id="cosmicBars" class="bar-chart">
+        <!-- filled by JS -->
+      </div>
+      <div style="font-size:0.72rem;color:var(--text-dim);margin-top:8px;text-align:center">Your Frequency Distribution</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">🔢 Number Mandala</div>
+    <canvas id="mandalaCanvas" width="300" height="300" style="display:block;margin:0 auto;max-width:100%;border-radius:50%;box-shadow:var(--glow)"></canvas>
+  </div>
+</div>
+
+<!-- ========== PAGE: LIFE PATH ========== -->
+<div class="page" id="page-lifepath">
+  <div class="page-header">
+    <div class="page-title">🌟 Life Path Number</div>
+    <div class="page-subtitle">Your soul's journey encoded in numbers</div>
+  </div>
+  <div class="grid-2" style="margin-bottom:20px">
+    <div class="card">
+      <div class="card-title">📅 Enter Your Birth Date</div>
+      <div class="input-label">Date of Birth</div>
+      <input type="date" class="input-field" id="lpBirth" style="margin-bottom:14px">
+      <button class="btn btn-gold" onclick="calcLifePath()" style="width:100%">✦ Reveal My Path</button>
+    </div>
+    <div class="card" style="text-align:center">
+      <div class="card-title">Your Life Path</div>
+      <div class="num-orbit">
+        <div class="orbit-ring" id="orbitRing"></div>
+        <div class="orbit-center" id="lpResult">?</div>
+      </div>
+      <div class="num-label" id="lpLabel">Enter birthday above</div>
+    </div>
+  </div>
+  <div class="card" id="lpDetails" style="display:none">
+    <div class="card-title">📖 Path Interpretation</div>
+    <div id="lpInterpret" class="result-box">
+      <div class="r-title">Your Number Meaning</div>
+      <div class="r-text" id="lpInterpretText"></div>
+    </div>
+    <div class="divider"></div>
+    <div class="grid-2" style="margin-top:12px">
+      <div>
+        <div class="card-title" style="font-size:0.8rem">Strengths</div>
+        <div id="lpStrengths"></div>
+      </div>
+      <div>
+        <div class="card-title" style="font-size:0.8rem">Challenges</div>
+        <div id="lpChallenges"></div>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="card-title" style="font-size:0.8rem">Energy Balance</div>
+    <div id="lpBars"></div>
+    <div class="divider"></div>
+    <div class="card-title" style="font-size:0.8rem">Famous People on Your Path</div>
+    <div id="lpFamous" style="font-size:0.82rem;color:var(--text-dim);line-height:1.8"></div>
+  </div>
+</div>
+
+<!-- ========== PAGE: NAME ANALYSIS ========== -->
+<div class="page" id="page-name">
+  <div class="page-header">
+    <div class="page-title">📝 Name Analysis</div>
+    <div class="page-subtitle">Discover the vibration of your name</div>
+  </div>
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-title">Enter Your Full Name</div>
+    <input type="text" class="input-field" id="nameInput" placeholder="e.g. Diana Maria Schneider" style="margin-bottom:12px">
+    <button class="btn btn-gold" onclick="analyzeName()" style="width:100%">✦ Analyze Name Vibration</button>
+  </div>
+  <div id="nameResults" style="display:none">
+    <div class="grid-3" style="margin-bottom:16px">
+      <div class="card" style="text-align:center">
+        <div class="num-label">Expression</div>
+        <div class="big-num" id="nameExpression">?</div>
+        <div class="num-label">Destiny Number</div>
+      </div>
+      <div class="card" style="text-align:center">
+        <div class="num-label">Soul Urge</div>
+        <div class="big-num" id="nameSoul">?</div>
+        <div class="num-label">Heart's Desire</div>
+      </div>
+      <div class="card" style="text-align:center">
+        <div class="num-label">Personality</div>
+        <div class="big-num" id="namePersonality">?</div>
+        <div class="num-label">Outer Persona</div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-title">🔤 Letter Frequency</div>
+      <div id="letterFreqBars" class="bar-chart"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">💎 Name Vibration Breakdown</div>
+      <div id="nameLetterGrid" style="font-family:var(--font-heading);letter-spacing:0.1em;font-size:1rem;text-align:center;line-height:2.2;color:var(--text)"></div>
+      <div id="nameInterpret" class="result-box" style="margin-top:14px">
+        <div class="r-title">Interpretation</div>
+        <div class="r-text" id="nameInterpretText"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE: BIRTH CHART ========== -->
+<div class="page" id="page-birthday">
+  <div class="page-header">
+    <div class="page-title">🎂 Birth Chart</div>
+    <div class="page-subtitle">All your core numbers from a single birthday</div>
+  </div>
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-title">Enter Birthday & Name</div>
+    <div class="grid-2">
+      <div>
+        <div class="input-label">Full Name</div>
+        <input type="text" class="input-field" id="bcName" placeholder="Full Name">
+      </div>
+      <div>
+        <div class="input-label">Date of Birth</div>
+        <input type="date" class="input-field" id="bcDate">
+      </div>
+    </div>
+    <button class="btn btn-gold" onclick="calcBirthChart()" style="width:100%;margin-top:14px">✦ Generate Birth Chart</button>
+  </div>
+  <div id="bcResults" style="display:none">
+    <div class="grid-4" style="margin-bottom:16px">
+      <div class="card" style="text-align:center"><div class="big-num" id="bc1">?</div><div class="num-label">Life Path</div></div>
+      <div class="card" style="text-align:center"><div class="big-num" id="bc2">?</div><div class="num-label">Expression</div></div>
+      <div class="card" style="text-align:center"><div class="big-num" id="bc3">?</div><div class="num-label">Soul Urge</div></div>
+      <div class="card" style="text-align:center"><div class="big-num" id="bc4">?</div><div class="num-label">Personality</div></div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">📊 Pythagorean Chart</div>
+        <div id="pythagoreanGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">🔄 Personal Year Cycle</div>
+        <div id="yearCycle"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE: COMPATIBILITY ========== -->
+<div class="page" id="page-compatibility">
+  <div class="page-header">
+    <div class="page-title">💑 Compatibility</div>
+    <div class="page-subtitle">Discover your numerological connection</div>
+  </div>
+  <div class="grid-2" style="margin-bottom:16px">
+    <div class="card">
+      <div class="card-title">👤 Person 1</div>
+      <div class="input-label">Name</div>
+      <input type="text" class="input-field" id="compat1name" placeholder="Your name" style="margin-bottom:8px">
+      <div class="input-label">Birthday</div>
+      <input type="date" class="input-field" id="compat1date">
+    </div>
+    <div class="card">
+      <div class="card-title">👤 Person 2</div>
+      <div class="input-label">Name</div>
+      <input type="text" class="input-field" id="compat2name" placeholder="Partner's name" style="margin-bottom:8px">
+      <div class="input-label">Birthday</div>
+      <input type="date" class="input-field" id="compat2date">
+    </div>
+  </div>
+  <button class="btn btn-gold" onclick="calcCompatibility()" style="width:100%;margin-bottom:16px">💑 Analyze Compatibility</button>
+  <div id="compatResults" style="display:none">
+    <div class="card daily-glow" style="margin-bottom:16px">
+      <div class="card-title" style="justify-content:center">💫 Compatibility Score</div>
+      <div class="compat-meter">
+        <div class="compat-arc"></div>
+        <div class="compat-fill" id="compatFill"></div>
+        <div class="compat-needle" id="compatNeedle" style="transform:rotate(-90deg)"></div>
+        <div class="compat-pct" id="compatPct">0%</div>
+      </div>
+      <div style="text-align:center;margin-top:8px;font-size:0.8rem;color:var(--text-dim)" id="compatLabel"></div>
+    </div>
+    <div class="grid-3" style="margin-bottom:16px">
+      <div class="card" style="text-align:center"><div class="big-num" id="cp1lp">?</div><div class="num-label" id="cp1name">Person 1 LP</div></div>
+      <div class="card" style="text-align:center;font-size:2rem;display:flex;align-items:center;justify-content:center">💕</div>
+      <div class="card" style="text-align:center"><div class="big-num" id="cp2lp">?</div><div class="num-label" id="cp2name">Person 2 LP</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">📖 Relationship Reading</div>
+      <div id="compatReading" class="result-box"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE: DAILY NUMBERS ========== -->
+<div class="page" id="page-daily">
+  <div class="page-header">
+    <div class="page-title">📅 Daily Numbers</div>
+    <div class="page-subtitle">The cosmic energy of today</div>
+  </div>
+  <div class="grid-3" style="margin-bottom:16px">
+    <div class="card daily-glow" style="text-align:center">
+      <div style="font-size:1.5rem">🌍</div>
+      <div class="big-num" id="universalDay">?</div>
+      <div class="num-label">Universal Day</div>
+    </div>
+    <div class="card daily-glow" style="text-align:center">
+      <div style="font-size:1.5rem">🌙</div>
+      <div class="big-num" id="universalMonth">?</div>
+      <div class="num-label">Universal Month</div>
+    </div>
+    <div class="card daily-glow" style="text-align:center">
+      <div style="font-size:1.5rem">☀️</div>
+      <div class="big-num" id="universalYear">?</div>
+      <div class="num-label">Universal Year</div>
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-title">🎯 Your Personal Day</div>
+    <div class="input-label">Your Birthday (for personal day)</div>
+    <input type="date" class="input-field" id="personalDayBirth" style="margin-bottom:12px">
+    <button class="btn btn-gold" onclick="calcPersonalDay()">✦ Get My Personal Day</button>
+    <div id="personalDayResult" style="margin-top:14px"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">📆 Weekly Forecast</div>
+    <div id="weeklyForecast" style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px"></div>
+  </div>
+</div>
+
+<!-- ========== PAGE: ASTROLOGY ========== -->
+<div class="page" id="page-astro">
+  <div class="page-header">
+    <div class="page-title">♈ Astrology & Numbers</div>
+    <div class="page-subtitle">Where the stars meet numerology</div>
+  </div>
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-title">Find Your Astrological Profile</div>
+    <div class="input-label">Date of Birth</div>
+    <input type="date" class="input-field" id="astroBirth" style="margin-bottom:12px">
+    <button class="btn btn-gold" onclick="calcAstro()">✦ Reveal My Cosmic Profile</button>
+  </div>
+  <div id="astroResults" style="display:none">
+    <div class="card daily-glow" style="margin-bottom:16px;text-align:center">
+      <div class="zodiac-symbol" id="astroSymbol">♈</div>
+      <div style="font-family:var(--font-heading);color:var(--gold);font-size:1.1rem;margin:8px 0" id="astroSignName"></div>
+      <div style="font-size:0.82rem;color:var(--text-dim)" id="astroDates"></div>
+      <div class="divider"></div>
+      <div class="grid-3" style="margin-top:12px">
+        <div><div class="num-label">Element</div><div id="astroElement" style="font-family:var(--font-heading);color:var(--gold);margin-top:4px"></div></div>
+        <div><div class="num-label">Planet</div><div id="astroPlanet" style="font-family:var(--font-heading);color:var(--gold);margin-top:4px"></div></div>
+        <div><div class="num-label">Lucky #</div><div id="astroLucky" style="font-family:var(--font-display);color:var(--gold);font-size:1.2rem;margin-top:4px"></div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">🌌 Cosmic Reading</div>
+      <div id="astroReading" class="result-box"></div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <div class="card-title">🔢 Number-Sign Correlation</div>
+      <div id="numSignCorr" style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;text-align:center;margin-top:8px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE: LUCKY NUMBERS ========== -->
+<div class="page" id="page-lucky">
+  <div class="page-header">
+    <div class="page-title">🍀 Lucky Numbers</div>
+    <div class="page-subtitle">Your numerologically blessed numbers</div>
+  </div>
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-title">Generate Your Lucky Numbers</div>
+    <div class="input-label">Your Birthday</div>
+    <input type="date" class="input-field" id="luckyBirth" style="margin-bottom:12px">
+    <div class="input-label">Your Name (optional)</div>
+    <input type="text" class="input-field" id="luckyName" placeholder="Your name" style="margin-bottom:12px">
+    <button class="btn btn-gold" onclick="generateLucky()">✦ Generate Lucky Numbers</button>
+  </div>
+  <div id="luckyResults" style="display:none">
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-title">🎱 Your Lucky Numbers</div>
+      <div id="luckyBalls" class="lucky-grid"></div>
+    </div>
+    <div class="grid-3" style="margin-bottom:16px">
+      <div class="card" style="text-align:center">
+        <div class="num-label">Lucky Color</div>
+        <div id="luckyColor" style="width:60px;height:60px;border-radius:50%;margin:12px auto;border:3px solid var(--gold)"></div>
+        <div id="luckyColorName" style="font-size:0.82rem;color:var(--text-dim)"></div>
+      </div>
+      <div class="card" style="text-align:center">
+        <div class="num-label">Lucky Day</div>
+        <div style="font-family:var(--font-display);font-size:1.2rem;color:var(--gold);margin-top:12px" id="luckyDay"></div>
+      </div>
+      <div class="card" style="text-align:center">
+        <div class="num-label">Power Stone</div>
+        <div style="font-size:2rem;margin:8px 0" id="luckyStoneEmoji"></div>
+        <div style="font-size:0.82rem;color:var(--text-dim)" id="luckyStoneName"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">💡 Manifestation Tip</div>
+      <div id="luckyTip" class="result-box"><div class="r-text"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE: SPIN THE WHEEL ========== -->
+<div class="page" id="page-wheel">
+  <div class="page-header">
+    <div class="page-title">🎡 Spin the Wheel</div>
+    <div class="page-subtitle">Let the universe decide your number</div>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="wheel-wrap">
+        <canvas id="wheelCanvas" width="320" height="320"></canvas>
+        <br>
+        <button class="spin-btn" id="spinBtn" onclick="spinWheel()">✦ SPIN ✦</button>
+        <div id="wheelResult" style="margin-top:16px;text-align:center;font-family:var(--font-heading);font-size:1.1rem;color:var(--gold);min-height:30px"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">📊 Spin History</div>
+      <div id="spinHistory" style="max-height:240px;overflow-y:auto"></div>
+      <div class="divider"></div>
+      <div class="score-ring" id="spinScore">
+        <div class="sr-num" id="spinTotalLabel">0</div>
+        <div class="sr-label">TOTAL SPINS</div>
+      </div>
+      <div style="margin-top:12px;text-align:center">
+        <button class="btn" onclick="clearSpinHistory()">Clear History</button>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <div class="card-title">🔮 Number Meaning</div>
+    <div id="spinMeaning" class="result-box">
+      <div class="r-text" style="text-align:center;color:var(--text-dim)">Spin the wheel to receive your message...</div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE: READINGS GALLERY ========== -->
+<div class="page" id="page-gallery">
+  <div class="page-header">
+    <div class="page-title">🖼 Readings Gallery</div>
+    <div class="page-subtitle">Your saved numerological readings</div>
+  </div>
+  <div id="galleryEmpty" class="card" style="text-align:center;padding:40px">
+    <div style="font-size:3rem;margin-bottom:12px">📜</div>
+    <div style="color:var(--text-dim)">No saved readings yet. Complete a reading and save it!</div>
+  </div>
+  <div id="galleryGrid" class="grid-3" style="display:none"></div>
+  <div style="text-align:center;margin-top:20px">
+    <canvas id="kaleido" width="300" height="300"></canvas>
+    <div style="font-size:0.75rem;color:var(--text-dim);margin-top:6px">Sacred Geometry Mandala</div>
+  </div>
+</div>
+
+<!-- ========== PAGE: PROFILE ========== -->
+<div class="page" id="page-profile">
+  <div class="page-header">
+    <div class="page-title">👤 My Profile</div>
+    <div class="page-subtitle">Your cosmic identity</div>
+  </div>
+  <div class="grid-2">
+    <div class="card" style="text-align:center">
+      <div class="avatar-wrap">
+        <img src="" id="profileImg" class="avatar-img" alt="Profile" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;0 0 100 100&quot;><circle cx=&quot;50&quot; cy=&quot;50&quot; r=&quot;50&quot; fill=&quot;%230a1628&quot;/><text x=&quot;50&quot; y=&quot;60&quot; text-anchor=&quot;middle&quot; font-size=&quot;40&quot; fill=&quot;%23f0c040&quot;>✦</text></svg>'">
+        <div class="avatar-ring"></div>
+        <div class="avatar-edit" onclick="document.getElementById('avatarUpload').click()">✏</div>
+        <input type="file" id="avatarUpload" style="display:none" accept="image/*" onchange="uploadAvatar(event)">
+      </div>
+      <div style="font-family:var(--font-heading);font-size:1.2rem;color:var(--gold);margin-bottom:4px" id="profileDisplayName">Anonymous Seeker</div>
+      <div style="font-size:0.8rem;color:var(--text-dim)" id="profileDisplayDate">Birthday not set</div>
+      <div style="margin-top:12px" id="profileZodiac"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">✏ Edit Profile</div>
+      <div class="input-label">Display Name</div>
+      <input type="text" class="input-field" id="profileName" placeholder="Your name" style="margin-bottom:10px">
+      <div class="input-label">Date of Birth</div>
+      <input type="date" class="input-field" id="profileBirth" style="margin-bottom:10px">
+      <div class="input-label">Email (optional)</div>
+      <input type="email" class="input-field" id="profileEmail" placeholder="your@email.com" style="margin-bottom:14px">
+      <button class="btn btn-gold" onclick="saveProfile()" style="width:100%">💾 Save Profile</button>
+    </div>
+  </div>
+  <div class="card" style="margin-top:16px" id="profileNumbers" style="display:none">
+    <div class="card-title">🔢 Your Core Numbers</div>
+    <div id="profileCoreNums" class="grid-4"></div>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <div class="card-title">📊 Your Numerological Timeline</div>
+    <div id="profileTimeline" class="timeline"></div>
+  </div>
+</div>
+
+<!-- ========== PAGE: GUIDE ========== -->
+<div class="page" id="page-guide">
+  <div class="page-header">
+    <div class="page-title">📖 Numerology Guide</div>
+    <div class="page-subtitle">Ancient wisdom, modern insight</div>
+  </div>
+  <div id="guideContent"></div>
+</div>
+
+</div><!-- /mainContent -->
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- Saved Reading Modal -->
+<div class="modal-overlay" id="readingModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// DIANA'S SWISS ARMY KNIFE FOR NUMEROLOGY
+// ============================================================
+
+// ===== DATA =====
+const QUOTES = [
+  { text: "Numbers are the highest degree of knowledge. It is knowledge itself.", author: "Plato" },
+  { text: "Mathematics is the language in which God has written the universe.", author: "Galileo Galilei" },
+  { text: "Everything is number.", author: "Pythagoras" },
+  { text: "The universe is made of stories, not of atoms.", author: "Muriel Rukeyser" },
+  { text: "Not everything that can be counted counts, and not everything that counts can be counted.", author: "Albert Einstein" },
+  { text: "The cosmos is within us. We are made of star-stuff.", author: "Carl Sagan" },
+  { text: "Where flowers bloom, so does hope.", author: "Lady Bird Johnson" },
+  { text: "Die Zahlen sind die Sprache der Natur.", author: "Swiss Proverb" },
+  { text: "Числа — це музика Всесвіту.", author: "Ukrainian Saying" },
+  { text: "Alle Dinge sind Zahlen.", author: "Pythagoras (DE)" },
+  { text: "Know thyself, and thou shalt know all the mysteries of the gods.", author: "Delphi Oracle" },
+  { text: "As above, so below; as within, so without.", author: "Hermes Trismegistus" },
+  { text: "The soul of man is a star and the body is its darkness.", author: "Manly P. Hall" },
+  { text: "Your birthday reveals the purpose of your life.", author: "Numerology Wisdom" },
+  { text: "Life is not measured in years, but in the depth of its living.", author: "Eleanor Roosevelt" },
+  { text: "Твоя доля написана в зорях і числах.", author: "Ukrainian Proverb" },
+  { text: "In the beginning was the number, and the number was with God.", author: "Mystical Tradition" },
+  { text: "The Swiss mountains teach us that every peak is reached one step at a time.", author: "Swiss Alpine Wisdom" },
+  { text: "Nine is the sacred number of completion and humanitarian love.", author: "Ancient Numerology" },
+  { text: "The vibration of seven is the bridge between earth and heaven.", author: "Kabbalah Teachings" },
+  { text: "One is not a number, it is an idea.", author: "Pythagorean Philosophy" },
+  { text: "Your name is a vibration, your birthday is a code.", author: "Diana's Wisdom" },
+  { text: "Certainty is the mother of quiet and despair.", author: "Francis Bacon" },
+  { text: "The sunflower always turns toward the light.", author: "Ukrainian Folklore" },
+  { text: "Helvetia semper libera — Switzerland forever free.", author: "Swiss Motto" },
+  { text: "Three is the number of creation: past, present, future.", author: "Numerology" },
+  { text: "The heart sees what the eyes cannot.", author: "Old Swiss Saying" },
+  { text: "Зерно — це доля селянина, число — доля мудреця.", author: "Ukrainian Proverb" },
+  { text: "Wherever you go, go with all your heart.", author: "Confucius" },
+  { text: "The stars are the street lights of eternity.", author: "Anonymous" },
+  { text: "In mathematics there is no ignorance that can be pardoned.", author: "Blaise Pascal" },
+  { text: "Mysticism is not the denial of reason, but its transcendence.", author: "Goethe" },
+  { text: "Eight is the number of infinity turned to stand.", author: "Sacred Geometry" },
+  { text: "Be the change you wish to see in the world.", author: "Mahatma Gandhi" },
+  { text: "Life is the art of drawing sufficient conclusions from insufficient premises.", author: "Samuel Butler" },
+  { text: "The Milky Way is a river of stars each singing its number.", author: "Diana's Universe" },
+  { text: "Красота в цифрах — це краса у Всесвіті.", author: "Ukrainian Numerologist" },
+  { text: "Der Weg ist das Ziel.", author: "German Proverb (The journey is the goal)" },
+  { text: "Numbers never lie, only our interpretations do.", author: "Modern Numerology" },
+  { text: "Six is the number of love, harmony and domestic bliss.", author: "Chaldean Numerology" },
+  { text: "The ancient sages wrote wisdom in stars and numbers.", author: "Mystery Schools" },
+  { text: "What we think, we become.", author: "Buddha" },
+  { text: "Time is the moving image of eternity.", author: "Plato" },
+  { text: "Alles Vergängliche ist nur ein Gleichnis.", author: "Goethe" },
+  { text: "Two souls, one purpose — that is the power of eleven.", author: "Master Numbers" },
+  { text: "The labyrinth is not a problem to solve but a truth to discover.", author: "Mystical Tradition" },
+  { text: "Де є воля, там є шлях.", author: "Ukrainian Proverb (Where there's will, there's a way)" },
+  { text: "He who is not courageous enough to take risks will accomplish nothing in life.", author: "Muhammad Ali" },
+  { text: "Your life path is a sacred number engraved in the cosmos.", author: "Numerology Master" },
+  { text: "The universe is not made of atoms; it's made of tiny stories.", author: "Joseph Gordon-Levitt" },
+  { text: "In Switzerland, even the mountains align perfectly — so do the numbers.", author: "Swiss Mystic" }
+];
+
+const LIFE_PATH_DATA = {
+  1: { name:"The Leader", desc:"You are a born pioneer with extraordinary drive and ambition. Your soul chose this path to learn independence, courage and self-reliance. The universe has placed leadership in your hands.", strengths:["Leadership","Independence","Originality","Determination"], challenges:["Ego","Stubbornness","Isolation","Impatience"], famous:"Napoleon Bonaparte, George Washington, Nicolas Tesla, Steve Jobs" },
+  2: { name:"The Peacemaker", desc:"You are a diplomatic soul with a gift for cooperation and sensitivity. Your path is to master the art of partnership, patience and intuition. You feel the world more deeply than others.", strengths:["Diplomacy","Sensitivity","Cooperation","Intuition"], challenges:["Indecisiveness","Over-sensitivity","Dependency","Self-doubt"], famous:"Barack Obama, Bill Clinton, Diana Princess of Wales" },
+  3: { name:"The Creator", desc:"Joy, creativity and self-expression define your journey. You were born to bring beauty, art and laughter into the world. Communication is your sacred gift.", strengths:["Creativity","Enthusiasm","Communication","Optimism"], challenges:["Scattered energy","Superficiality","Emotional highs/lows"], famous:"David Bowie, Christina Aguilera, Mary J. Blige" },
+  4: { name:"The Builder", desc:"Discipline, order and foundation are your virtues. You are the architect of reality, building lasting structures through patience and hard work. The earth itself is your element.", strengths:["Discipline","Reliability","Practicality","Loyalty"], challenges:["Rigidity","Stubbornness","Workaholism"], famous:"Albert Einstein, Oprah Winfrey, Bill Gates" },
+  5: { name:"The Explorer", desc:"Freedom, adventure and change fuel your spirit. You crave experience, travel and the unknown. Your five senses are amplified and the world is your teacher.", strengths:["Adaptability","Curiosity","Versatility","Freedom-loving"], challenges:["Restlessness","Inconsistency","Overindulgence"], famous:"Angelina Jolie, Vincent van Gogh, Abraham Lincoln" },
+  6: { name:"The Nurturer", desc:"Love, responsibility and healing are your gifts to the world. You are drawn to family, community and service. Your heart carries the warmth of a thousand suns.", strengths:["Nurturing","Responsibility","Compassion","Harmony"], challenges:["Over-protectiveness","Perfectionism","Martyrdom"], famous:"Michael Jackson, John Lennon, Albert Einstein (expression)" },
+  7: { name:"The Mystic", desc:"You are the seeker of truth, walking the path of the philosopher and the mystic. Depth, analysis and spiritual understanding define your journey.", strengths:["Intelligence","Spiritual depth","Analysis","Wisdom"], challenges:["Isolation","Cynicism","Over-analysis","Aloofness"], famous:"Leonardo DiCaprio, Taylor Swift, Marilyn Monroe" },
+  8: { name:"The Achiever", desc:"Power, abundance and material mastery are your life themes. You are here to understand the laws of cause and effect in the material world and achieve great success.", strengths:["Ambition","Authority","Financial acumen","Leadership"], challenges:["Materialism","Domination","Workaholism"], famous:"Sandra Bullock, Halle Berry, 50 Cent" },
+  9: { name:"The Humanitarian", desc:"Compassion, wisdom and universal love guide your soul. You have lived many lifetimes and carry ancient wisdom. The world is your family and service is your purpose.", strengths:["Compassion","Wisdom","Generosity","Humanitarianism"], challenges:["Idealism","Holding grudges","Martyrdom"], famous:"Mahatma Gandhi, Mother Teresa, Jimi Hendrix" },
+  11: { name:"The Illuminator", desc:"You carry a master vibration — a spiritual messenger between the divine and humanity. Your intuition is extraordinary and your purpose is to inspire others.", strengths:["Spiritual insight","Inspiration","Intuition","Charisma"], challenges:["Nervous tension","Impracticality","Extreme sensitivity"], famous:"Barack Obama, Bill Clinton, Harry Houdini" },
+  22: { name:"The Master Builder", desc:"The most powerful of all life paths, you carry the potential to manifest dreams into global reality. Your soul has the blueprints of nations and institutions.", strengths:["Manifesting ability","Vision","Discipline","Leadership"], challenges:["Overwhelming potential","Self-doubt","Stress"], famous:"Dalai Lama, Paul McCartney, Oprah Winfrey" },
+  33: { name:"The Master Teacher", desc:"The rarest and most spiritually evolved number. You are here to teach love unconditionally and to nurture humanity's spiritual awakening.", strengths:["Unconditional love","Spiritual teaching","Healing","Wisdom"], challenges:["Self-sacrifice","Perfectionism","Burnout"], famous:"Stephen King, Albert Einstein, John Lennon" }
+};
+
+const ZODIAC = [
+  { sign:"Capricorn", symbol:"♑", start:"12-22", end:"01-19", element:"🌍 Earth", planet:"♄ Saturn", lucky:"4, 8", dates:"Dec 22 – Jan 19" },
+  { sign:"Aquarius", symbol:"♒", start:"01-20", end:"02-18", element:"💨 Air", planet:"♅ Uranus", lucky:"4, 7, 11", dates:"Jan 20 – Feb 18" },
+  { sign:"Pisces", symbol:"♓", start:"02-19", end:"03-20", element:"💧 Water", planet:"♆ Neptune", lucky:"3, 9, 12", dates:"Feb 19 – Mar 20" },
+  { sign:"Aries", symbol:"♈", start:"03-21", end:"04-19", element:"🔥 Fire", planet:"♂ Mars", lucky:"1, 9", dates:"Mar 21 – Apr 19" },
+  { sign:"Taurus", symbol:"♉", start:"04-20", end:"05-20", element:"🌍 Earth", planet:"♀ Venus", lucky:"2, 6", dates:"Apr 20 – May 20" },
+  { sign:"Gemini", symbol:"♊", start:"05-21", end:"06-20", element:"💨 Air", planet:"☿ Mercury", lucky:"3, 5", dates:"May 21 – Jun 20" },
+  { sign:"Cancer", symbol:"♋", start:"06-21", end:"07-22", element:"💧 Water", planet:"☾ Moon", lucky:"2, 7", dates:"Jun 21 – Jul 22" },
+  { sign:"Leo", symbol:"♌", start:"07-23", end:"08-22", element:"🔥 Fire", planet:"☉ Sun", lucky:"1, 4", dates:"Jul 23 – Aug 22" },
+  { sign:"Virgo", symbol:"♍", start:"08-23", end:"09-22", element:"🌍 Earth", planet:"☿ Mercury", lucky:"3, 6", dates:"Aug 23 – Sep 22" },
+  { sign:"Libra", symbol:"♎", start:"09-23", end:"10-22", element:"💨 Air", planet:"♀ Venus", lucky:"6, 9", dates:"Sep 23 – Oct 22" },
+  { sign:"Scorpio", symbol:"♏", start:"10-23", end:"11-21", element:"💧 Water", planet:"♇ Pluto", lucky:"8, 11", dates:"Oct 23 – Nov 21" },
+  { sign:"Sagittarius", symbol:"♐", start:"11-22", end:"12-21", element:"🔥 Fire", planet:"♃ Jupiter", lucky:"3, 9", dates:"Nov 22 – Dec 21" }
+];
+
+const LUCKY_DATA = {
+  colors: [{name:"Royal Gold",hex:"#ffd700"},{name:"Cosmic Blue",hex:"#1565c0"},{name:"Mystic Purple",hex:"#6a1b9a"},{name:"Forest Green",hex:"#2e7d32"},{name:"Crimson Red",hex:"#c62828"},{name:"Silver Moon",hex:"#78909c"},{name:"Rose Quartz",hex:"#f06292"},{name:"Deep Teal",hex:"#00695c"},{name:"Amber",hex:"#f57f17"}],
+  days:["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
+  stones:[{name:"Amethyst",emoji:"💜"},{name:"Rose Quartz",emoji:"🌸"},{name:"Citrine",emoji:"💛"},{name:"Obsidian",emoji:"⚫"},{name:"Aquamarine",emoji:"💎"},{name:"Ruby",emoji:"❤️"},{name:"Emerald",emoji:"💚"},{name:"Sapphire",emoji:"🔵"},{name:"Moonstone",emoji:"🌕"}],
+  tips:["Write your intention on paper and place it under a crystal tonight.","Meditate on your lucky number as a golden sphere of light entering your heart.","Speak your number aloud three times at sunrise facing east.","Draw your life path number and surround it with golden light in your mind.","Carry your lucky color today and notice how the universe responds.","Begin any new project on a day that reduces to your life path number."]
+};
+
+const NUM_WHEEL = [1,2,3,4,5,6,7,8,9,11,22,33];
+const WHEEL_COLORS = ["#f0c040","#4fc3f7","#e040fb","#69f0ae","#ff6f00","#f06292","#26c6da","#ffca28","#8d6e63","#ef5350","#42a5f5","#66bb6a"];
+
+const COMPAT_MSGS = {
+  high:"✨ Exceptional harmony! Your numbers sing together in perfect resonance. This is a rare and powerful connection that holds the potential for deep mutual growth.",
+  med:"💫 Good compatibility with interesting contrasts. Your numbers complement each other, creating a dynamic dance of similarities and differences.",
+  low:"🌙 Challenging but growth-oriented. Your numbers create tension that, when navigated with awareness, can lead to profound transformation for both souls."
+};
+
+const TRANSLATIONS = {
+  en: { dashboard:"Dashboard", lifepath:"Life Path", name:"Name Analysis", birthday:"Birth Chart", compatibility:"Compatibility", daily:"Daily Numbers", astro:"Astrology", lucky:"Lucky Numbers", wheel:"Spin the Wheel", gallery:"Readings Gallery", profile:"My Profile", guide:"Guide" },
+  de: { dashboard:"Übersicht", lifepath:"Lebensweg", name:"Namensanalyse", birthday:"Geburtshoroskop", compatibility:"Kompatibilität", daily:"Tageszahlen", astro:"Astrologie", lucky:"Glückszahlen", wheel:"Glücksrad", gallery:"Lesungen", profile:"Profil", guide:"Leitfaden" },
+  uk: { dashboard:"Головна", lifepath:"Шлях Життя", name:"Аналіз Імені", birthday:"Карта Народження", compatibility:"Сумісність", daily:"Числа Дня", astro:"Астрологія", lucky:"Щасливі числа", wheel:"Колесо Фортуни", gallery:"Читання", profile:"Профіль", guide:"Посібник" }
+};
+
+// ===== STATE =====
+let currentLang = "en";
+let currentBg = "stars";
+let currentTheme = "default";
+let spinning = false;
+let spinAngle = 0;
+let spinHistory = [];
+let userProfile = { name:"", birth:"", email:"", avatar:"" };
+let savedReadings = [];
+
+// ===== INDEXEDDB =====
+let db;
+function initDB() {
+  const req = indexedDB.open("DianaNumDB", 2);
+  req.onupgradeneeded = e => {
+    const d = e.target.result;
+    if (!d.objectStoreNames.contains("settings")) d.createObjectStore("settings");
+    if (!d.objectStoreNames.contains("profile")) d.createObjectStore("profile");
+    if (!d.objectStoreNames.contains("readings")) d.createObjectStore("readings", { keyPath:"id", autoIncrement:true });
+    if (!d.objectStoreNames.contains("spinHistory")) d.createObjectStore("spinHistory", { keyPath:"id", autoIncrement:true });
+  };
+  req.onsuccess = e => {
+    db = e.target.result;
+    loadAllData();
+  };
+  req.onerror = () => console.warn("IndexedDB unavailable");
+}
+
+function dbSet(store, key, val) {
+  if (!db) return;
+  const tx = db.transaction(store, "readwrite");
+  tx.objectStore(store).put(val, key);
+}
+
+function dbGet(store, key) {
+  return new Promise(res => {
+    if (!db) { res(null); return; }
+    const tx = db.transaction(store, "readonly");
+    const req = tx.objectStore(store).get(key);
+    req.onsuccess = e => res(e.target.result || null);
+    req.onerror = () => res(null);
+  });
+}
+
+function dbGetAll(store) {
+  return new Promise(res => {
+    if (!db) { res([]); return; }
+    const tx = db.transaction(store, "readonly");
+    const req = tx.objectStore(store).getAll();
+    req.onsuccess = e => res(e.target.result || []);
+    req.onerror = () => res([]);
+  });
+}
+
+async function loadAllData() {
+  const settings = await dbGet("settings", "app");
+  if (settings) {
+    currentLang = settings.lang || "en";
+    currentBg = settings.bg || "stars";
+    currentTheme = settings.theme || "default";
+    applyTheme(currentTheme);
+    applyBg(currentBg);
+    updateLangBtn();
+  }
+  const prof = await dbGet("profile", "user");
+  if (prof) {
+    userProfile = prof;
+    updateProfileDisplay();
+  }
+  savedReadings = await dbGetAll("readings");
+  updateGallery();
+  spinHistory = await dbGetAll("spinHistory");
+  updateSpinHistory();
+}
+
+function saveSettings() {
+  dbSet("settings", "app", { lang:currentLang, bg:currentBg, theme:currentTheme });
+}
+
+// ===== WEBGL BACKGROUND =====
+const canvas = document.getElementById("bgCanvas");
+const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  if (gl) gl.viewport(0, 0, canvas.width, canvas.height);
+}
+
+let stars = [], meteors = [], numbers3D = [];
+let animFrame;
+let bgMode = "stars";
+
+function initStars() {
+  stars = [];
+  for (let i=0; i<300; i++) {
+    stars.push({ x:Math.random()*2-1, y:Math.random()*2-1, z:Math.random(), size:Math.random()*2+0.5, twinkle:Math.random()*Math.PI*2, speed:0.0002+Math.random()*0.0005 });
+  }
+  meteors = [];
+}
+
+function spawnMeteor() {
+  if (meteors.length < 5) {
+    meteors.push({ x:-1.2+Math.random()*0.4, y:0.8+Math.random()*0.4, vx:0.012+Math.random()*0.008, vy:-0.008-Math.random()*0.006, life:1, tail:[], num:Math.floor(Math.random()*9)+1 });
+  }
+}
+
+let glReady = false;
+let starProgram, starVBO;
+
+const STAR_VERT = `attribute vec2 aPos; attribute float aSize; attribute float aBright;
+uniform float uTime; void main(){gl_Position=vec4(aPos,0,1); gl_PointSize=aSize*(0.7+0.3*sin(uTime+aBright*6.28));}`;
+const STAR_FRAG = `precision mediump float; uniform vec3 uColor;
+void main(){vec2 c=gl_PointCoord-0.5; float d=length(c); if(d>0.5)discard; float a=1.0-d*2.0; gl_FragColor=vec4(uColor,a*0.9);}`;
+
+function compileShader(src, type) {
+  const s = gl.createShader(type);
+  gl.shaderSource(s, src);
+  gl.compileShader(s);
+  return s;
+}
+
+function initGL() {
+  if (!gl) return;
+  const prog = gl.createProgram();
+  gl.attachShader(prog, compileShader(STAR_VERT, gl.VERTEX_SHADER));
+  gl.attachShader(prog, compileShader(STAR_FRAG, gl.FRAGMENT_SHADER));
+  gl.linkProgram(prog);
+  starProgram = prog;
+  gl.useProgram(prog);
+  starVBO = gl.createBuffer();
+  gl.enable(gl.BLEND);
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+  glReady = true;
+}
+
+const c2d = document.createElement("canvas");
+c2d.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none";
+document.body.insertBefore(c2d, document.body.firstChild);
+const ctx2 = c2d.getContext("2d");
+
+function resize2D() { c2d.width = window.innerWidth; c2d.height = window.innerHeight; }
+
+let t = 0;
+function renderBg() {
+  t += 0.016;
+  const W = c2d.width, H = c2d.height;
+  ctx2.clearRect(0,0,W,H);
+
+  if (bgMode === "stars") {
+    // Deep sky gradient
+    const grad = ctx2.createRadialGradient(W/2,H/2,0,W/2,H/2,Math.max(W,H)*0.8);
+    grad.addColorStop(0,"rgba(10,20,60,0.98)");
+    grad.addColorStop(1,"rgba(2,2,15,0.99)");
+    ctx2.fillStyle = grad;
+    ctx2.fillRect(0,0,W,H);
+
+    // Stars
+    stars.forEach(s => {
+      const sx = (s.x+1)/2*W, sy = (1-s.y)/2*H;
+      const bright = 0.5+0.5*Math.sin(t*2+s.twinkle);
+      ctx2.beginPath();
+      ctx2.arc(sx,sy,s.size*bright,0,Math.PI*2);
+      const themeColor = getComputedStyle(document.documentElement).getPropertyValue("--gold").trim() || "#f0c040";
+      ctx2.fillStyle = `rgba(200,220,255,${0.3+0.5*bright})`;
+      ctx2.fill();
+      // Occasional gold stars
+      if (s.size > 2) {
+        ctx2.fillStyle = `rgba(240,192,64,${0.2*bright})`;
+        ctx2.fill();
+      }
+    });
+
+    // Nebula glow
+    const ng = ctx2.createRadialGradient(W*0.7,H*0.3,0,W*0.7,H*0.3,W*0.3);
+    ng.addColorStop(0,"rgba(80,40,120,0.08)");
+    ng.addColorStop(1,"rgba(0,0,0,0)");
+    ctx2.fillStyle = ng;
+    ctx2.fillRect(0,0,W,H);
+
+    const ng2 = ctx2.createRadialGradient(W*0.2,H*0.7,0,W*0.2,H*0.7,W*0.25);
+    ng2.addColorStop(0,"rgba(20,60,120,0.1)");
+    ng2.addColorStop(1,"rgba(0,0,0,0)");
+    ctx2.fillStyle = ng2;
+    ctx2.fillRect(0,0,W,H);
+
+    // Meteors
+    meteors = meteors.filter(m => m.life > 0);
+    meteors.forEach(m => {
+      m.tail.push({x:m.x,y:m.y});
+      if (m.tail.length > 20) m.tail.shift();
+      m.x += m.vx; m.y += m.vy; m.life -= 0.018;
+      const sx = (m.x+1)/2*W, sy = (1-m.y)/2*H;
+      // Tail
+      for (let i=0;i<m.tail.length;i++) {
+        const tp = m.tail[i], a = (i/m.tail.length)*0.7*m.life;
+        const tx=(tp.x+1)/2*W,ty=(1-tp.y)/2*H;
+        ctx2.beginPath();
+        ctx2.arc(tx,ty,1.5*(i/m.tail.length),0,Math.PI*2);
+        ctx2.fillStyle=`rgba(255,220,100,${a})`;
+        ctx2.fill();
+      }
+      // Head
+      ctx2.beginPath();
+      ctx2.arc(sx,sy,3,0,Math.PI*2);
+      ctx2.fillStyle=`rgba(255,255,255,${m.life})`;
+      ctx2.fill();
+      // Number on meteor
+      ctx2.font = "bold 12px 'Cinzel Decorative', serif";
+      ctx2.fillStyle = `rgba(240,192,64,${m.life*0.8})`;
+      ctx2.fillText(m.num, sx+4, sy-4);
+    });
+    if (Math.random()<0.005) spawnMeteor();
+
+  } else if (bgMode === "numbers") {
+    ctx2.fillStyle = "rgba(2,2,15,0.15)";
+    ctx2.fillRect(0,0,W,H);
+    // Falling numbers
+    if (!window._fnums) {
+      window._fnums = Array.from({length:60},(_,i)=>({x:Math.random()*W,y:Math.random()*H,speed:0.5+Math.random()*2,num:Math.floor(Math.random()*9)+1,size:10+Math.random()*30,opacity:0.1+Math.random()*0.4,hue:Math.random()*60+30}));
+    }
+    window._fnums.forEach(f=>{
+      f.y += f.speed;
+      if(f.y>H+50){f.y=-50;f.x=Math.random()*W;f.num=Math.floor(Math.random()*9)+1;}
+      ctx2.font=`900 ${f.size}px 'Cinzel Decorative',serif`;
+      ctx2.fillStyle=`hsla(${f.hue},90%,60%,${f.opacity})`;
+      ctx2.fillText(f.num,f.x,f.y);
+    });
+
+  } else if (bgMode === "matrix") {
+    ctx2.fillStyle = "rgba(0,5,0,0.1)";
+    ctx2.fillRect(0,0,W,H);
+    if(!window._matCols){
+      window._matCols=[];
+      for(let i=0;i<W/14;i++) window._matCols.push(Math.random()*H);
+    }
+    ctx2.font="13px monospace";
+    ctx2.fillStyle="#00ff41";
+    window._matCols.forEach((y,i)=>{
+      const ch=String.fromCharCode(0x30A0+Math.random()*96);
+      ctx2.fillText(ch,i*14,y);
+      window._matCols[i]= y>H+Math.random()*100 ? 0 : y+14;
+    });
+
+  } else if (bgMode === "nebula") {
+    ctx2.fillStyle="rgba(2,2,15,0.04)";
+    ctx2.fillRect(0,0,W,H);
+    const colors=["rgba(100,40,200,","rgba(40,100,200,","rgba(200,40,100,","rgba(40,200,150,"];
+    for(let i=0;i<3;i++){
+      const angle=t*0.2+i*Math.PI*2/3;
+      const gx=W/2+Math.cos(angle)*W*0.25, gy=H/2+Math.sin(angle)*H*0.2;
+      const ng=ctx2.createRadialGradient(gx,gy,0,gx,gy,W*0.35);
+      ng.addColorStop(0,colors[i]+"0.06)");
+      ng.addColorStop(1,"rgba(0,0,0,0)");
+      ctx2.fillStyle=ng;
+      ctx2.fillRect(0,0,W,H);
+    }
+    stars.forEach(s=>{
+      const sx=(s.x+1)/2*W, sy=(1-s.y)/2*H;
+      const bright=0.5+0.5*Math.sin(t*3+s.twinkle);
+      ctx2.beginPath();ctx2.arc(sx,sy,s.size*0.8,0,Math.PI*2);
+      ctx2.fillStyle=`rgba(200,200,255,${0.2+0.4*bright})`;
+      ctx2.fill();
+    });
+  }
+
+  animFrame = requestAnimationFrame(renderBg);
+}
+
+function applyBg(mode) {
+  bgMode = mode;
+  currentBg = mode;
+  document.querySelectorAll("[data-bg]").forEach(el => el.classList.toggle("active", el.dataset.bg===mode));
+  if(!window._fnums && mode==="numbers") { window._fnums=null; }
+  if(!window._matCols && mode==="matrix") { window._matCols=null; }
+  saveSettings();
+}
+
+// ===== FLOATING CSS NUMBERS =====
+function initFloatNums() {
+  const wrap = document.getElementById("floatNums");
+  for (let i=0; i<18; i++) {
+    const el = document.createElement("div");
+    el.className = "fn";
+    el.textContent = Math.floor(Math.random()*9)+1;
+    el.style.left = Math.random()*100+"%";
+    el.style.fontSize = (14+Math.random()*32)+"px";
+    el.style.animationDuration = (8+Math.random()*16)+"s";
+    el.style.animationDelay = (Math.random()*12)+"s";
+    el.style.opacity = 0;
+    wrap.appendChild(el);
+  }
+}
+
+// ===== QUOTES =====
+let quoteIdx = 0;
+function showNextQuote() {
+  const el = document.getElementById("quoteText");
+  el.style.opacity = 0;
+  setTimeout(() => {
+    const q = QUOTES[quoteIdx % QUOTES.length];
+    el.textContent = `"${q.text}" — ${q.author}`;
+    el.style.opacity = 1;
+    quoteIdx++;
+  }, 700);
+}
+
+// ===== NAVIGATION =====
+function navigateTo(page) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+  const pg = document.getElementById("page-"+page);
+  if (pg) { pg.classList.add("active"); pg.classList.remove("reveal"); }
+  document.querySelectorAll(`[data-page="${page}"]`).forEach(n => n.classList.add("active"));
+  // Close sidebar on mobile
+  if (window.innerWidth < 900) {
+    document.getElementById("sidebar").classList.remove("open");
+    document.getElementById("sidebarOverlay").classList.remove("open");
+  }
+  // Page-specific init
+  if (page==="home") initHomePage();
+  if (page==="wheel") initWheelCanvas();
+  if (page==="gallery") { drawKaleidoscope(); updateGallery(); }
+  if (page==="daily") initDailyPage();
+  if (page==="guide") renderGuide();
+  if (page==="profile") renderProfilePage();
+}
+
+document.querySelectorAll(".nav-item").forEach(n => {
+  n.addEventListener("click", () => navigateTo(n.dataset.page));
+});
+
+// ===== SETTINGS PANEL =====
+document.getElementById("settingsBtn").addEventListener("click", e => {
+  e.stopPropagation();
+  document.getElementById("settingsPanel").classList.toggle("open");
+});
+document.addEventListener("click", e => {
+  if (!e.target.closest("#settingsPanel") && !e.target.closest("#settingsBtn")) {
+    document.getElementById("settingsPanel").classList.remove("open");
+  }
+});
+
+document.querySelectorAll(".theme-dot").forEach(dot => {
+  dot.addEventListener("click", () => {
+    applyTheme(dot.dataset.theme);
+    document.querySelectorAll(".theme-dot").forEach(d=>d.classList.remove("active"));
+    dot.classList.add("active");
+  });
+});
+
+document.querySelectorAll("[data-font]").forEach(chip => {
+  chip.addEventListener("click", () => {
+    document.body.dataset.font = chip.dataset.font==="default" ? "" : chip.dataset.font;
+    document.querySelectorAll("[data-font]").forEach(c=>c.classList.remove("active"));
+    chip.classList.add("active");
+    dbSet("settings","font",chip.dataset.font);
+  });
+});
+
+document.querySelectorAll("[data-bg]").forEach(chip => {
+  chip.addEventListener("click", () => applyBg(chip.dataset.bg));
+});
+
+document.querySelectorAll("[data-lang]").forEach(chip => {
+  chip.addEventListener("click", () => {
+    currentLang = chip.dataset.lang;
+    document.querySelectorAll("[data-lang]").forEach(c=>c.classList.remove("active"));
+    chip.classList.add("active");
+    updateLangBtn();
+    applyTranslations();
+    saveSettings();
+  });
+});
+
+function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme === "default" ? "" : theme;
+  currentTheme = theme;
+  saveSettings();
+}
+
+function updateLangBtn() {
+  const flags = {en:"🇬🇧 EN",de:"🇨🇭 DE",uk:"🇺🇦 UA"};
+  document.getElementById("btnLang").textContent = flags[currentLang]||"🌐 EN";
+}
+
+function applyTranslations() {
+  const tr = TRANSLATIONS[currentLang]||TRANSLATIONS.en;
+  document.querySelectorAll(".nav-item[data-page]").forEach(n=>{
+    const icon = n.querySelector(".nav-icon").outerHTML;
+    const badge = n.querySelector(".nav-badge") ? n.querySelector(".nav-badge").outerHTML : "";
+    const key = n.dataset.page;
+    if(tr[key]) n.innerHTML = icon + " " + tr[key] + badge;
+  });
+}
+
+// Header button shortcuts
+document.getElementById("btnThemeCycle").addEventListener("click", () => {
+  const themes=["default","swiss","ukraine","mystic","fire","emerald"];
+  const i = themes.indexOf(currentTheme);
+  applyTheme(themes[(i+1)%themes.length]);
+  document.querySelectorAll(".theme-dot").forEach(d=>d.classList.toggle("active",d.dataset.theme===currentTheme||(currentTheme==="default"&&d.dataset.theme==="default")));
+  showToast("Theme: "+currentTheme);
+});
+
+document.getElementById("btnBgCycle").addEventListener("click", () => {
+  const bgs=["stars","numbers","matrix","nebula"];
+  const i=bgs.indexOf(currentBg);
+  applyBg(bgs[(i+1)%bgs.length]);
+  showToast("Background: "+currentBg);
+});
+
+document.getElementById("btnLang").addEventListener("click", () => {
+  const langs=["en","de","uk"];
+  const i=langs.indexOf(currentLang);
+  currentLang=langs[(i+1)%langs.length];
+  updateLangBtn();
+  applyTranslations();
+  saveSettings();
+  showToast("Language: "+currentLang.toUpperCase());
+});
+
+// Mobile sidebar
+document.getElementById("menuToggle").addEventListener("click",()=>{
+  document.getElementById("sidebar").classList.toggle("open");
+  document.getElementById("sidebarOverlay").classList.toggle("open");
+});
+document.getElementById("sidebarOverlay").addEventListener("click",()=>{
+  document.getElementById("sidebar").classList.remove("open");
+  document.getElementById("sidebarOverlay").classList.remove("open");
+});
+
+// ===== NUMEROLOGY CORE FUNCTIONS =====
+function reduceNum(n) {
+  if (n===11||n===22||n===33) return n;
+  while(n>9 && n!==11 && n!==22 && n!==33) {
+    n = String(n).split("").reduce((a,b)=>a+parseInt(b),0);
+    if(n===11||n===22||n===33) return n;
+  }
+  return n;
+}
+
+function calcLifePathNum(dateStr) {
+  if(!dateStr) return null;
+  const [y,m,d] = dateStr.split("-").map(Number);
+  const sum = y.toString().split("").reduce((a,b)=>a+parseInt(b),0) +
+              m.toString().split("").reduce((a,b)=>a+parseInt(b),0) +
+              d.toString().split("").reduce((a,b)=>a+parseInt(b),0);
+  return reduceNum(sum);
+}
+
+const LETTER_VALUES = {A:1,B:2,C:3,D:4,E:5,F:6,G:7,H:8,I:9,J:1,K:2,L:3,M:4,N:5,O:6,P:7,Q:8,R:9,S:1,T:2,U:3,V:4,W:5,X:6,Y:7,Z:8};
+const VOWELS = new Set(["A","E","I","O","U"]);
+
+function nameToNums(name) {
+  return name.toUpperCase().replace(/[^A-Z]/g,"").split("").map(c=>LETTER_VALUES[c]||0);
+}
+
+function calcExpression(name) {
+  return reduceNum(nameToNums(name).reduce((a,b)=>a+b,0));
+}
+
+function calcSoulUrge(name) {
+  return reduceNum(name.toUpperCase().replace(/[^A-Z]/g,"").split("").filter(c=>VOWELS.has(c)).map(c=>LETTER_VALUES[c]||0).reduce((a,b)=>a+b,0)||1);
+}
+
+function calcPersonality(name) {
+  return reduceNum(name.toUpperCase().replace(/[^A-Z]/g,"").split("").filter(c=>!VOWELS.has(c)).map(c=>LETTER_VALUES[c]||0).reduce((a,b)=>a+b,0)||1);
+}
+
+function getZodiac(dateStr) {
+  if(!dateStr) return null;
+  const [y,m,d] = dateStr.split("-").map(Number);
+  const mmdd = String(m).padStart(2,"0")+"-"+String(d).padStart(2,"0");
+  for(const z of ZODIAC) {
+    const s=z.start, e=z.end;
+    if(s<=e){if(mmdd>=s&&mmdd<=e)return z;}
+    else{if(mmdd>=s||mmdd<=e)return z;}
+  }
+  return ZODIAC[0];
+}
+
+// ===== HOME PAGE =====
+function initHomePage() {
+  const now = new Date();
+  document.getElementById("todayInfo").textContent = now.toLocaleDateString("en-US",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
+  if(userProfile.name) document.getElementById("welcomeMsg").textContent = "Welcome back, "+userProfile.name;
+  const ud = reduceNum([now.getDate(),now.getMonth()+1,now.getFullYear()].reduce((a,n)=>a+n.toString().split("").reduce((x,d)=>x+parseInt(d),0),0));
+  document.getElementById("homeDailyNum").textContent = ud;
+  if(userProfile.birth) {
+    const lp = calcLifePathNum(userProfile.birth);
+    document.getElementById("homeLifePath").textContent = lp||"?";
+    const z = getZodiac(userProfile.birth);
+    if(z){ document.getElementById("homeZodiac").textContent=z.symbol; document.getElementById("homeZodiacName").textContent=z.sign; }
+  }
+  drawCosmicBars();
+  drawMandala();
+}
+
+function drawCosmicBars() {
+  const data = [3,7,5,9,4,8,6,2,11];
+  const nums = [1,2,3,4,5,6,7,8,9];
+  const wrap = document.getElementById("cosmicBars");
+  wrap.innerHTML="";
+  nums.forEach((n,i)=>{
+    const h = Math.floor(Math.random()*70)+30;
+    const d = document.createElement("div");
+    d.className="bar-item";
+    d.innerHTML=`<div class="bar-val">${n}</div><div class="bar-fill" style="height:${h}px" data-h="${h}"></div><div class="bar-label">${n}</div>`;
+    wrap.appendChild(d);
+  });
+}
+
+function drawMandala() {
+  const mc = document.getElementById("mandalaCanvas");
+  if(!mc) return;
+  const ctx = mc.getContext("2d");
+  const W=300,H=300,cx=150,cy=150;
+  ctx.clearRect(0,0,W,H);
+  const grad=ctx.createRadialGradient(cx,cy,0,cx,cy,130);
+  grad.addColorStop(0,"rgba(240,192,64,0.05)");
+  grad.addColorStop(1,"rgba(10,22,50,0)");
+  ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
+  const t2=Date.now()/3000;
+  for(let r=20;r<=120;r+=20){
+    for(let a=0;a<9;a++){
+      const angle=a*Math.PI*2/9+t2*(r/100);
+      const x=cx+Math.cos(angle)*r,y=cy+Math.sin(angle)*r;
+      ctx.font=`bold ${8+r/15}px 'Cinzel Decorative',serif`;
+      const grd=ctx.createLinearGradient(0,0,W,H);
+      grd.addColorStop(0,"#f0c040");grd.addColorStop(1,"#4fc3f7");
+      ctx.fillStyle=grd;
+      ctx.fillText(a+1,x-5,y+5);
+    }
+  }
+  // Sacred geometry rings
+  [30,60,90,120].forEach((r,i)=>{
+    ctx.beginPath();
+    ctx.arc(cx,cy,r,0,Math.PI*2);
+    ctx.strokeStyle=`rgba(240,192,64,${0.08+i*0.03})`;
+    ctx.lineWidth=1;ctx.stroke();
+  });
+  requestAnimationFrame(drawMandala);
+}
+
+function quickCalc() {
+  const d = document.getElementById("quickBirth").value;
+  if(!d){showToast("Please enter a birthday");return;}
+  const lp=calcLifePathNum(d);
+  const z=getZodiac(d);
+  const data=LIFE_PATH_DATA[lp]||LIFE_PATH_DATA[1];
+  document.getElementById("quickResult").innerHTML=`
+    <div class="result-box">
+      <div class="r-title">${z?z.symbol+" ":""} Life Path ${lp} — ${data.name}</div>
+      <div class="r-text">${data.desc.substring(0,120)}...</div>
+    </div>`;
+  document.getElementById("homeLifePath").textContent=lp;
+  if(z){document.getElementById("homeZodiac").textContent=z.symbol;document.getElementById("homeZodiacName").textContent=z.sign;}
+  showToast("Life Path: "+lp+" — "+data.name);
+}
+
+// ===== LIFE PATH PAGE =====
+function calcLifePath() {
+  const d=document.getElementById("lpBirth").value;
+  if(!d){showToast("Please enter a birthday");return;}
+  const lp=calcLifePathNum(d);
+  document.getElementById("lpResult").textContent=lp;
+  document.getElementById("lpLabel").textContent=(LIFE_PATH_DATA[lp]||{name:"Unknown"}).name;
+  const data=LIFE_PATH_DATA[lp]||LIFE_PATH_DATA[1];
+  document.getElementById("lpDetails").style.display="block";
+  document.getElementById("lpInterpretText").textContent=data.desc;
+  document.getElementById("lpStrengths").innerHTML=data.strengths.map(s=>`<div class="tag" style="margin:3px 0">✦ ${s}</div>`).join("");
+  document.getElementById("lpChallenges").innerHTML=data.challenges.map(s=>`<div class="tag" style="margin:3px 0;border-color:rgba(224,64,251,0.3);color:var(--accent2)">⚡ ${s}</div>`).join("");
+  const attrs=["Creativity","Ambition","Intuition","Leadership","Harmony"];
+  document.getElementById("lpBars").innerHTML=attrs.map(a=>{const v=Math.floor(Math.random()*60)+40;return`<div class="progress-wrap"><div class="progress-label"><span>${a}</span><span>${v}%</span></div><div class="progress-bar"><div class="progress-fill" style="width:${v}%"></div></div></div>`}).join("");
+  document.getElementById("lpFamous").textContent=data.famous;
+  // Add orbit nums
+  const ring=document.getElementById("orbitRing");
+  ring.innerHTML="";
+  for(let i=0;i<9;i++){
+    const span=document.createElement("span");
+    span.className="orbit-num";
+    span.textContent=i+1;
+    const angle=i*40;
+    span.style.transform=`rotate(${angle}deg) translateY(-72px) rotate(-${angle}deg)`;
+    ring.appendChild(span);
+  }
+  saveReading({type:"Life Path",number:lp,name:data.name,date:d});
+  showToast("Life Path "+lp+" revealed!");
+}
+
+// ===== NAME PAGE =====
+function analyzeName() {
+  const name=document.getElementById("nameInput").value.trim();
+  if(!name){showToast("Please enter a name");return;}
+  const expr=calcExpression(name),soul=calcSoulUrge(name),pers=calcPersonality(name);
+  document.getElementById("nameExpression").textContent=expr;
+  document.getElementById("nameSoul").textContent=soul;
+  document.getElementById("namePersonality").textContent=pers;
+  document.getElementById("nameResults").style.display="block";
+  // Letter grid
+  const letters=name.toUpperCase().replace(/[^A-Z ]/g,"").split("");
+  const colors={1:"#f0c040",2:"#4fc3f7",3:"#e040fb",4:"#69f0ae",5:"#ff6f00",6:"#f06292",7:"#4dd0e1",8:"#ffca28",9:"#8d6e63"};
+  document.getElementById("nameLetterGrid").innerHTML=letters.map(l=>{
+    if(l===" ")return `<span style="margin:0 8px"> </span>`;
+    const v=LETTER_VALUES[l]||0;
+    return `<span style="color:${colors[v]||"#fff"};text-shadow:0 0 8px ${colors[v]||"#fff"};margin:0 2px" title="${l}=${v}">${l}<sub style="font-size:0.5em">${v}</sub></span>`;
+  }).join("");
+  // Letter freq bars
+  const freq={};
+  letters.filter(l=>l!==" ").forEach(l=>{freq[l]=(freq[l]||0)+1;});
+  const sorted=Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const maxF=sorted[0]?.[1]||1;
+  document.getElementById("letterFreqBars").innerHTML=sorted.map(([l,c])=>
+    `<div class="bar-item"><div class="bar-val">${c}</div><div class="bar-fill" style="height:${Math.floor(c/maxF*80)+10}px"></div><div class="bar-label">${l}</div></div>`
+  ).join("");
+  const data=LIFE_PATH_DATA[expr]||LIFE_PATH_DATA[1];
+  document.getElementById("nameInterpretText").textContent=`Your name "${name}" carries the expression number ${expr} (${data.name}). ${data.desc}`;
+  saveReading({type:"Name Analysis",number:expr,name:name,date:new Date().toISOString().split("T")[0]});
+  showToast("Name vibration: "+expr);
+}
+
+// ===== BIRTH CHART =====
+function calcBirthChart() {
+  const name=document.getElementById("bcName").value.trim();
+  const date=document.getElementById("bcDate").value;
+  if(!date){showToast("Please enter a birthday");return;}
+  const lp=calcLifePathNum(date);
+  const expr=name?calcExpression(name):"-";
+  const soul=name?calcSoulUrge(name):"-";
+  const pers=name?calcPersonality(name):"-";
+  ["bc1","bc2","bc3","bc4"].forEach((id,i)=>{
+    document.getElementById(id).textContent=[lp,expr,soul,pers][i];
+  });
+  document.getElementById("bcResults").style.display="block";
+  // Pythagorean chart
+  const pg=document.getElementById("pythagoreanGrid");
+  const nums=[3,6,9,2,5,8,1,4,7];
+  const [y,m,d]=date.split("-").map(Number);
+  const allDigits=[...String(d),...String(m),...String(y)].map(Number);
+  pg.innerHTML=nums.map(n=>{
+    const count=allDigits.filter(x=>x===n).length;
+    return `<div style="background:rgba(240,192,64,${0.05+count*0.15});border:1px solid rgba(240,192,64,${0.2+count*0.15});border-radius:8px;padding:10px 4px;text-align:center"><div style="font-family:var(--font-display);color:var(--gold);font-size:1.1rem">${n}</div><div style="font-size:0.65rem;color:var(--text-dim)">${"◆".repeat(count)||"○"}</div></div>`;
+  }).join("");
+  // Year cycle
+  const now=new Date();
+  const pyYear=reduceNum(now.getFullYear().toString().split("").reduce((a,b)=>a+parseInt(b),0)+m+d.toString().split("").reduce((a,b)=>a+parseInt(b),0));
+  document.getElementById("yearCycle").innerHTML=`
+    <div style="text-align:center">
+      <div class="big-num" style="font-size:2.5rem">${pyYear}</div>
+      <div class="num-label">Personal Year ${now.getFullYear()}</div>
+      <div style="margin-top:12px;font-size:0.82rem;color:var(--text-dim);line-height:1.6">${(LIFE_PATH_DATA[pyYear]||LIFE_PATH_DATA[1]).desc.substring(0,100)}...</div>
+    </div>`;
+}
+
+// ===== COMPATIBILITY =====
+function calcCompatibility() {
+  const n1=document.getElementById("compat1name").value||"Person 1";
+  const n2=document.getElementById("compat2name").value||"Person 2";
+  const d1=document.getElementById("compat1date").value;
+  const d2=document.getElementById("compat2date").value;
+  if(!d1||!d2){showToast("Please enter both birthdays");return;}
+  const lp1=calcLifePathNum(d1),lp2=calcLifePathNum(d2);
+  const expr1=calcExpression(n1),expr2=calcExpression(n2);
+  const diff=Math.abs(lp1-lp2);
+  let score;
+  const harmony=[[1,1],[2,2],[3,3],[4,4],[5,5],[6,6],[7,7],[8,8],[9,9],[1,9],[2,8],[3,6],[4,22],[5,7],[6,3]];
+  const isHarmonic=harmony.some(p=>p.includes(lp1)&&p.includes(lp2));
+  if(lp1===lp2)score=95;
+  else if(isHarmonic)score=75+Math.floor(Math.random()*15);
+  else if(diff<=2)score=60+Math.floor(Math.random()*20);
+  else score=35+Math.floor(Math.random()*30);
+  document.getElementById("cp1lp").textContent=lp1;
+  document.getElementById("cp2lp").textContent=lp2;
+  document.getElementById("cp1name").textContent=n1+" LP";
+  document.getElementById("cp2name").textContent=n2+" LP";
+  document.getElementById("compatResults").style.display="block";
+  // Animate meter
+  setTimeout(()=>{
+    const needle=document.getElementById("compatNeedle");
+    const pct=document.getElementById("compatPct");
+    const angle=-90+(score/100)*180;
+    needle.style.transform=`rotate(${angle}deg)`;
+    pct.textContent=score+"%";
+    const msg=score>=70?COMPAT_MSGS.high:score>=45?COMPAT_MSGS.med:COMPAT_MSGS.low;
+    document.getElementById("compatLabel").textContent=score>=70?"💫 Highly Compatible":score>=45?"🌙 Moderately Compatible":"⚡ Complex Dynamic";
+    const rd=document.getElementById("compatReading");
+    rd.innerHTML=`<div class="r-title">Reading for ${n1} & ${n2}</div><div class="r-text">${msg} Life Path ${lp1} and ${lp2} create ${score}% cosmic harmony. ${score>=70?"Together you amplify each other's gifts and share aligned life purposes.":"Your differences invite growth and learning from each other's unique perspectives."}</div>`;
+  },300);
+  saveReading({type:"Compatibility",number:score,name:`${n1} & ${n2}`,date:new Date().toISOString().split("T")[0]});
+  showToast(`Compatibility: ${score}%`);
+}
+
+// ===== DAILY =====
+function initDailyPage() {
+  const now=new Date();
+  const ud=reduceNum([now.getDate(),now.getMonth()+1,now.getFullYear()].reduce((a,n)=>a+n.toString().split("").reduce((x,d)=>x+parseInt(d),0),0));
+  const um=reduceNum((now.getMonth()+1).toString().split("").reduce((a,b)=>a+parseInt(b),0)+now.getFullYear().toString().split("").reduce((a,b)=>a+parseInt(b),0));
+  const uy=reduceNum(now.getFullYear().toString().split("").reduce((a,b)=>a+parseInt(b),0));
+  document.getElementById("universalDay").textContent=ud;
+  document.getElementById("universalMonth").textContent=um;
+  document.getElementById("universalYear").textContent=uy;
+  // Weekly
+  const wrap=document.getElementById("weeklyForecast");
+  wrap.innerHTML="";
+  const days=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  for(let i=0;i<7;i++){
+    const d=new Date(now);d.setDate(now.getDate()-now.getDay()+i);
+    const dn=reduceNum([d.getDate(),d.getMonth()+1,d.getFullYear()].reduce((a,n)=>a+n.toString().split("").reduce((x,dd)=>x+parseInt(dd),0),0));
+    const isToday=d.getDate()===now.getDate();
+    const el=document.createElement("div");
+    el.style.cssText=`min-width:70px;text-align:center;padding:12px 8px;border-radius:12px;background:${isToday?"rgba(240,192,64,0.15)":"rgba(255,255,255,0.04)"};border:1px solid ${isToday?"var(--gold)":"var(--card-border)"};flex-shrink:0`;
+    el.innerHTML=`<div style="font-size:0.7rem;color:var(--text-dim);margin-bottom:4px">${days[d.getDay()]}</div><div style="font-family:var(--font-display);font-size:1.5rem;color:${isToday?"var(--gold)":"var(--text)"};">${dn}</div><div style="font-size:0.65rem;color:var(--text-dim)">${d.getDate()}</div>`;
+    wrap.appendChild(el);
+  }
+}
+
+function calcPersonalDay() {
+  const b=document.getElementById("personalDayBirth").value;
+  if(!b){showToast("Please enter your birthday");return;}
+  const now=new Date();
+  const pd=reduceNum([now.getDate(),now.getMonth()+1,now.getFullYear(),parseInt(b.split("-")[1]),parseInt(b.split("-")[2])].reduce((a,n)=>a+n.toString().split("").reduce((x,d)=>x+parseInt(d),0),0));
+  const data=LIFE_PATH_DATA[pd]||LIFE_PATH_DATA[1];
+  document.getElementById("personalDayResult").innerHTML=`<div class="result-box"><div class="r-title">Your Personal Day: ${pd} — ${data.name}</div><div class="r-text">${data.desc.substring(0,150)}...</div></div>`;
+}
+
+// ===== ASTROLOGY =====
+function calcAstro() {
+  const d=document.getElementById("astroBirth").value;
+  if(!d){showToast("Please enter a birthday");return;}
+  const z=getZodiac(d);
+  if(!z)return;
+  document.getElementById("astroResults").style.display="block";
+  document.getElementById("astroSymbol").textContent=z.symbol;
+  document.getElementById("astroSignName").textContent=z.sign;
+  document.getElementById("astroDates").textContent=z.dates;
+  document.getElementById("astroElement").textContent=z.element;
+  document.getElementById("astroPlanet").textContent=z.planet;
+  document.getElementById("astroLucky").textContent=z.lucky;
+  const lp=calcLifePathNum(d);
+  const data=LIFE_PATH_DATA[lp]||LIFE_PATH_DATA[1];
+  document.getElementById("astroReading").innerHTML=`<div class="r-title">${z.sign} — Life Path ${lp}</div><div class="r-text">As a ${z.sign}, you are governed by ${z.planet} and fueled by ${z.element.split(" ")[1]} energy. Combined with your Life Path ${lp} (${data.name}), you are ${data.desc.substring(0,100)}...</div>`;
+  // Number-sign grid
+  const grid=document.getElementById("numSignCorr");
+  grid.innerHTML=ZODIAC.map(z2=>`<div style="text-align:center;padding:8px;border-radius:8px;border:1px solid ${z2.sign===z.sign?"var(--gold)":"var(--card-border)"};background:${z2.sign===z.sign?"rgba(240,192,64,0.12)":"transparent"}"><div style="font-size:1.5rem">${z2.symbol}</div><div style="font-size:0.6rem;color:var(--text-dim)">${z2.sign.substring(0,3)}</div></div>`).join("");
+  saveReading({type:"Astrology",number:z.symbol,name:z.sign,date:d});
+}
+
+// ===== LUCKY NUMBERS =====
+function generateLucky() {
+  const b=document.getElementById("luckyBirth").value;
+  const name=document.getElementById("luckyName").value;
+  if(!b){showToast("Please enter birthday");return;}
+  const lp=calcLifePathNum(b);
+  const expr=name?calcExpression(name):lp;
+  const seed=lp*expr;
+  // Generate 6 lucky numbers
+  const lucky=new Set();
+  lucky.add(lp);
+  lucky.add(expr);
+  while(lucky.size<6){lucky.add(Math.floor((seed*lucky.size*7)%49)+1);}
+  const balls=document.getElementById("luckyBalls");
+  balls.innerHTML=[...lucky].map((n,i)=>`<div class="lucky-ball" style="animation-delay:${i*0.1}s">${n}</div>`).join("");
+  // Color
+  const colorIdx=(lp-1)%LUCKY_DATA.colors.length;
+  const col=LUCKY_DATA.colors[colorIdx];
+  document.getElementById("luckyColor").style.background=col.hex;
+  document.getElementById("luckyColorName").textContent=col.name;
+  document.getElementById("luckyDay").textContent=LUCKY_DATA.days[(lp-1)%7];
+  const stone=LUCKY_DATA.stones[(expr-1)%LUCKY_DATA.stones.length];
+  document.getElementById("luckyStoneEmoji").textContent=stone.emoji;
+  document.getElementById("luckyStoneName").textContent=stone.name;
+  document.getElementById("luckyTip").innerHTML=`<div class="r-text">${LUCKY_DATA.tips[lp%LUCKY_DATA.tips.length]}</div>`;
+  document.getElementById("luckyResults").style.display="block";
+  showToast("Lucky numbers generated!");
+}
+
+// ===== SPIN WHEEL =====
+let wheelAnim=null;
+let wheelAngle=0;
+let wheelResult=null;
+
+function initWheelCanvas() {
+  drawWheel(wheelAngle);
+}
+
+function drawWheel(angle) {
+  const wc=document.getElementById("wheelCanvas");
+  if(!wc) return;
+  const ctx=wc.getContext("2d");
+  const W=320,H=320,cx=160,cy=160,R=140;
+  ctx.clearRect(0,0,W,H);
+  const n=NUM_WHEEL.length;
+  const slice=Math.PI*2/n;
+  // Shadow
+  ctx.shadowColor="rgba(240,192,64,0.3)";ctx.shadowBlur=20;
+  for(let i=0;i<n;i++){
+    const a=angle+i*slice;
+    ctx.beginPath();ctx.moveTo(cx,cy);
+    ctx.arc(cx,cy,R,a,a+slice);ctx.closePath();
+    ctx.fillStyle=WHEEL_COLORS[i];
+    ctx.fill();
+    ctx.strokeStyle="rgba(0,0,0,0.3)";ctx.lineWidth=1.5;ctx.stroke();
+    // Number label
+    ctx.save();ctx.translate(cx,cy);ctx.rotate(a+slice/2);
+    ctx.textAlign="right";
+    ctx.font=`bold 18px 'Cinzel Decorative',serif`;
+    ctx.fillStyle="#000";
+    ctx.shadowBlur=0;
+    ctx.fillText(NUM_WHEEL[i],R-14,6);
+    ctx.restore();
+  }
+  ctx.shadowBlur=0;
+  // Center circle
+  const cg=ctx.createRadialGradient(cx,cy,0,cx,cy,30);
+  cg.addColorStop(0,"#1a237e");cg.addColorStop(1,"#0d1f3c");
+  ctx.beginPath();ctx.arc(cx,cy,28,0,Math.PI*2);
+  ctx.fillStyle=cg;ctx.fill();
+  ctx.strokeStyle="var(--gold)";ctx.lineWidth=3;ctx.stroke();
+  ctx.font="bold 16px 'Cinzel Decorative',serif";
+  ctx.fillStyle="#f0c040";ctx.textAlign="center";ctx.textBaseline="middle";
+  ctx.fillText("✦",cx,cy);
+  // Pointer
+  ctx.beginPath();
+  ctx.moveTo(cx+R+12,cy);
+  ctx.lineTo(cx+R-10,cy-8);
+  ctx.lineTo(cx+R-10,cy+8);
+  ctx.closePath();
+  ctx.fillStyle="#f0c040";ctx.fill();
+  ctx.strokeStyle="#000";ctx.lineWidth=1;ctx.stroke();
+  // Outer ring
+  ctx.beginPath();ctx.arc(cx,cy,R+4,0,Math.PI*2);
+  ctx.strokeStyle="rgba(240,192,64,0.4)";ctx.lineWidth=2;ctx.stroke();
+}
+
+function spinWheel() {
+  if(spinning)return;
+  spinning=true;
+  document.getElementById("spinBtn").disabled=true;
+  document.getElementById("wheelResult").textContent="";
+  const extraSpins=5+Math.floor(Math.random()*5);
+  const targetAngle=wheelAngle+Math.PI*2*extraSpins+Math.random()*Math.PI*2;
+  const duration=4000;const start=Date.now();const startAngle=wheelAngle;
+  function animate(){
+    const elapsed=Date.now()-start;
+    const progress=Math.min(elapsed/duration,1);
+    const ease=1-Math.pow(1-progress,4);
+    wheelAngle=startAngle+(targetAngle-startAngle)*ease;
+    drawWheel(wheelAngle);
+    if(progress<1){requestAnimationFrame(animate);}
+    else{
+      spinning=false;
+      document.getElementById("spinBtn").disabled=false;
+      const n=NUM_WHEEL.length;
+      const slice=Math.PI*2/n;
+      const normalized=((wheelAngle%(Math.PI*2))+Math.PI*2)%(Math.PI*2);
+      const idx=n-1-Math.floor(normalized/slice)%n;
+      const result=NUM_WHEEL[((n-Math.floor(normalized/slice)%n))%n];
+      wheelResult=result;
+      showWheelResult(result);
+    }
+  }
+  requestAnimationFrame(animate);
+}
+
+async function showWheelResult(num){
+  const data=LIFE_PATH_DATA[num]||LIFE_PATH_DATA[1];
+  document.getElementById("wheelResult").innerHTML=`🎯 You got <span style="font-family:var(--font-display);color:var(--gold);font-size:1.5rem">${num}</span> — ${data.name}!`;
+  document.getElementById("spinMeaning").innerHTML=`<div class="r-title">Number ${num} — ${data.name}</div><div class="r-text">${data.desc}</div>`;
+  const entry={num,name:data.name,time:new Date().toLocaleTimeString(),id:Date.now()};
+  spinHistory.unshift(entry);
+  if(spinHistory.length>20)spinHistory.pop();
+  updateSpinHistory();
+  if(db){
+    const tx=db.transaction("spinHistory","readwrite");
+    tx.objectStore("spinHistory").add(entry);
+  }
+  showToast("✨ Number "+num+" — "+data.name);
+}
+
+function updateSpinHistory(){
+  const wrap=document.getElementById("spinHistory");
+  if(!wrap)return;
+  wrap.innerHTML=spinHistory.slice(0,15).map(e=>`<div style="display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--card-border)"><span style="font-family:var(--font-display);color:var(--gold);font-size:1rem;width:24px">${e.num}</span><span style="font-size:0.8rem;color:var(--text-dim);flex:1">${e.name}</span><span style="font-size:0.65rem;color:var(--text-dim)">${e.time||""}</span></div>`).join("");
+  const total=document.getElementById("spinTotalLabel");
+  if(total)total.textContent=spinHistory.length;
+}
+
+function clearSpinHistory(){
+  spinHistory=[];
+  updateSpinHistory();
+  if(db){const tx=db.transaction("spinHistory","readwrite");tx.objectStore("spinHistory").clear();}
+  showToast("History cleared");
+}
+
+// ===== GALLERY =====
+function drawKaleidoscope() {
+  const kc=document.getElementById("kaleido");
+  if(!kc)return;
+  const ctx=kc.getContext("2d");
+  const W=300,H=300,cx=150,cy=150,t3=Date.now()/2000;
+  ctx.clearRect(0,0,W,H);
+  for(let slice=0;slice<12;slice++){
+    ctx.save();ctx.translate(cx,cy);ctx.rotate(slice*Math.PI/6);
+    for(let r=0;r<120;r+=15){
+      for(let a=0;a<Math.PI/6;a+=0.15){
+        const x=Math.cos(a+t3)*r,y=Math.sin(a+t3)*r;
+        const n=Math.floor((r/15+slice+Math.round(t3))%9)+1;
+        ctx.font=`bold ${8+r/20}px 'Cinzel Decorative',serif`;
+        const hue=(slice*30+r*2+t3*60)%360;
+        ctx.fillStyle=`hsla(${hue},80%,60%,0.7)`;
+        ctx.fillText(n,x,y);
+      }
+    }
+    ctx.restore();
+  }
+  requestAnimationFrame(drawKaleidoscope);
+}
+
+function saveReading(data){
+  const reading={...data,id:Date.now(),savedAt:new Date().toISOString()};
+  savedReadings.unshift(reading);
+  if(savedReadings.length>30)savedReadings.pop();
+  if(db){const tx=db.transaction("readings","readwrite");tx.objectStore("readings").add(reading);}
+}
+
+function updateGallery(){
+  const empty=document.getElementById("galleryEmpty");
+  const grid=document.getElementById("galleryGrid");
+  if(!empty||!grid)return;
+  if(savedReadings.length===0){empty.style.display="block";grid.style.display="none";}
+  else{
+    empty.style.display="none";grid.style.display="grid";
+    grid.innerHTML=savedReadings.slice(0,9).map(r=>`
+      <div class="card" style="cursor:pointer" onclick="showReadingModal(${r.id})">
+        <div style="font-size:1.5rem;text-align:center;margin-bottom:8px">${r.type==="Life Path"?"🌟":r.type==="Name Analysis"?"📝":r.type==="Compatibility"?"💑":r.type==="Astrology"?"♈":"🍀"}</div>
+        <div class="card-title" style="justify-content:center;font-size:0.8rem">${r.type}</div>
+        <div class="big-num" style="font-size:2rem;text-align:center">${r.number}</div>
+        <div style="font-size:0.75rem;color:var(--text-dim);text-align:center;margin-top:6px">${r.name}</div>
+        <div style="font-size:0.65rem;color:var(--text-dim);text-align:center;margin-top:4px">${r.date}</div>
+      </div>`).join("");
+  }
+}
+
+function showReadingModal(id){
+  const r=savedReadings.find(x=>x.id===id);
+  if(!r)return;
+  document.getElementById("modalContent").innerHTML=`
+    <div style="text-align:center;margin-bottom:16px"><div style="font-size:2.5rem">${r.type==="Astrology"?r.number:"🔢"}</div></div>
+    <div class="card-title" style="justify-content:center">${r.type}</div>
+    <div class="big-num" style="font-size:3rem;text-align:center;margin:12px 0">${r.number}</div>
+    <div style="text-align:center;color:var(--text-dim);font-size:0.85rem">${r.name}</div>
+    <div style="text-align:center;color:var(--text-dim);font-size:0.75rem;margin-top:8px">Saved on ${r.date}</div>`;
+  document.getElementById("readingModal").classList.add("open");
+}
+function closeModal(){document.getElementById("readingModal").classList.remove("open");}
+document.getElementById("readingModal").addEventListener("click",e=>{if(e.target===e.currentTarget)closeModal();});
+
+// ===== PROFILE =====
+function saveProfile(){
+  const name=document.getElementById("profileName").value;
+  const birth=document.getElementById("profileBirth").value;
+  const email=document.getElementById("profileEmail").value;
+  userProfile={...userProfile,name,birth,email};
+  dbSet("profile","user",userProfile);
+  updateProfileDisplay();
+  showToast("Profile saved! ✦");
+}
+
+function updateProfileDisplay(){
+  if(userProfile.name){
+    document.getElementById("profileDisplayName").textContent=userProfile.name;
+    document.getElementById("welcomeMsg").textContent="Welcome back, "+userProfile.name;
+  }
+  if(userProfile.birth){
+    const d=new Date(userProfile.birth+"T12:00:00");
+    document.getElementById("profileDisplayDate").textContent=d.toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric"});
+    const lp=calcLifePathNum(userProfile.birth);
+    document.getElementById("homeLifePath").textContent=lp;
+    const z=getZodiac(userProfile.birth);
+    if(z){
+      document.getElementById("homeZodiac").textContent=z.symbol;
+      document.getElementById("homeZodiacName").textContent=z.sign;
+    }
+  }
+  if(userProfile.avatar){
+    document.getElementById("profileImg").src=userProfile.avatar;
+  }
+  if(userProfile.name){document.getElementById("profileName").value=userProfile.name;}
+  if(userProfile.birth){document.getElementById("profileBirth").value=userProfile.birth;}
+  if(userProfile.email){document.getElementById("profileEmail").value=userProfile.email;}
+}
+
+function uploadAvatar(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const data=ev.target.result;
+    userProfile.avatar=data;
+    document.getElementById("profileImg").src=data;
+    dbSet("profile","user",userProfile);
+    showToast("Avatar updated!");
+  };
+  reader.readAsDataURL(file);
+}
+
+function renderProfilePage(){
+  updateProfileDisplay();
+  if(!userProfile.birth)return;
+  const lp=calcLifePathNum(userProfile.birth);
+  const z=getZodiac(userProfile.birth);
+  const pz=document.getElementById("profileZodiac");
+  if(z)pz.innerHTML=`<div class="tag" style="font-size:1rem">${z.symbol} ${z.sign}</div>`;
+  // Core nums
+  const cn=document.getElementById("profileCoreNums");
+  cn.innerHTML=`
+    <div class="card" style="text-align:center;padding:12px"><div class="big-num" style="font-size:1.8rem">${lp}</div><div class="num-label">Life Path</div></div>
+    <div class="card" style="text-align:center;padding:12px"><div class="big-num" style="font-size:1.8rem">${userProfile.name?calcExpression(userProfile.name):"?"}</div><div class="num-label">Expression</div></div>
+    <div class="card" style="text-align:center;padding:12px"><div class="big-num" style="font-size:1.8rem">${userProfile.name?calcSoulUrge(userProfile.name):"?"}</div><div class="num-label">Soul Urge</div></div>
+    <div class="card" style="text-align:center;padding:12px"><div class="big-num" style="font-size:1.8rem">${z?z.symbol:"✦"}</div><div class="num-label">Zodiac</div></div>`;
+  document.getElementById("profileNumbers").style.display="block";
+  // Timeline
+  const tl=document.getElementById("profileTimeline");
+  const year=userProfile.birth?parseInt(userProfile.birth.split("-")[0]):1990;
+  const cycles=[{age:0,title:"Birth — Life Path Awakens"},{age:9,title:"First Personal Year Cycle"},{age:18,title:"Karmic Turning Point"},{age:27,title:"Saturn Return — Realignment"},{age:36,title:"Second Major Cycle"},{age:45,title:"Midlife Numerological Shift"},{age:54,title:"Third Cycle — Mastery"}];
+  tl.innerHTML=cycles.map(c=>`<div class="tl-item"><div class="tl-dot"></div><div class="tl-title">Age ${c.age} (${year+c.age}) — ${c.title}</div><div class="tl-desc">${(LIFE_PATH_DATA[lp]||LIFE_PATH_DATA[1]).strengths[c.age%4]||"Growth"} energy dominates this phase of your journey.</div></div>`).join("");
+}
+
+// ===== GUIDE =====
+function renderGuide(){
+  const nums=[1,2,3,4,5,6,7,8,9,11,22,33];
+  document.getElementById("guideContent").innerHTML=`
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-title">📚 The Sacred Numbers 1–9 and Master Numbers</div>
+      <div style="font-size:0.82rem;color:var(--text-dim);line-height:1.7;margin-bottom:16px">Numerology is the ancient study of the mystical relationship between numbers and life. Every number from 1 to 9, plus master numbers 11, 22, and 33, carries a unique vibration that influences personality, destiny, and cosmic timing.</div>
+    </div>
+    <div class="grid-3">
+    ${nums.map(n=>{const d=LIFE_PATH_DATA[n]||LIFE_PATH_DATA[1];return`<div class="card"><div class="card-title">${n} — ${d.name}</div><div style="font-size:0.78rem;color:var(--text-dim);line-height:1.6">${d.desc.substring(0,80)}...</div><div style="margin-top:10px">${d.strengths.slice(0,2).map(s=>`<span class="tag" style="margin:2px;font-size:0.65rem">${s}</span>`).join("")}</div></div>`;}).join("")}
+    </div>
+    <div class="card" style="margin-top:16px">
+      <div class="card-title">🔢 How to Calculate Your Life Path</div>
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-title">Step 1: Write your full birthdate</div><div class="tl-desc">Example: May 15, 1990 → 05/15/1990</div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-title">Step 2: Add all digits</div><div class="tl-desc">0+5+1+5+1+9+9+0 = 30</div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-title">Step 3: Reduce to single digit</div><div class="tl-desc">3+0 = 3 → Life Path 3</div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-title">Exception: Master Numbers</div><div class="tl-desc">If you reach 11, 22, or 33 — stop! These are sacred master numbers.</div></div>
+      </div>
+    </div>`;
+}
+
+// ===== TOAST =====
+function showToast(msg){
+  const t=document.getElementById("toast");
+  t.textContent=msg;t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"),2800);
+}
+
+// ===== WINDOW RESIZE =====
+window.addEventListener("resize",()=>{
+  resizeCanvas();resize2D();
+  if(window._matCols)window._matCols=null;
+});
+
+// ===== INIT =====
+function init(){
+  resizeCanvas();resize2D();
+  initStars();
+  initDB();
+  renderBg();
+  initFloatNums();
+  // Quotes rotation
+  showNextQuote();
+  setInterval(showNextQuote,7000);
+  // Home init
+  initHomePage();
+  initDailyPage();
+  // Default profile img
+  document.getElementById("profileImg").onerror=function(){
+    this.src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%230a1628'/><text x='50' y='65' text-anchor='middle' font-size='50' fill='%23f0c040'>✦</text></svg>";
+  };
+  document.getElementById("profileImg").src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%230a1628'/><text x='50' y='65' text-anchor='middle' font-size='50' fill='%23f0c040'>✦</text></svg>";
+  // Animate bars on home after small delay
+  setTimeout(()=>{
+    document.querySelectorAll(".bar-fill").forEach(b=>{
+      b.style.height="0px";
+      setTimeout(()=>b.style.height=(b.dataset.h||Math.floor(Math.random()*70+20))+"px",100);
+    });
+  },500);
+}
+
+window.addEventListener("load", init);
+</script>
+</body>
+</html>
